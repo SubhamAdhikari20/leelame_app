@@ -5,12 +5,14 @@ class CustomPrimaryButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String text;
   final Color? color;
+  final bool? isLoading;
 
   const CustomPrimaryButton({
     super.key,
     required this.onPressed,
     required this.text,
     this.color,
+    this.isLoading,
   });
 
   @override
@@ -26,15 +28,24 @@ class CustomPrimaryButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           elevation: 0,
         ),
-        onPressed: onPressed,
-        child: Text(
-          text,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        onPressed: isLoading == true ? null : onPressed,
+        child: isLoading == true
+            ? const SizedBox(
+                height: 18,
+                width: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Text(
+                text,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
       ),
     );
   }

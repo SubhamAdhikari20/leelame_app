@@ -1,23 +1,27 @@
-// lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
-import 'package:leelame/screens/sign_up_screen.dart';
+import 'package:leelame/screens/login_screen.dart';
+import 'package:leelame/widgets/custom_auth_text_field.dart';
 import 'package:leelame/widgets/custom_outlined_button.dart';
 import 'package:leelame/widgets/custom_primary_button.dart';
-import 'package:leelame/widgets/custom_auth_text_field.dart';
 import 'package:leelame/widgets/or_divider.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _loginFormKey = GlobalKey<FormState>();
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _signUpFormKey = GlobalKey<FormState>();
 
-  final TextEditingController identifierController = TextEditingController();
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController contactController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  bool _agreeToTerms = false;
   final bool _loading = false;
 
   @override
@@ -40,34 +44,63 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   constraints: BoxConstraints(maxWidth: maxWidth),
                   // width: double.infinity,
-                  // padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  // padding: const EdgeInsets.symmetric(
+                  //   horizontal: 20,
+                  //   vertical: 20,
+                  // ),
                   child: Column(
                     children: [
                       // Logo
                       Image.asset(
                         "assets/images/leelame_logo_cropped_png.png",
-                        width: MediaQuery.of(context).size.width * 0.25,
-                        height: MediaQuery.of(context).size.width * 0.25,
+                        width: MediaQuery.of(context).size.width * 0.15,
+                        height: MediaQuery.of(context).size.width * 0.15,
                         // width: isDesktop
-                        //     ? MediaQuery.of(context).size.width * 0.40
-                        //     : MediaQuery.of(context).size.width * 0.25,
+                        //     ? MediaQuery.of(context).size.width * 0.30
+                        //     : MediaQuery.of(context).size.width * 0.15,
                         // height: isDesktop
-                        //     ? MediaQuery.of(context).size.width * 0.40
-                        //     : MediaQuery.of(context).size.width * 0.25,
+                        //     ? MediaQuery.of(context).size.width * 0.30
+                        //     : MediaQuery.of(context).size.width * 0.15,
                         fit: BoxFit.contain,
                       ),
-                      SizedBox(height: 40),
+                      SizedBox(height: 20),
 
-                      // Login Form
+                      // Sign up Form
                       Form(
-                        key: _loginFormKey,
+                        key: _signUpFormKey,
                         child: Column(
                           children: [
-                            // Username or Email Text Field
+                            // FullName Text Field
                             CustomAuthTextField(
-                              controller: identifierController,
-                              hintText: "Username or Email",
-                              labelText: "Username or Email",
+                              controller: fullNameController,
+                              hintText: "Full Name",
+                              labelText: "Full Name",
+                            ),
+                            SizedBox(height: 20),
+
+                            // Username Text Field
+                            CustomAuthTextField(
+                              controller: usernameController,
+                              hintText: "Username",
+                              labelText: "Username",
+                            ),
+                            SizedBox(height: 20),
+
+                            // Email Text Field
+                            CustomAuthTextField(
+                              controller: emailController,
+                              hintText: "Email",
+                              labelText: "Email",
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            SizedBox(height: 20),
+
+                            // Contact Text Field
+                            CustomAuthTextField(
+                              controller: contactController,
+                              hintText: "Phone Number",
+                              labelText: "Phone Number",
+                              keyboardType: TextInputType.phone,
                             ),
                             SizedBox(height: 20),
 
@@ -78,45 +111,50 @@ class _LoginScreenState extends State<LoginScreen> {
                               labelText: "Password",
                               isPassword: true,
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(height: 10),
 
-                            // Forgot Password Text Button
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: () {},
-                                style: TextButton.styleFrom(
-                                  minimumSize: Size.zero,
-                                  padding: EdgeInsets.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: const Text(
-                                  "Forgot password?",
-                                  style: TextStyle(
-                                    color: Color(0xFF155DFC),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
+                            // Terms and conditions Checkbox
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: _agreeToTerms,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _agreeToTerms = value ?? false;
+                                    });
+                                  },
+                                  activeColor: const Color(0xFF4CAF50),
+                                  side: const BorderSide(
+                                    color: Color(0xFF999999),
+                                    width: 2,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
                                   ),
                                 ),
-                              ),
+                                Expanded(
+                                  child: Text(
+                                    "I agree to all terms and conditions",
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(height: 10),
 
-                            // Login Button
+                            // Sign up Button
                             CustomPrimaryButton(
                               onPressed: () {
-                                if (_loginFormKey.currentState?.validate() ==
+                                if (_signUpFormKey.currentState?.validate() ==
                                     true) {}
                               },
-                              text: "Login",
+                              text: "Sign up",
                               isLoading: _loading,
                             ),
                             const SizedBox(height: 20),
                           ],
                         ),
                       ),
-
                       // OR Divider
                       const OrDivider(),
                       const SizedBox(height: 20),
@@ -130,14 +168,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 25,
                           width: 25,
                         ),
-                        // If you don't have the asset yet, temporarily use:
-                        // prefixIcon: const Text("G ", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue)),
                       ),
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 30),
 
-                      // Don't have an account?
+                      // Already have an account?
                       const Text(
-                        "Don't have an account?",
+                        "Already have an account?",
                         style: TextStyle(
                           color: Color(0xFF666666),
                           fontSize: 18,
@@ -145,17 +181,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 15),
 
-                      // Create account
+                      // Login
                       CustomOutlinedButton(
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SignUpScreen(),
+                              builder: (context) => LoginScreen(),
                             ),
                           );
                         },
-                        text: "Create account",
+                        text: "Login",
                       ),
                       const SizedBox(height: 20),
 

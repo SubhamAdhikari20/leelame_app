@@ -5,7 +5,7 @@ class CustomOutlinedButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String text;
   final Widget? prefixIcon;
-  final bool hasIcon;
+  final bool? hasIcon;
   final Icon? icon;
 
   const CustomOutlinedButton({
@@ -13,7 +13,7 @@ class CustomOutlinedButton extends StatelessWidget {
     required this.onPressed,
     required this.text,
     this.prefixIcon,
-    this.hasIcon = false,
+    this.hasIcon,
     this.icon,
   });
 
@@ -22,7 +22,7 @@ class CustomOutlinedButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: 56,
-      child: hasIcon
+      child: hasIcon == true
           ? OutlinedButton.icon(
               onPressed: onPressed,
               label: Text(text),
