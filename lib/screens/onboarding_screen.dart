@@ -46,27 +46,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-    final bool isTabletOrLarger = MediaQuery.of(context).size.width > 600;
+    final bool isTablet = MediaQuery.of(context).size.width > 600;
     final bool isDesktop = MediaQuery.of(context).size.width > 900;
 
     final double maxContentWidth = isDesktop
         ? 800
-        : (isTabletOrLarger ? 700 : double.infinity);
+        : (isTablet ? 700 : double.infinity);
     final double horizontalPadding = isDesktop
         ? 60
-        : (isTabletOrLarger ? 45 : 30);
+        : (isTablet ? 45 : 30);
     final double imageHeight = isLandscape
         ? MediaQuery.of(context).size.height * 0.48
         : MediaQuery.of(context).size.height *
-              (isDesktop ? 0.5 : (isTabletOrLarger ? 0.5 : 0.45));
+              (isDesktop ? 0.5 : (isTablet ? 0.5 : 0.45));
     final double titleFontSize = isDesktop
         ? 40
-        : (isTabletOrLarger ? 35 : (isLandscape ? 25 : 30));
+        : (isTablet ? 35 : (isLandscape ? 25 : 30));
 
     final double subtitleFontSize = isDesktop
         ? 22
-        : (isTabletOrLarger ? 20 : (isLandscape ? 15 : 17));
-    // final double buttonWidth = isDesktop ? 200 : (isTabletOrLarger ? 150 : 160);
+        : (isTablet ? 20 : (isLandscape ? 15 : 17));
+    // final double buttonWidth = isDesktop ? 200 : (isTablet ? 150 : 160);
     final double dotActiveWidth = isDesktop ? 35 : 30;
     final double verticalSpacing = isLandscape ? 24 : 48;
     final double smallSpacing = isLandscape ? 16 : 24;
@@ -89,7 +89,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         "Skip",
                         style: TextStyle(
                           color: Color(0xFF2ADA03),
-                          fontSize: isTabletOrLarger ? 20 : 18,
+                          fontSize: isTablet ? 20 : 18,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -121,7 +121,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(
-                                    isTabletOrLarger ? 30 : 20,
+                                    isTablet ? 30 : 20,
                                   ),
                                   child: Image.asset(
                                     _onboardingData[index]["image"]!,
@@ -238,7 +238,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 : "Next",
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: isTabletOrLarger ? 20 : 18,
+                              fontSize: isTablet ? 20 : 18,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
