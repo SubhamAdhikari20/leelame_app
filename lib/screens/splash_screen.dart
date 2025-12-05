@@ -1,7 +1,9 @@
 // lib/screens/splash_screen.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:leelame/screens/login_screen.dart';
+import 'package:flutter/services.dart';
+// import 'package:leelame/screens/login_screen.dart';
+import 'package:leelame/screens/onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -30,10 +32,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Interval(0.3, 1.0),
-      ),
+      CurvedAnimation(parent: _animationController, curve: Interval(0.3, 1.0)),
     );
 
     _animationController.forward();
@@ -45,14 +44,28 @@ class _SplashScreenState extends State<SplashScreen>
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => LoginScreen()),
+        MaterialPageRoute(builder: (_) => OnboardingScreen()),
       );
     });
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final bool isPhone = MediaQuery.of(context).size.shortestSide < 600;
+    if (isPhone) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
+  }
+
+  @override
   void dispose() {
     _animationController.dispose();
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
     super.dispose();
   }
 
@@ -76,9 +89,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 SizedBox(height: 60),
                 CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Colors.blueGrey,
-                  ),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blueGrey),
                   strokeWidth: 3,
                 ),
               ],
