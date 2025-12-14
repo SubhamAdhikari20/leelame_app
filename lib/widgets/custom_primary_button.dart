@@ -21,16 +21,14 @@ class CustomPrimaryButton extends StatelessWidget {
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: color ?? Color(0xFF2ADA03),
+          backgroundColor: color,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          elevation: 0,
         ),
         onPressed: isLoading == true ? null : onPressed,
         child: isLoading == true
-            ? const SizedBox(
+            ? SizedBox(
                 height: 18,
                 width: 18,
                 child: CircularProgressIndicator(
@@ -42,8 +40,6 @@ class CustomPrimaryButton extends StatelessWidget {
                 text,
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
       ),

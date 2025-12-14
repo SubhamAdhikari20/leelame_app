@@ -89,34 +89,15 @@ class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
       keyboardType: widget.keyboardType ?? TextInputType.text,
       style: TextStyle(fontSize: 18),
       decoration: InputDecoration(
-        filled: true,
-        fillColor: Color(0xFFF5F5F5),
         hintText: widget.hintText,
         hintStyle: TextStyle(color: effectiveHintColor, fontSize: 17),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 18,
-        ),
         labelText: widget.labelText,
         labelStyle: TextStyle(color: effectiveHintColor),
         floatingLabelStyle: TextStyle(
           color: effectiveFloatingLabelColor,
           fontSize: 18,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          // borderSide: BorderSide.none,
-        ),
-        // enabledBorder: OutlineInputBorder(
-        //   borderRadius: BorderRadius.circular(12),
-        //   // borderSide: BorderSide.none,
-        // ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF4CAF50), width: 2),
-        ),
-
         suffixIcon: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -149,16 +130,6 @@ class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
               ),
             },
           ],
-        ),
-
-        // Optional error style
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
       ),
       validator: (value) {
