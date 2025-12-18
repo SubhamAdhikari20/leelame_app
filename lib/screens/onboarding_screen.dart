@@ -52,9 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final double maxContentWidth = isDesktop
         ? 800
         : (isTablet ? 700 : double.infinity);
-    final double horizontalPadding = isDesktop
-        ? 60
-        : (isTablet ? 45 : 30);
+    final double horizontalPadding = isDesktop ? 60 : (isTablet ? 45 : 30);
     final double imageHeight = isLandscape
         ? MediaQuery.of(context).size.height * 0.48
         : MediaQuery.of(context).size.height *
@@ -109,8 +107,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         itemCount: _onboardingData.length,
                         itemBuilder: (context, index) {
                           return SingleChildScrollView(
-                            physics:
-                                const BouncingScrollPhysics(),
+                            physics: const BouncingScrollPhysics(),
                             padding: EdgeInsets.symmetric(
                               horizontal: horizontalPadding,
                             ),
@@ -118,7 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               children: [
                                 // const Spacer(flex: 2),
                                 SizedBox(height: isLandscape ? 10 : 20),
-                            
+
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(
                                     isTablet ? 30 : 20,
@@ -128,7 +125,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     height: imageHeight,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(
+                                    errorBuilder: (_, _, _) => Container(
                                       height: imageHeight,
                                       color: Colors.grey[200],
                                       child: const Icon(
@@ -141,7 +138,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 ),
                                 // SizedBox(height: 50),
                                 SizedBox(height: verticalSpacing),
-                            
+
                                 // Title
                                 Text(
                                   _onboardingData[index]["title"]!,
@@ -155,7 +152,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 ),
                                 // SizedBox(height: 20),
                                 SizedBox(height: smallSpacing),
-                            
+
                                 // Subtitle
                                 Padding(
                                   padding: const EdgeInsets.symmetric(

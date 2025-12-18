@@ -1,6 +1,6 @@
 // lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
-import 'package:leelame/screens/dashboard_screen.dart';
+import 'package:leelame/screens/bottom_navigation_screen.dart';
 import 'package:leelame/screens/forgot_password_screen.dart';
 import 'package:leelame/screens/sign_up_screen.dart';
 import 'package:leelame/widgets/custom_outlined_button.dart';
@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => DashboardScreen(),
+                                      builder: (context) => BottomNavigationScreen(),
                                     ),
                                   );
                                 }

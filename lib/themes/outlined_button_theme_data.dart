@@ -10,7 +10,7 @@ OutlinedButtonThemeData getOutlinedButtonTheme() {
         fontFamily: "OpenSans Regular",
         fontWeight: FontWeight.w600,
       ),
-      backgroundColor: Color(0xFF2ADA03),
+      side: BorderSide(color: Color(0xFF2ADA03), width: 2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       elevation: 0,

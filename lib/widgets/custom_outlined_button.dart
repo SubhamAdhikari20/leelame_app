@@ -28,7 +28,6 @@ class CustomOutlinedButton extends StatelessWidget {
               label: Text(text),
               icon: icon,
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Color(0xFF2ADA03), width: 2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -37,7 +36,6 @@ class CustomOutlinedButton extends StatelessWidget {
           : OutlinedButton(
               onPressed: onPressed,
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Color(0xFF2ADA03), width: 2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
@@ -47,11 +45,11 @@ class CustomOutlinedButton extends StatelessWidget {
                 children: [
                   if (prefixIcon != null) ...[
                     prefixIcon!,
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                   ],
                   Text(
                     text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Color(0xFF2ADA03),
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
