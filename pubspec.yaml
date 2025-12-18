@@ -137,6 +137,14 @@ flutter:
       fonts:
         - asset: assets/fonts/PersonFilledIcon.ttf
 
+    - family: SearchIcon
+      fonts:
+        - asset: assets/fonts/SearchIcon.ttf
+
+    - family: NotificationOutlinedIcon
+      fonts:
+        - asset: assets/fonts/NotificationOutlinedIcon.ttf
+
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
