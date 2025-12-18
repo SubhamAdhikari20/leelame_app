@@ -77,21 +77,65 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
+    - family: OpenSans ExtraBold
+      fonts:
+        - asset: assets/fonts/OpenSans-ExtraBold.ttf
+
     - family: OpenSans Bold
       fonts:
         - asset: assets/fonts/OpenSans-Bold.ttf
+
     - family: OpenSans Italic
       fonts:
         - asset: assets/fonts/OpenSans-Italic.ttf
+
     - family: OpenSans Regular
       fonts:
         - asset: assets/fonts/OpenSans-Regular.ttf
+
+    - family: OpenSans Medium
+      fonts:
+        - asset: assets/fonts/OpenSans-Medium.ttf
+
+    - family: OpenSans Light
+      fonts:
+        - asset: assets/fonts/OpenSans-Light.ttf
+
+    - family: OpenSans SemiBold
+      fonts:
+        - asset: assets/fonts/OpenSans-SemiBold.ttf
+
     - family: HomeFilledIcon
       fonts:
         - asset: assets/fonts/HomeFilledIcon.ttf
+
     - family: HomeOutlinedIcon
       fonts:
         - asset: assets/fonts/HomeOutlinedIcon.ttf
+
+    - family: BidHammerFilledIcon
+      fonts:
+        - asset: assets/fonts/BidHammerFilledIcon.ttf
+
+    - family: BidHammerOutlinedIcon
+      fonts:
+        - asset: assets/fonts/BidHammerOutlinedIcon.ttf
+
+    - family: WatchlistFilledIcon
+      fonts:
+        - asset: assets/fonts/WatchlistFilledIcon.ttf
+
+    - family: WatchlistOutlinedIcon
+      fonts:
+        - asset: assets/fonts/WatchlistOutlinedIcon.ttf
+
+    - family: PersonOutlinedIcon
+      fonts:
+        - asset: assets/fonts/PersonOutlinedIcon.ttf
+        
+    - family: PersonFilledIcon
+      fonts:
+        - asset: assets/fonts/PersonFilledIcon.ttf
 
   #   - family: Schyler
   #     fonts:

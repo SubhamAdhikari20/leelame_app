@@ -1,9 +1,17 @@
 // lib/screens/bottom_navigation_screen.dart
 import 'package:flutter/material.dart';
 import 'package:leelame/bottom_screens/home_screen.dart';
+import 'package:leelame/bottom_screens/my_bids_screen.dart';
 import 'package:leelame/bottom_screens/profile_screen.dart';
-import 'package:leelame/icons/home_filled_icon.dart';
-import 'package:leelame/icons/home_outlined_icon.dart';
+import 'package:leelame/bottom_screens/watchlist_screen.dart';
+import 'package:leelame/custom_icons/bid_hammer_filled_icon.dart';
+import 'package:leelame/custom_icons/bid_hammer_outlined_icon.dart';
+import 'package:leelame/custom_icons/home_filled_icon.dart';
+import 'package:leelame/custom_icons/home_outlined_icon.dart';
+import 'package:leelame/custom_icons/person_filled_icon.dart';
+import 'package:leelame/custom_icons/person_outlined_icon.dart';
+import 'package:leelame/custom_icons/watchlist_filled_icon.dart';
+import 'package:leelame/custom_icons/watchlist_outlined_icon.dart';
 
 class BottomNavigationScreen extends StatefulWidget {
   const BottomNavigationScreen({super.key});
@@ -17,8 +25,8 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
 
   List<Widget> lstBottomScreen = [
     HomeScreen(),
-    // ProductScreen(),
-    // CartScreen(),
+    MyBidsScreen(),
+    WatchlistScreen(),
     ProfileScreen(),
   ];
 
@@ -31,7 +39,8 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         iconSize: 25,
         backgroundColor: Colors.white,
         selectedItemColor: Color(0xFF2ADA03),
-        unselectedItemColor: Colors.black,
+        unselectedItemColor: Color(0xFF555555),
+        selectedLabelStyle: TextStyle(fontFamily: "OpenSans SemiBold"),
         selectedFontSize: 15,
         unselectedFontSize: 14,
         elevation: 2,
@@ -42,16 +51,18 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.production_quantity_limits_sharp),
-            label: "Product",
+            activeIcon: Icon(BidHammerFilledIcon.icon),
+            icon: Icon(BidHammerOutlinedIcon.icon),
+            label: "My Bids",
           ),
           BottomNavigationBarItem(
-            label: "Cart",
-            icon: Icon(HomeOutlinedIcon.icon),
+            activeIcon: Icon(WatchlistFilledIcon.icon),
+            icon: Icon(WatchlistOutlinedIcon.icon),
+            label: "Watchlist",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
+            activeIcon: Icon(PersonFilledIcon.icon),
+            icon: Icon(PersonOutlinedIcon.icon),
             label: "Profile",
           ),
         ],
