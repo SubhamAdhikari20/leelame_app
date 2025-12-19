@@ -1,5 +1,5 @@
 // lib/widgets/category_toggle_item.dart
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class CategoryToggleItem extends StatelessWidget {
   const CategoryToggleItem({super.key, required this.label});

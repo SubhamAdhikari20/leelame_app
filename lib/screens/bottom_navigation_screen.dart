@@ -34,44 +34,50 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: lstBottomScreen[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        iconSize: 25,
-        backgroundColor: Colors.white,
-        selectedItemColor: Color(0xFF2ADA03),
-        unselectedItemColor: Color(0xFF555555),
-        selectedLabelStyle: TextStyle(fontFamily: "OpenSans SemiBold"),
-        selectedFontSize: 15,
-        unselectedFontSize: 14,
-        elevation: 2,
-        items: [
-          BottomNavigationBarItem(
-            activeIcon: Icon(HomeFilledIcon.icon),
-            icon: Icon(HomeOutlinedIcon.icon),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            activeIcon: Icon(BidHammerFilledIcon.icon),
-            icon: Icon(BidHammerOutlinedIcon.icon),
-            label: "My Bids",
-          ),
-          BottomNavigationBarItem(
-            activeIcon: Icon(WatchlistFilledIcon.icon),
-            icon: Icon(WatchlistOutlinedIcon.icon),
-            label: "Watchlist",
-          ),
-          BottomNavigationBarItem(
-            activeIcon: Icon(PersonFilledIcon.icon),
-            icon: Icon(PersonOutlinedIcon.icon),
-            label: "Profile",
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.only(top: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+        ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          iconSize: 25,
+          backgroundColor: Colors.white,
+          selectedItemColor: Color(0xFF2ADA03),
+          unselectedItemColor: Color(0xFF555555),
+          selectedLabelStyle: TextStyle(fontFamily: "OpenSans SemiBold"),
+          selectedFontSize: 15,
+          unselectedFontSize: 14,
+          elevation: 0,
+          items: [
+            BottomNavigationBarItem(
+              activeIcon: Icon(HomeFilledIcon.icon),
+              icon: Icon(HomeOutlinedIcon.icon),
+              label: "Home",
+            ),
+            BottomNavigationBarItem(
+              activeIcon: Icon(BidHammerFilledIcon.icon),
+              icon: Icon(BidHammerOutlinedIcon.icon),
+              label: "My Bids",
+            ),
+            BottomNavigationBarItem(
+              activeIcon: Icon(WatchlistFilledIcon.icon),
+              icon: Icon(WatchlistOutlinedIcon.icon),
+              label: "Watchlist",
+            ),
+            BottomNavigationBarItem(
+              activeIcon: Icon(PersonFilledIcon.icon),
+              icon: Icon(PersonOutlinedIcon.icon),
+              label: "Profile",
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+        ),
       ),
     );
   }

@@ -55,14 +55,14 @@ class ProductCard extends StatelessWidget {
     return Material(
       color: theme.cardColor,
       elevation: 2,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(15),
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(15),
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
             color: theme.cardColor,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.02),
@@ -77,8 +77,8 @@ class ProductCard extends StatelessWidget {
               // Image with tag pills and favorite overlay
               ClipRRect(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(14),
-                  topRight: Radius.circular(14),
+                  topLeft: Radius.circular(15),
+                  topRight: Radius.circular(15),
                 ),
                 child: Stack(
                   children: [
@@ -309,13 +309,12 @@ class ProductCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
+                              horizontal: 20,
                             ),
                           ),
                           child: Text(
                             'Place Bid',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.white, fontSize: 16),
                           ),
                         ),
                       ],

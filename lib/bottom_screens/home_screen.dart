@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:leelame/custom_icons/notification_outlined_icon.dart';
 import 'package:leelame/custom_icons/search_icon.dart';
 import 'package:leelame/widgets/category_toggle_item.dart';
+import 'package:leelame/widgets/custom_tab_item.dart';
 import 'package:leelame/widgets/product_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -111,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen>
       //       fit: BoxFit.contain,
       //     ),
       //   ),
-      //   leadingWidth: 75,
+      //   leadingWidth: 65,
       //   actions: [
       //     IconButton(icon: Icon(SearchIcon.icon), onPressed: () {}),
       //     IconButton(
@@ -153,14 +154,14 @@ class _HomeScreenState extends State<HomeScreen>
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       padding: EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
+                        horizontal: 15,
+                        vertical: 8,
                       ),
                       child: Row(
                         children: List.generate(categories.length, (index) {
                           final category = categories[index];
                           return Padding(
-                            padding: EdgeInsets.only(right: 8.0),
+                            padding: EdgeInsets.only(right: 8),
                             child: FilterChip(
                               label: CategoryToggleItem(
                                 label: category['label'],
@@ -181,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen>
                               selectedColor: Colors.blue.withValues(alpha: 0.2),
                               showCheckmark: false,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(8),
                                 side: BorderSide.none,
                               ),
                             ),
@@ -202,28 +203,73 @@ class _HomeScreenState extends State<HomeScreen>
               delegate: SliverAppBarDelegate(
                 minHeight: 50,
                 maxHeight: 50,
-                child: Container(
-                  color: Theme.of(context).colorScheme.surface,
-                  child: TabBar(
-                    controller: _tabController,
-                    tabs: [
-                      Tab(text: 'Live Auctions'),
-                      Tab(text: 'Ending Soon'),
-                      Tab(text: 'New'),
-                    ],
-                    labelColor: Colors.purple,
-                    unselectedLabelColor: Colors.grey,
-                    indicatorColor: Colors.purple,
+                child: Material(
+                  elevation: 2,
+                  child: Container(
+                    // margin: EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      // borderRadius: BorderRadius.all(Radius.circular(25)),
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.02),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: TabBar(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 5,
+                      ),
+                      controller: _tabController,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      dividerColor: Colors.transparent,
+                      indicator: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF9831E0), Color(0xFFCF2988)],
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(25)),
+                      ),
+                      labelColor: Colors.white,
+                      unselectedLabelColor: Colors.grey,
+                      indicatorColor: Colors.purple,
+                      tabs: [
+                        CustomTabItem(title: 'Live Auctions', count: 0),
+                        CustomTabItem(title: 'Ending Soon', count: 0),
+                        CustomTabItem(title: 'New', count: 0),
+                        // Tab(
+                        //   child: Text(
+                        //     "Live Auctions",
+                        //     style: TextStyle(fontFamily: "OpenSans Medium"),
+                        //   ),
+                        // ),
+                        // Tab(
+                        //   child: Text(
+                        //     "Ending Soon",
+                        //     style: TextStyle(fontFamily: "OpenSans Medium"),
+                        //   ),
+                        // ),
+                        // Tab(
+                        //   child: Text(
+                        //     "New",
+                        //     style: TextStyle(fontFamily: "OpenSans Medium"),
+                        //   ),
+                        // ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
 
             SliverPadding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
-                  final product = products[index % products.length]; // sample
+                  final product = products[index % products.length];
                   return Padding(
                     padding: EdgeInsets.only(bottom: 20),
                     child: ProductCard(
