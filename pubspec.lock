@@ -91,6 +91,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  gradient_elevated_button:
+    dependency: "direct main"
+    description:
+      name: gradient_elevated_button
+      sha256: "2a704e4e4fd0d4ac88cd8087c7397dba61b5fc35bae8ff8df2e63e8ecfe7f428"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   http:
     dependency: transitive
     description:
