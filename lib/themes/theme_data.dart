@@ -6,7 +6,7 @@ import 'package:leelame/themes/outlined_button_theme_data.dart';
 
 ThemeData getApplicationTheme() {
   return ThemeData(
-    colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
     useMaterial3: true,
     fontFamily: "OpenSans Regular",
     elevatedButtonTheme: getElevatedButtonTheme(),
