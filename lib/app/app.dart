@@ -1,7 +1,7 @@
-// lib/app.dart
+// lib/app/app.dart
 import 'package:flutter/material.dart';
+import 'package:leelame/app/theme/app_theme.dart';
 import 'package:leelame/screens/splash_screen.dart';
-import 'package:leelame/themes/theme_data.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -11,7 +11,8 @@ class App extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: "Leelame",
-      theme: getApplicationTheme(),
+      theme: AppTheme.lightTheme,
+      // themeMode: ThemeMode.system,
       home: SplashScreen(),
     );
   }
