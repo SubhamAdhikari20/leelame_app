@@ -1,9 +1,9 @@
-// lib/screens/login_screen.dart
+// lib/features/auth/presentation/pages/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:leelame/features/auth/presentation/pages/sign_up_screen.dart';
-import 'package:leelame/screens/bottom_navigation_screen.dart';
+import 'package:leelame/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:leelame/widgets/custom_outlined_button.dart';
 import 'package:leelame/widgets/custom_primary_button.dart';
 import 'package:leelame/widgets/custom_auth_text_field.dart';
@@ -118,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     true) {
                                   AppRoutes.pushReplacement(
                                     context,
-                                    const BottomNavigationScreen(),
+                                    const DashboardPage(),
                                   );
                                 }
                               },

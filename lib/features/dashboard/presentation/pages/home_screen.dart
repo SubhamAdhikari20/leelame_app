@@ -1,7 +1,7 @@
-// lib/bottom_screens/home_screen.dart
+// lib/features/dashboard/presentation/pages/home_screen.dart
 import 'package:flutter/material.dart';
-import 'package:leelame/custom_icons/notification_outlined_icon.dart';
-import 'package:leelame/custom_icons/search_icon.dart';
+import 'package:leelame/core/custom_icons/notification_outlined_icon.dart';
+import 'package:leelame/core/custom_icons/search_icon.dart';
 import 'package:leelame/widgets/category_toggle_item.dart';
 import 'package:leelame/widgets/custom_tab_item.dart';
 import 'package:leelame/widgets/product_card.dart';
