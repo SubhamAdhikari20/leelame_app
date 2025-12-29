@@ -4,10 +4,10 @@ import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:leelame/features/auth/presentation/pages/sign_up_screen.dart';
 import 'package:leelame/features/dashboard/presentation/pages/dashboard_page.dart';
-import 'package:leelame/widgets/custom_outlined_button.dart';
-import 'package:leelame/widgets/custom_primary_button.dart';
-import 'package:leelame/widgets/custom_auth_text_field.dart';
-import 'package:leelame/widgets/or_divider.dart';
+import 'package:leelame/core/widgets/custom_outlined_button.dart';
+import 'package:leelame/core/widgets/custom_primary_button.dart';
+import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
+import 'package:leelame/features/auth/presentation/widgets/or_divider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

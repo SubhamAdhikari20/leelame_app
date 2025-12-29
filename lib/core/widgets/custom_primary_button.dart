@@ -1,4 +1,4 @@
-// lib/widgets/custom_primary_button.dart
+// lib/core/widgets/custom_primary_button.dart
 import 'package:flutter/material.dart';
 
 class CustomPrimaryButton extends StatelessWidget {
@@ -36,12 +36,7 @@ class CustomPrimaryButton extends StatelessWidget {
                   color: Colors.white,
                 ),
               )
-            : Text(
-                text,
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
+            : Text(text, style: TextStyle(color: Colors.white)),
       ),
     );
   }

@@ -1,4 +1,4 @@
-// lib/widgets/category_toggle_item.dart
+// lib/core/widgets/category_toggle_item.dart
 import 'package:flutter/material.dart';
 
 class CategoryToggleItem extends StatelessWidget {

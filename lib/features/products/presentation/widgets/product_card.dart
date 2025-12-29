@@ -1,4 +1,4 @@
-// lib/widgets/product_card.dart
+// lib/features/products/presentation/widgets/product_card.dart
 import 'package:flutter/material.dart';
 import 'package:gradient_elevated_button/gradient_elevated_button.dart';
 

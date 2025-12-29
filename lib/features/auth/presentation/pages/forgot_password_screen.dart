@@ -1,9 +1,9 @@
-// lib/screens/forgot_password_screen.dart
+// lib/features/auth/presentation/pages/forgot_password_screen.dart
 import 'package:flutter/material.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/features/auth/presentation/pages/verification_registration_screen.dart';
-import 'package:leelame/widgets/custom_auth_text_field.dart';
-import 'package:leelame/widgets/custom_primary_button.dart';
+import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
+import 'package:leelame/core/widgets/custom_primary_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

@@ -1,4 +1,4 @@
-// lib/widgets/custom_tab_item.dart
+// lib/core/widgets/custom_tab_item.dart
 import 'package:flutter/material.dart';
 
 class CustomTabItem extends StatelessWidget {

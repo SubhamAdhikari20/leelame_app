@@ -1,4 +1,4 @@
-// widgets/or_divider.dart
+// lib/features/auth/presentation/widgets/or_divider.dart
 import 'package:flutter/material.dart';
 
 class OrDivider extends StatelessWidget {

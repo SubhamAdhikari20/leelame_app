@@ -1,4 +1,4 @@
-// lib/widgets/custom_outlined_button.dart
+// lib/core/widgets/custom_outlined_button.dart
 import 'package:flutter/material.dart';
 
 class CustomOutlinedButton extends StatelessWidget {
@@ -43,10 +43,7 @@ class CustomOutlinedButton extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (prefixIcon != null) ...[
-                    prefixIcon!,
-                    SizedBox(width: 12),
-                  ],
+                  if (prefixIcon != null) ...[prefixIcon!, SizedBox(width: 12)],
                   Text(
                     text,
                     style: TextStyle(

@@ -1,4 +1,4 @@
-// lib/widgets/custom_auth_text_field.dart
+// lib/features/auth/presentation/widgets/custom_auth_text_field.dart
 import 'package:flutter/material.dart';
 
 class CustomAuthTextField extends StatefulWidget {

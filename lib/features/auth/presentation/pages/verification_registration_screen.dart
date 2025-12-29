@@ -1,8 +1,8 @@
-// lib/screens/verification_registration_screen.dart
+// lib/features/auth/presentation/pages/verification_registration_screen.dart
 import 'package:flutter/material.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/features/auth/presentation/pages/reset_password_screen.dart';
-import 'package:leelame/widgets/custom_primary_button.dart';
+import 'package:leelame/core/widgets/custom_primary_button.dart';
 
 class VerificationRegistrationScreen extends StatefulWidget {
   const VerificationRegistrationScreen({super.key});
