@@ -1,9 +1,9 @@
-// lib/screens/splash_screen.dart
+// lib/features/splash/presentation/pages/splash_screen.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:leelame/screens/login_screen.dart';
-import 'package:leelame/screens/onboarding_screen.dart';
+import 'package:leelame/features/onboarding/presentation/pages/onboarding_screen.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

@@ -1,4 +1,4 @@
-// lib/screens/onboarding_screen.dart
+// lib/features/onboarding/presentation/pages/onboarding_screen.dart
 import 'package:flutter/material.dart';
 import 'package:leelame/features/auth/presentation/pages/login_screen.dart';
 
