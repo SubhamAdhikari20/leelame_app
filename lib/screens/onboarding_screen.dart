@@ -1,6 +1,6 @@
 // lib/screens/onboarding_screen.dart
 import 'package:flutter/material.dart';
-import 'package:leelame/screens/login_screen.dart';
+import 'package:leelame/features/auth/presentation/pages/login_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:leelame/screens/login_screen.dart';
+import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/features/auth/presentation/pages/login_screen.dart';
 import 'package:leelame/widgets/custom_auth_text_field.dart';
 import 'package:leelame/widgets/custom_outlined_button.dart';
 import 'package:leelame/widgets/custom_primary_button.dart';
@@ -184,12 +185,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       // Login
                       CustomOutlinedButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LoginScreen(),
-                            ),
-                          );
+                          AppRoutes.push(context, const LoginScreen());
                         },
                         text: "Login",
                       ),

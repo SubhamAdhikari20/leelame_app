@@ -1,8 +1,9 @@
 // lib/screens/login_screen.dart
 import 'package:flutter/material.dart';
+import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/features/auth/presentation/pages/forgot_password_screen.dart';
+import 'package:leelame/features/auth/presentation/pages/sign_up_screen.dart';
 import 'package:leelame/screens/bottom_navigation_screen.dart';
-import 'package:leelame/screens/forgot_password_screen.dart';
-import 'package:leelame/screens/sign_up_screen.dart';
 import 'package:leelame/widgets/custom_outlined_button.dart';
 import 'package:leelame/widgets/custom_primary_button.dart';
 import 'package:leelame/widgets/custom_auth_text_field.dart';
@@ -87,12 +88,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
-                                  Navigator.push(
+                                  AppRoutes.push(
                                     context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ForgotPasswordScreen(),
-                                    ),
+                                    const ForgotPasswordScreen(),
                                   );
                                 },
                                 style: TextButton.styleFrom(
@@ -118,11 +116,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               onPressed: () {
                                 if (_loginFormKey.currentState?.validate() ==
                                     true) {
-                                  Navigator.pushReplacement(
+                                  AppRoutes.pushReplacement(
                                     context,
-                                    MaterialPageRoute(
-                                      builder: (context) => BottomNavigationScreen(),
-                                    ),
+                                    const BottomNavigationScreen(),
                                   );
                                 }
                               },
@@ -165,12 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Create account
                       CustomOutlinedButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SignUpScreen(),
-                            ),
-                          );
+                          AppRoutes.push(context, const SignUpScreen());
                         },
                         text: "Create account",
                       ),

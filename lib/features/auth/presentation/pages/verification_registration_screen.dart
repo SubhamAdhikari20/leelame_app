@@ -1,6 +1,7 @@
 // lib/screens/verification_registration_screen.dart
 import 'package:flutter/material.dart';
-import 'package:leelame/screens/reset_password_screen.dart';
+import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/features/auth/presentation/pages/reset_password_screen.dart';
 import 'package:leelame/widgets/custom_primary_button.dart';
 
 class VerificationRegistrationScreen extends StatefulWidget {
@@ -83,7 +84,7 @@ class _VerificationRegistrationScreenState
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => AppRoutes.pop(context),
         ),
         centerTitle: true,
         title: Image.asset(
@@ -146,12 +147,7 @@ class _VerificationRegistrationScreenState
                       // Verify Button
                       CustomPrimaryButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ResetPasswordScreen(),
-                            ),
-                          );
+                          AppRoutes.push(context, const ResetPasswordScreen());
                         },
                         text: "Verify",
                         isLoading: _isLoading,

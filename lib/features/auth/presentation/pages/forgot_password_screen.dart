@@ -1,22 +1,21 @@
-// lib/screens/reset_passsword_screen.dart
+// lib/screens/forgot_password_screen.dart
 import 'package:flutter/material.dart';
-import 'package:leelame/screens/login_screen.dart';
+import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/features/auth/presentation/pages/verification_registration_screen.dart';
 import 'package:leelame/widgets/custom_auth_text_field.dart';
 import 'package:leelame/widgets/custom_primary_button.dart';
 
-class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  final _resetPasswordFormKey = GlobalKey<FormState>();
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final _forgotPasswordFormKey = GlobalKey<FormState>();
 
-  final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final bool _loading = false;
 
   @override
@@ -29,13 +28,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     //     : (isTablet ? 700 : double.infinity);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => AppRoutes.pop(context),
         ),
         centerTitle: true,
         title: Image.asset(
@@ -44,6 +42,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           fit: BoxFit.contain,
         ),
       ),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -64,54 +63,52 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Enter new password",
+                        "Forgot Password",
                         style: TextStyle(
                           fontSize: isDesktop ? 35 : (isTablet ? 30 : 20),
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
-                        textAlign: TextAlign.start,
+                      ),
+                      SizedBox(height: 5),
+
+                      Text(
+                        "Enter your email or phone number",
+                        style: TextStyle(
+                          fontSize: isDesktop ? 25 : (isTablet ? 20 : 16),
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
                       ),
                       SizedBox(height: 25),
 
                       // Forgot Password Form
                       Form(
-                        key: _resetPasswordFormKey,
+                        key: _forgotPasswordFormKey,
                         child: Column(
                           children: [
-                            // New Password Text Field
+                            // Email Text Field
                             CustomAuthTextField(
-                              controller: newPasswordController,
-                              hintText: "New Password",
-                              labelText: "New Password",
-                              keyboardType: TextInputType.emailAddress,
-                            ),
-                            SizedBox(height: 20),
-
-                            // Confirm Password Text Field
-                            CustomAuthTextField(
-                              controller: confirmPasswordController,
-                              hintText: "Confirm Password",
-                              labelText: "Confirm Password",
+                              controller: emailController,
+                              hintText: "Email",
+                              labelText: "Email",
                               keyboardType: TextInputType.emailAddress,
                             ),
                             SizedBox(height: 40),
 
-                            // Reset Password Button
+                            // Send Code Button
                             CustomPrimaryButton(
                               onPressed: () {
-                                if (_resetPasswordFormKey.currentState
+                                if (_forgotPasswordFormKey.currentState
                                         ?.validate() ==
                                     true) {
-                                  Navigator.pushReplacement(
+                                  AppRoutes.push(
                                     context,
-                                    MaterialPageRoute(
-                                      builder: (context) => LoginScreen(),
-                                    ),
+                                    const VerificationRegistrationScreen(),
                                   );
                                 }
                               },
-                              text: "Reset",
+                              text: "Send Code",
                               isLoading: _loading,
                             ),
                             const SizedBox(height: 20),
