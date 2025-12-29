@@ -8,6 +8,6 @@ class HiveTableConstant {
   static const int usersTypeId = 0;
   static const String usersTable = "users";
 
-  // static const int buyersTypeId = 1;
-  // static const String buyersTable = "buyers";
+  static const int buyersTypeId = 1;
+  static const String buyersTable = "buyers";
 }
