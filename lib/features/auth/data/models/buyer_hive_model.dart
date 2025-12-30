@@ -4,10 +4,12 @@ import 'package:leelame/core/constants/hive_table_constant.dart';
 import 'package:leelame/features/auth/domain/entities/buyer_entity.dart';
 import 'package:uuid/uuid.dart';
 
+part "buyer_hive_model.g.dart";
+
 @HiveType(typeId: HiveTableConstant.buyersTypeId)
 class BuyerHiveModel {
   @HiveField(0)
-  final String? buyerId;
+  final String? id;
 
   @HiveField(1)
   final String fullName;
@@ -27,44 +29,51 @@ class BuyerHiveModel {
   @HiveField(6)
   final String? bio;
 
+  @HiveField(7)
+  final bool termsAccepted;
+
+  @HiveField(8)
+  final String userId;
+
   BuyerHiveModel({
-    String? buyerId,
+    String? id,
     required this.fullName,
-    String? username,
-    String? mobileNumber,
-    String? password,
-    String? profilePictureUrl,
-    String? bio,
-  }) : buyerId = buyerId ?? Uuid().v4(),
-       username = username ?? "",
-       mobileNumber = mobileNumber ?? "",
-       password = password ?? "",
-       profilePictureUrl = profilePictureUrl ?? "",
-       bio = bio ?? "";
+    this.username,
+    this.mobileNumber,
+    this.password,
+    this.profilePictureUrl,
+    this.bio,
+    required this.termsAccepted,
+    required this.userId,
+  }) : id = id ?? Uuid().v4();
 
   // Convert Model to Buyer Entity
   BuyerEntity toEntity() {
     return BuyerEntity(
-      buyerId: buyerId,
+      id: id,
       fullName: fullName,
       username: username,
       mobileNumber: mobileNumber,
       password: password,
       profilePictureUrl: profilePictureUrl,
       bio: bio,
+      termsAccepted: termsAccepted,
+      userId: userId,
     );
   }
 
   // Convert Buyer Entity to Model
   factory BuyerHiveModel.fromEntity(BuyerEntity buyerEntity) {
     return BuyerHiveModel(
-      buyerId: buyerEntity.buyerId,
+      id: buyerEntity.id,
       fullName: buyerEntity.fullName,
       username: buyerEntity.username,
       mobileNumber: buyerEntity.mobileNumber,
       password: buyerEntity.password,
       profilePictureUrl: buyerEntity.profilePictureUrl,
       bio: buyerEntity.bio,
+      termsAccepted: buyerEntity.termsAccepted,
+      userId: buyerEntity.userId,
     );
   }
 

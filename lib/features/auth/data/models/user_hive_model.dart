@@ -4,10 +4,12 @@ import 'package:leelame/core/constants/hive_table_constant.dart';
 import 'package:leelame/features/auth/domain/entities/user_entity.dart';
 import 'package:uuid/uuid.dart';
 
+part "user_hive_model.g.dart";
+
 @HiveType(typeId: HiveTableConstant.usersTypeId)
 class UserHiveModel {
   @HiveField(0)
-  final String? userId;
+  final String? id;
 
   @HiveField(1)
   final String email;
@@ -18,30 +20,72 @@ class UserHiveModel {
   @HiveField(3)
   final bool isVerified;
 
+  @HiveField(4)
+  final bool isPermanentlyBanned;
+
+  @HiveField(5)
+  final String? banReason;
+
+  @HiveField(6)
+  final DateTime? bannedAt;
+
+  @HiveField(7)
+  final DateTime? bannedFrom;
+
+  @HiveField(8)
+  final DateTime? bannedTo;
+
+  @HiveField(9)
+  final String? buyerProfileId;
+
+  @HiveField(10)
+  final String? sellerProfileId;
+
   UserHiveModel({
-    String? userId,
+    String? id,
     required this.email,
     required this.role,
     required this.isVerified,
-  }) : userId = userId ?? Uuid().v4();
+    required this.isPermanentlyBanned,
+    this.banReason,
+    this.bannedAt,
+    this.bannedFrom,
+    this.bannedTo,
+    this.buyerProfileId,
+    this.sellerProfileId,
+  }) : id = id ?? Uuid().v4();
 
   // Convert Model to User Entity
   UserEntity toEntity() {
     return UserEntity(
-      userId: userId,
+      id: id,
       email: email,
       role: role,
       isVerified: isVerified,
+      isPermanentlyBanned: isPermanentlyBanned,
+      banReason: banReason,
+      bannedAt: bannedAt,
+      bannedFrom: bannedFrom,
+      bannedTo: bannedTo,
+      buyerId: buyerProfileId,
+      sellerId: sellerProfileId,
     );
   }
 
   // Convert User Entity to Model
   factory UserHiveModel.fromEntity(UserEntity userEntity) {
     return UserHiveModel(
-      userId: userEntity.userId,
+      id: userEntity.id,
       email: userEntity.email,
       role: userEntity.role,
       isVerified: userEntity.isVerified,
+      isPermanentlyBanned: userEntity.isPermanentlyBanned,
+      banReason: userEntity.banReason,
+      bannedAt: userEntity.bannedAt,
+      bannedFrom: userEntity.bannedFrom,
+      bannedTo: userEntity.bannedTo,
+      buyerProfileId: userEntity.buyerId,
+      sellerProfileId: userEntity.sellerId,
     );
   }
 
