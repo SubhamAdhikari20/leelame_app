@@ -7,9 +7,9 @@ import 'package:uuid/uuid.dart';
 part "user_hive_model.g.dart";
 
 @HiveType(typeId: HiveTableConstant.usersTypeId)
-class UserHiveModel {
+class UserHiveModel extends HiveObject{
   @HiveField(0)
-  final String? id;
+  final String? userId;
 
   @HiveField(1)
   final String email;
@@ -35,14 +35,14 @@ class UserHiveModel {
   @HiveField(8)
   final DateTime? bannedTo;
 
-  @HiveField(9)
-  final String? buyerProfileId;
+  // @HiveField(9)
+  // final String? buyerProfileId;
 
-  @HiveField(10)
-  final String? sellerProfileId;
+  // @HiveField(10)
+  // final String? sellerProfileId;
 
   UserHiveModel({
-    String? id,
+    String? userId,
     required this.email,
     required this.role,
     required this.isVerified,
@@ -51,14 +51,14 @@ class UserHiveModel {
     this.bannedAt,
     this.bannedFrom,
     this.bannedTo,
-    this.buyerProfileId,
-    this.sellerProfileId,
-  }) : id = id ?? Uuid().v4();
+    // this.buyerProfileId,
+    // this.sellerProfileId,
+  }) : userId = userId ?? Uuid().v4();
 
   // Convert Model to User Entity
   UserEntity toEntity() {
     return UserEntity(
-      id: id,
+      userId: userId,
       email: email,
       role: role,
       isVerified: isVerified,
@@ -67,15 +67,15 @@ class UserHiveModel {
       bannedAt: bannedAt,
       bannedFrom: bannedFrom,
       bannedTo: bannedTo,
-      buyerId: buyerProfileId,
-      sellerId: sellerProfileId,
+      // buyerId: buyerProfileId,
+      // sellerId: sellerProfileId,
     );
   }
 
   // Convert User Entity to Model
   factory UserHiveModel.fromEntity(UserEntity userEntity) {
     return UserHiveModel(
-      id: userEntity.id,
+      userId: userEntity.userId,
       email: userEntity.email,
       role: userEntity.role,
       isVerified: userEntity.isVerified,
@@ -84,8 +84,8 @@ class UserHiveModel {
       bannedAt: userEntity.bannedAt,
       bannedFrom: userEntity.bannedFrom,
       bannedTo: userEntity.bannedTo,
-      buyerProfileId: userEntity.buyerId,
-      sellerProfileId: userEntity.sellerId,
+      // buyerProfileId: userEntity.buyerId,
+      // sellerProfileId: userEntity.sellerId,
     );
   }
 

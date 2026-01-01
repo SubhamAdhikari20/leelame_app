@@ -17,7 +17,7 @@ class UserHiveModelAdapter extends TypeAdapter<UserHiveModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return UserHiveModel(
-      id: fields[0] as String?,
+      userId: fields[0] as String?,
       email: fields[1] as String,
       role: fields[2] as String,
       isVerified: fields[3] as bool,
@@ -26,17 +26,15 @@ class UserHiveModelAdapter extends TypeAdapter<UserHiveModel> {
       bannedAt: fields[6] as DateTime?,
       bannedFrom: fields[7] as DateTime?,
       bannedTo: fields[8] as DateTime?,
-      buyerProfileId: fields[9] as String?,
-      sellerProfileId: fields[10] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserHiveModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(9)
       ..writeByte(0)
-      ..write(obj.id)
+      ..write(obj.userId)
       ..writeByte(1)
       ..write(obj.email)
       ..writeByte(2)
@@ -52,11 +50,7 @@ class UserHiveModelAdapter extends TypeAdapter<UserHiveModel> {
       ..writeByte(7)
       ..write(obj.bannedFrom)
       ..writeByte(8)
-      ..write(obj.bannedTo)
-      ..writeByte(9)
-      ..write(obj.buyerProfileId)
-      ..writeByte(10)
-      ..write(obj.sellerProfileId);
+      ..write(obj.bannedTo);
   }
 
   @override

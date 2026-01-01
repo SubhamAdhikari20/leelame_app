@@ -1,37 +1,40 @@
-// lib/features/auth/domain/entities/buyer_entity.dart
+// lib/features/buyer/domain/entities/buyer_entity.dart
 import 'package:equatable/equatable.dart';
+import 'package:leelame/features/auth/domain/entities/user_entity.dart';
 
 class BuyerEntity extends Equatable {
-  final String? id;
+  final String? buyerId;
   final String fullName;
   final String? username;
-  final String? mobileNumber;
+  final String? phoneNumber;
   final String? password;
   final String? profilePictureUrl;
   final String? bio;
   final bool termsAccepted;
 
   // Reference from base user
-  final String userId;
+  final String? userId;
+  final UserEntity? userEntity;
 
   const BuyerEntity({
-    this.id,
+    this.buyerId,
     required this.fullName,
     this.username,
-    this.mobileNumber,
+    this.phoneNumber,
     this.password,
     this.profilePictureUrl,
     this.bio,
     required this.termsAccepted,
-    required this.userId,
+    this.userId,
+    this.userEntity,
   });
 
   @override
   List<Object?> get props => [
-    id,
+    buyerId,
     fullName,
     username,
-    mobileNumber,
+    phoneNumber,
     password,
     profilePictureUrl,
     bio,

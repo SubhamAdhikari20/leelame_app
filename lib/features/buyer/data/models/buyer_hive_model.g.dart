@@ -17,15 +17,15 @@ class BuyerHiveModelAdapter extends TypeAdapter<BuyerHiveModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return BuyerHiveModel(
-      id: fields[0] as String?,
+      buyerId: fields[0] as String?,
       fullName: fields[1] as String,
       username: fields[2] as String?,
-      mobileNumber: fields[3] as String?,
+      phoneNumber: fields[3] as String?,
       password: fields[4] as String?,
       profilePictureUrl: fields[5] as String?,
       bio: fields[6] as String?,
       termsAccepted: fields[7] as bool,
-      userId: fields[8] as String,
+      userId: fields[8] as String?,
     );
   }
 
@@ -34,13 +34,13 @@ class BuyerHiveModelAdapter extends TypeAdapter<BuyerHiveModel> {
     writer
       ..writeByte(9)
       ..writeByte(0)
-      ..write(obj.id)
+      ..write(obj.buyerId)
       ..writeByte(1)
       ..write(obj.fullName)
       ..writeByte(2)
       ..write(obj.username)
       ..writeByte(3)
-      ..write(obj.mobileNumber)
+      ..write(obj.phoneNumber)
       ..writeByte(4)
       ..write(obj.password)
       ..writeByte(5)

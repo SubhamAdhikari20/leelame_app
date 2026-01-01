@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 
 class UserEntity extends Equatable {
   // id is optional because we dont need id while adding but required when updating and deleting
-  final String? id;
+  final String? userId;
   final String email;
   final String role;
   final bool isVerified;
@@ -16,8 +16,8 @@ class UserEntity extends Equatable {
   final DateTime? bannedTo;
 
   // Users references
-  final String? buyerId;
-  final String? sellerId;
+  // final String? buyerId;
+  // final String? sellerId;
 
   bool get isBanned =>
       isPermanentlyBanned ||
@@ -27,7 +27,7 @@ class UserEntity extends Equatable {
           DateTime.now().isBefore(bannedTo!));
 
   const UserEntity({
-    this.id,
+    this.userId,
     required this.email,
     required this.role,
     required this.isVerified,
@@ -36,13 +36,13 @@ class UserEntity extends Equatable {
     this.bannedAt,
     this.bannedFrom,
     this.bannedTo,
-    this.buyerId,
-    this.sellerId,
+    // this.buyerId,
+    // this.sellerId,
   });
 
   @override
   List<Object?> get props => [
-    id,
+    userId,
     email,
     role,
     isVerified,
@@ -51,7 +51,7 @@ class UserEntity extends Equatable {
     bannedAt,
     bannedFrom,
     bannedTo,
-    buyerId,
-    sellerId,
+    // buyerId,
+    // sellerId,
   ];
 }

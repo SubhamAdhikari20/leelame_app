@@ -1,7 +1,7 @@
 // lib/core/services/hive/hive_service.dart
 import 'package:hive/hive.dart';
 import 'package:leelame/core/constants/hive_table_constant.dart';
-import 'package:leelame/features/auth/data/models/buyer_hive_model.dart';
+import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -45,13 +45,13 @@ class HiveService {
 
   // Create a new user
   Future<UserHiveModel?> createUser(UserHiveModel userModel) async {
-    await _usersBox.put(userModel.id, userModel);
+    await _usersBox.put(userModel.userId, userModel);
     return userModel;
   }
 
   // Create a existing user
   Future<UserHiveModel?> updateUser(UserHiveModel userModel) async {
-    await _usersBox.put(userModel.id, userModel);
+    await _usersBox.put(userModel.userId, userModel);
     return userModel;
   }
 
@@ -80,15 +80,44 @@ class HiveService {
   Box<BuyerHiveModel> get _buyersBox =>
       Hive.box<BuyerHiveModel>(HiveTableConstant.buyersTable);
 
-  // Create a new buyer
-  Future<BuyerHiveModel?> createBuyer(BuyerHiveModel buyerModel) async {
-    await _buyersBox.put(buyerModel.id, buyerModel);
+  // Sign Up Buyer
+  Future<BuyerHiveModel?> signUpBuyer(
+    UserHiveModel userModel,
+    BuyerHiveModel buyerModel,
+  ) async {
+    await _usersBox.put(userModel.userId, userModel);
+    await _buyersBox.put(buyerModel.buyerId, buyerModel);
     return buyerModel;
+  }
+
+  // Login Buyer
+  Future<BuyerHiveModel?> loginBuyer(String identifier, String password) async {
+    final users = _usersBox.values.where((user) => user.email == identifier);
+    // late UserHiveModel user;
+
+    if (users.isNotEmpty) {
+      final user = users.first;
+      final buyers = _buyersBox.values.where(
+        (buyer) => buyer.userId == user.userId && buyer.password == password,
+      );
+      if (buyers.isEmpty) {
+        return null;
+      }
+      return buyers.first;
+    }
+
+    final buyers = _buyersBox.values.where(
+      (buyer) => buyer.username == identifier && buyer.password == password,
+    );
+    if (buyers.isEmpty) {
+      return null;
+    }
+    return buyers.first;
   }
 
   // Create a existing buyer
   Future<BuyerHiveModel?> updateBuyer(BuyerHiveModel buyerModel) async {
-    await _buyersBox.put(buyerModel.id, buyerModel);
+    await _buyersBox.put(buyerModel.buyerId, buyerModel);
     return buyerModel;
   }
 
