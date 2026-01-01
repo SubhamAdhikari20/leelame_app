@@ -1,9 +1,14 @@
 // lib/core/services/hive/hive_service.dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:leelame/core/constants/hive_table_constant.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
 import 'package:path_provider/path_provider.dart';
+
+final hiveServiceProvider = Provider<HiveService>((ref) {
+  return HiveService();
+});
 
 class HiveService {
   // Initialize Hive
@@ -75,6 +80,17 @@ class HiveService {
     await _usersBox.clear();
   }
 
+  // Does Email Exists
+  Future<bool> isEmailExists(String email) async {
+    final users = _usersBox.values.where((user) => user.email == email);
+    return users.isNotEmpty;
+  }
+
+  // get current user
+  Future<UserHiveModel?> getCurrentUser(String userId) async {
+    return _usersBox.get(userId);
+  }
+
   // ---------------------------- Buyers ------------------------------
   // Get buyers box
   Box<BuyerHiveModel> get _buyersBox =>
@@ -113,6 +129,14 @@ class HiveService {
       return null;
     }
     return buyers.first;
+  }
+
+  // Logout
+  Future<void> logoutBuyer() async {}
+
+  // get current buyer
+  Future<BuyerHiveModel?> getCurrentBuyer(String buyerId) async {
+    return _buyersBox.get(buyerId);
   }
 
   // Create a existing buyer
