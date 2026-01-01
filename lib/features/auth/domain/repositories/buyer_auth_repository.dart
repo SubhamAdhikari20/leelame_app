@@ -12,7 +12,7 @@ abstract interface class IBuyerAuthRepository {
   Future<Either<Failures, BuyerEntity>> login(
     String identifier,
     String password,
-    // String role,
+    String role,
   );
   // Future<Either<Failures, UserEntity>> getCurrentUser(String userId);
   Future<Either<Failures, BuyerEntity>> getCurrentBuyer(String buyerId);

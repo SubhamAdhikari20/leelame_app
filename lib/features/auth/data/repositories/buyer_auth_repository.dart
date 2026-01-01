@@ -24,9 +24,10 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
   Future<Either<Failures, BuyerEntity>> login(
     String identifier,
     String password,
+    String role,
   ) async {
     try {
-      final buyer = await _buyerAuthDatasource.login(identifier, password);
+      final buyer = await _buyerAuthDatasource.login(identifier, password, role);
       if (buyer == null) {
         return const Left(
           LocalDatabaseFailure(message: "Failed to login buyer!"),

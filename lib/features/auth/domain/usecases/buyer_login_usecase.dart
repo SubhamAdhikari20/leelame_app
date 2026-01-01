@@ -11,14 +11,16 @@ import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
 class BuyerLoginUsecaseParams extends Equatable {
   final String identifier;
   final String password;
+  final String role;
 
   const BuyerLoginUsecaseParams({
     required this.identifier,
     required this.password,
+    required this.role,
   });
 
   @override
-  List<Object?> get props => [identifier, password];
+  List<Object?> get props => [identifier, password, role];
 }
 
 // Provider for Login Usecase
@@ -36,6 +38,6 @@ class BuyerLoginUsecase
 
   @override
   Future<Either<Failures, BuyerEntity>> call(BuyerLoginUsecaseParams params) {
-    return _buyerAuthRepository.login(params.identifier, params.password);
+    return _buyerAuthRepository.login(params.identifier, params.password, params.role);
   }
 }

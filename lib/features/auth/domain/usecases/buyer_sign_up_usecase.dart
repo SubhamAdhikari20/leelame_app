@@ -22,7 +22,7 @@ class BuyerSignUpUsecaseParams extends Equatable {
   final String? bio;
   final bool termsAccepted;
 
-  final String userId;
+  final String? userId;
 
   final bool isPermanentlyBanned;
   final String? banReason;
@@ -38,7 +38,7 @@ class BuyerSignUpUsecaseParams extends Equatable {
     this.password,
     required this.role,
     required this.isVerified,
-    required this.userId,
+    this.userId,
     this.profilePictureUrl,
     this.bio,
     required this.termsAccepted,

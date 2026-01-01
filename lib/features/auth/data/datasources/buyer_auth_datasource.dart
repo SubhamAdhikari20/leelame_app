@@ -10,7 +10,7 @@ abstract interface class IBuyerAuthDatasource {
   Future<BuyerHiveModel?> login(
     String identifier,
     String password,
-    // String role,
+    String role,
   );
   Future<UserHiveModel?> getCurrentUser(String userId);
   Future<BuyerHiveModel?> getCurrentBuyer(String buyerId);

@@ -107,9 +107,14 @@ class HiveService {
   }
 
   // Login Buyer
-  Future<BuyerHiveModel?> loginBuyer(String identifier, String password) async {
-    final users = _usersBox.values.where((user) => user.email == identifier);
-    // late UserHiveModel user;
+  Future<BuyerHiveModel?> loginBuyer(
+    String identifier,
+    String password,
+    String role,
+  ) async {
+    final users = _usersBox.values.where(
+      (user) => user.email == identifier && user.role == role,
+    );
 
     if (users.isNotEmpty) {
       final user = users.first;

@@ -19,9 +19,9 @@ class BuyerAuthLocalDatasource implements IBuyerAuthDatasource {
     : _hiveService = hiveService;
 
   @override
-  Future<BuyerHiveModel?> login(String identifier, String password) async {
+  Future<BuyerHiveModel?> login(String identifier, String password, String role) async {
     try {
-      final buyer = await _hiveService.loginBuyer(identifier, password);
+      final buyer = await _hiveService.loginBuyer(identifier, password, role);
       return Future.value(buyer);
     } catch (e) {
       return Future.value(null);
