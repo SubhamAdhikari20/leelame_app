@@ -31,4 +31,74 @@ class AppColors {
   static const Color warning = Color(0xFFFFA726);
   static const Color error = Color(0xFFEF4444);
   static const Color info = Color(0xFF3B82F6);
+
+  // White with opacity
+  static const Color white90 = Color(0xE6FFFFFF);
+  static const Color white80 = Color(0xCCFFFFFF);
+  static const Color white50 = Color(0x80FFFFFF);
+  static const Color white30 = Color(0x4DFFFFFF);
+  static const Color white20 = Color(0x33FFFFFF);
+
+  // Black with opacity
+  static const Color black20 = Color(0x33000000);
+
+  // Text secondary with opacity
+  static const Color textSecondary60 = Color(0x996B7280);
+  static const Color textSecondary50 = Color(0x806B7280);
+
+  // Item Status Gradients
+  static const LinearGradient lostGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFE53935), Color(0xFFD32F2F)],
+  );
+
+  static const LinearGradient foundGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF43A047), Color(0xFF388E3C)],
+  );
+
+  // Gradient Colors
+  static const LinearGradient primaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF6C63FF), Color(0xFF5B54E8)],
+  );
+
+  static const LinearGradient secondaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFF6584), Color(0xFFFF8BA0)],
+  );
+
+  static const LinearGradient accentGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF4ECDC4), Color(0xFF98D8C8)],
+  );
+
+  static const LinearGradient backgroundGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFFF8F9FE), Color(0xFFFFFFFF)],
+  );
+
+  // Shadows
+  static const List<BoxShadow> cardShadow = [
+    BoxShadow(color: Color(0x146C63FF), blurRadius: 24, offset: Offset(0, 8)),
+  ];
+
+  static const List<BoxShadow> buttonShadow = [
+    BoxShadow(color: Color(0x406C63FF), blurRadius: 16, offset: Offset(0, 4)),
+  ];
+
+  static const List<BoxShadow> softShadow = [
+    BoxShadow(color: Color(0x0A000000), blurRadius: 12, offset: Offset(0, 4)),
+  ];
+
+  static const List<BoxShadow> elevatedShadow = [
+    BoxShadow(color: black20, blurRadius: 30, offset: Offset(0, 15)),
+    BoxShadow(color: white30, blurRadius: 20, offset: Offset(0, 5)),
+  ];
 }

@@ -1,4 +1,4 @@
-// lib/features/dashboard/presentation/pages/watchlist_screen.dart
+// lib/features/buyer/presentation/pages/watchlist_page.dart
 import 'package:flutter/material.dart';
 
 class WatchlistScreen extends StatelessWidget {

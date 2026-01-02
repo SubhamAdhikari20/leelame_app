@@ -1,9 +1,9 @@
-// lib/features/dashboard/presentation/pages/dashboard_page.dart
+// lib/features/buyer/presentation/pages/dashboard_page.dart
 import 'package:flutter/material.dart';
-import 'package:leelame/features/dashboard/presentation/pages/home_screen.dart';
-import 'package:leelame/features/dashboard/presentation/pages/my_bids_screen.dart';
-import 'package:leelame/features/dashboard/presentation/pages/profile_screen.dart';
-import 'package:leelame/features/dashboard/presentation/pages/watchlist_screen.dart';
+import 'package:leelame/features/buyer/presentation/pages/home_page.dart';
+import 'package:leelame/features/buyer/presentation/pages/my_bids_page.dart';
+import 'package:leelame/features/buyer/presentation/pages/profile_page.dart';
+import 'package:leelame/features/buyer/presentation/pages/watchlist_page.dart';
 import 'package:leelame/core/custom_icons/bid_hammer_filled_icon.dart';
 import 'package:leelame/core/custom_icons/bid_hammer_outlined_icon.dart';
 import 'package:leelame/core/custom_icons/home_filled_icon.dart';

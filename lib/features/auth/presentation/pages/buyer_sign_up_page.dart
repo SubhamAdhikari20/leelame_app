@@ -1,9 +1,9 @@
-// lib/features/auth/presentation/pages/sign_up_screen.dart
+// lib/features/auth/presentation/pages/buyer_sign_up_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
-import 'package:leelame/features/auth/presentation/pages/login_screen.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer_login_page.dart';
 import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
 import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
@@ -38,16 +38,16 @@ class _BuyerSignUpPageState extends ConsumerState<BuyerSignUpPage> {
     }
 
     if (_signUpFormKey.currentState!.validate()) {
-      // Pass the form data to view model
+      // Pass the sign up form data to view model
       ref
           .read(buyerAuthViewModelProvider.notifier)
           .signUp(
-            fullName: _fullNameController.text,
-            username: _usernameController.text,
-            email: _emailController.text,
-            phoneNumber: _phoneNumber.text,
-            password: _passwordController.text,
-            role: "buyer",
+            fullName: _fullNameController.text.trim(),
+            username: _usernameController.text.trim(),
+            email: _emailController.text.trim(),
+            phoneNumber: _phoneNumber.text.trim(),
+            password: _passwordController.text.trim(),
+            role: "buyer".trim(),
             isVerified: true,
             termsAccepted: _agreeToTerms,
             isPermanentlyBanned: false,
@@ -57,10 +57,10 @@ class _BuyerSignUpPageState extends ConsumerState<BuyerSignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Auth State
+    // Buyer Auth State
     final buyerAuthState = ref.watch(buyerAuthViewModelProvider);
 
-    // listen for auth state changes
+    // listen for buyer auth state changes
     ref.listen<BuyerAuthState>(buyerAuthViewModelProvider, (previous, next) {
       if (next.buyerAuthStatus == BuyerAuthStatus.error) {
         SnackbarUtil.showError(context, next.errorMessage ?? "Sign Up Failed!");
@@ -73,7 +73,7 @@ class _BuyerSignUpPageState extends ConsumerState<BuyerSignUpPage> {
         );
 
         // Navigate to login
-        AppRoutes.push(context, const LoginScreen());
+        AppRoutes.push(context, const BuyerLoginPage());
       }
     });
 
@@ -302,7 +302,7 @@ class _BuyerSignUpPageState extends ConsumerState<BuyerSignUpPage> {
                       // Login
                       CustomOutlinedButton(
                         onPressed: () {
-                          AppRoutes.push(context, const LoginScreen());
+                          AppRoutes.push(context, const BuyerLoginPage());
                         },
                         text: "Login",
                       ),

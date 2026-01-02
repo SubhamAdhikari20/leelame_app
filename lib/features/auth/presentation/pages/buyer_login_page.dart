@@ -1,30 +1,67 @@
-// lib/features/auth/presentation/pages/login_screen.dart
+// lib/features/auth/presentation/pages/buyer_login_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:leelame/features/auth/presentation/pages/buyer_sign_up_page.dart';
-import 'package:leelame/features/dashboard/presentation/pages/dashboard_page.dart';
+import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
+import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
+import 'package:leelame/features/buyer/presentation/pages/dashboard_page.dart';
 import 'package:leelame/core/widgets/custom_outlined_button.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
 import 'package:leelame/features/auth/presentation/widgets/or_divider.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class BuyerLoginPage extends ConsumerStatefulWidget {
+  const BuyerLoginPage({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<BuyerLoginPage> createState() => _BuyerLoginPageState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _BuyerLoginPageState extends ConsumerState<BuyerLoginPage> {
   final _loginFormKey = GlobalKey<FormState>();
 
   final TextEditingController identifierController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final bool _loading = false;
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _handleLogin() async {
+    if (_loginFormKey.currentState!.validate()) {
+      // Pass the login form data to view model
+      ref
+          .read(buyerAuthViewModelProvider.notifier)
+          .login(
+            identifier: identifierController.text.trim(),
+            password: _passwordController.text.trim(),
+            role: "buyer".trim(),
+          );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Buyer Auth State
+    final buyerAuthState = ref.watch(buyerAuthViewModelProvider);
+
+    // listen for buyer auth state changes
+    ref.listen<BuyerAuthState>(buyerAuthViewModelProvider, (previous, next) {
+      if (next.buyerAuthStatus == BuyerAuthStatus.error &&
+          next.errorMessage != null) {
+        SnackbarUtil.showError(context, next.errorMessage ?? "Login Failed!");
+      } else if (next.buyerAuthStatus == BuyerAuthStatus.authenticated) {
+        // Login Successful
+        SnackbarUtil.showSuccess(
+          context,
+          "Login Successful",
+          // next.errorMessage ?? "Login Successful",
+        );
+
+        // Navigate to dashboard
+        AppRoutes.pushReplacement(context, const DashboardPage());
+      }
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -71,15 +108,30 @@ class _LoginScreenState extends State<LoginScreen> {
                               controller: identifierController,
                               hintText: "Username or Email",
                               labelText: "Username or Email",
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter username or email';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 20),
 
                             // Password Text Field
                             CustomAuthTextField(
-                              controller: passwordController,
+                              controller: _passwordController,
                               hintText: "Password",
                               labelText: "Password",
                               isPassword: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value.length < 8) {
+                                  return 'Password must be at least 8 characters';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 20),
 
@@ -113,17 +165,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             // Login Button
                             CustomPrimaryButton(
-                              onPressed: () {
-                                if (_loginFormKey.currentState?.validate() ==
-                                    true) {
-                                  AppRoutes.pushReplacement(
-                                    context,
-                                    const DashboardPage(),
-                                  );
-                                }
-                              },
+                              onPressed: _handleLogin,
                               text: "Login",
-                              isLoading: _loading,
+                              isLoading:
+                                  buyerAuthState.buyerAuthStatus ==
+                                  BuyerAuthStatus.loading,
                             ),
                             const SizedBox(height: 20),
                           ],

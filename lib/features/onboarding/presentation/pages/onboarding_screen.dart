@@ -1,6 +1,6 @@
 // lib/features/onboarding/presentation/pages/onboarding_screen.dart
 import 'package:flutter/material.dart';
-import 'package:leelame/features/auth/presentation/pages/login_screen.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer_login_page.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -37,7 +37,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        MaterialPageRoute(builder: (_) => const BuyerLoginPage()),
       );
     }
   }

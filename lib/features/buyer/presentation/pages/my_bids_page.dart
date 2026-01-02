@@ -1,8 +1,8 @@
-// lib/features/dashboard/presentation/pages/watchlist_screen.dart
+// lib/features/buyer/presentation/pages/my_bids_page.dart
 import 'package:flutter/material.dart';
 
-class WatchlistScreen extends StatelessWidget {
-  const WatchlistScreen({super.key});
+class MyBidsScreen extends StatelessWidget {
+  const MyBidsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class WatchlistScreen extends StatelessWidget {
       body: SizedBox.expand(
         child: Center(
           child: Text(
-            "Welcome to Watchlist",
+            "Welcome to My Bids",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,

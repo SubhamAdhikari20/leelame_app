@@ -47,7 +47,7 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
       isPermanentlyBanned: isPermanentlyBanned,
     );
 
-    // Wait for new seconds
+    // Wait for few seconds
     await Future.delayed(Duration(seconds: 2));
     final result = await _buyerSignUpUsecase(buyerSignUpParams);
 
@@ -76,6 +76,8 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
       role: role,
     );
 
+    // Wait for few seconds
+    await Future.delayed(Duration(seconds: 2));
     final result = await _buyerLoginUsecase(buyerLoginParams);
 
     result.fold(

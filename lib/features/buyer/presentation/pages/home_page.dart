@@ -1,4 +1,4 @@
-// lib/features/dashboard/presentation/pages/home_screen.dart
+// lib/features/buyer/presentation/pages/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:leelame/core/custom_icons/notification_outlined_icon.dart';
 import 'package:leelame/core/custom_icons/search_icon.dart';
