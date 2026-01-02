@@ -6,9 +6,9 @@ import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
 
 // Buyer Auth View Model Notifier Provider
 final buyerAuthViewModelProvider =
-    NotifierProvider<BuyerAuthViewModel, BuyerAuthState>(
-      () => BuyerAuthViewModel(),
-    );
+    NotifierProvider<BuyerAuthViewModel, BuyerAuthState>(() {
+      return BuyerAuthViewModel();
+    });
 
 class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
   late final BuyerSignUpUsecase _buyerSignUpUsecase;
@@ -37,14 +37,18 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
     state = state.copywith(buyerAuthStatus: BuyerAuthStatus.loading);
     final buyerSignUpParams = BuyerSignUpUsecaseParams(
       fullName: fullName,
+      username: username,
       email: email,
+      phoneNumber: phoneNumber,
+      password: password,
       role: role,
       isVerified: isVerified,
-      userId: userId,
       termsAccepted: termsAccepted,
       isPermanentlyBanned: isPermanentlyBanned,
     );
 
+    // Wait for new seconds
+    await Future.delayed(Duration(seconds: 2));
     final result = await _buyerSignUpUsecase(buyerSignUpParams);
 
     result.fold(

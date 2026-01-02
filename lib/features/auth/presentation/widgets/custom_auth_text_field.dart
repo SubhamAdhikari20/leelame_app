@@ -9,6 +9,7 @@ class CustomAuthTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final bool? isPassword;
   final bool? showClearButton;
+  final FormFieldValidator<String>? validator;
 
   const CustomAuthTextField({
     super.key,
@@ -19,6 +20,7 @@ class CustomAuthTextField extends StatefulWidget {
     this.keyboardType,
     this.isPassword,
     this.showClearButton,
+    this.validator,
   });
 
   @override
@@ -132,13 +134,15 @@ class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
           ],
         ),
       ),
-      validator: (value) {
-        _updateState();
-        if (value == null || value.isEmpty) {
-          return "Please enter ${displayLabel.toLowerCase()}";
-        }
-        return null;
-      },
+      validator:
+          widget.validator ??
+          (value) {
+            _updateState();
+            if (value == null || value.isEmpty) {
+              return "Please enter ${displayLabel.toLowerCase()}";
+            }
+            return null;
+          },
     );
   }
 }

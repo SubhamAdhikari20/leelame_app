@@ -5,9 +5,7 @@ import 'package:leelame/features/auth/data/datasources/buyer_auth_datasource.dar
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 
-final buyerAuthLocalDatasourceProvider = Provider<BuyerAuthLocalDatasource>((
-  ref,
-) {
+final buyerAuthLocalDatasourceProvider = Provider<IBuyerAuthDatasource>((ref) {
   final hiveService = ref.read(hiveServiceProvider);
   return BuyerAuthLocalDatasource(hiveService: hiveService);
 });
@@ -19,7 +17,11 @@ class BuyerAuthLocalDatasource implements IBuyerAuthDatasource {
     : _hiveService = hiveService;
 
   @override
-  Future<BuyerHiveModel?> login(String identifier, String password, String role) async {
+  Future<BuyerHiveModel?> login(
+    String identifier,
+    String password,
+    String role,
+  ) async {
     try {
       final buyer = await _hiveService.loginBuyer(identifier, password, role);
       return Future.value(buyer);
@@ -52,16 +54,6 @@ class BuyerAuthLocalDatasource implements IBuyerAuthDatasource {
   }
 
   @override
-  Future<bool> isEmailExists(String email) async {
-    try {
-      final isExists = await _hiveService.isEmailExists(email);
-      return Future.value(isExists);
-    } catch (e) {
-      return Future.value(false);
-    }
-  }
-
-  @override
   Future<UserHiveModel?> getCurrentUser(String userId) async {
     try {
       final user = await _hiveService.getCurrentUser(userId);
@@ -78,6 +70,36 @@ class BuyerAuthLocalDatasource implements IBuyerAuthDatasource {
       return Future.value(buyer);
     } catch (e) {
       return Future.value(null);
+    }
+  }
+
+  @override
+  Future<bool> isEmailExists(String email) async {
+    try {
+      final isExists = await _hiveService.isEmailExists(email);
+      return Future.value(isExists);
+    } catch (e) {
+      return Future.value(false);
+    }
+  }
+
+  @override
+  Future<bool> isUsernameExists(String username) async {
+    try {
+      final isExists = await _hiveService.isUsernameExists(username);
+      return Future.value(isExists);
+    } catch (e) {
+      return Future.value(false);
+    }
+  }
+
+  @override
+  Future<bool> isPhoneNumberExists(String phoneNumber) async {
+    try {
+      final isExists = await _hiveService.isPhoneNumberExists(phoneNumber);
+      return Future.value(isExists);
+    } catch (e) {
+      return Future.value(false);
     }
   }
 }

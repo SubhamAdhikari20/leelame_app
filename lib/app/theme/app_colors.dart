@@ -25,4 +25,10 @@ class AppColors {
   static const Color surfaceColor = Color(0xFFFFFFFF);
   static const Color surfaceVariantColor = Color(0xFFF5F6FA);
   static const Color inputFillColor = Color(0xFFF5F5F5);
+
+  // Status Colors
+  static const Color success = Color(0xFF4CAF50);
+  static const Color warning = Color(0xFFFFA726);
+  static const Color error = Color(0xFFEF4444);
+  static const Color info = Color(0xFF3B82F6);
 }

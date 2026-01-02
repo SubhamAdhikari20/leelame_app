@@ -33,7 +33,8 @@ class CustomPrimaryButton extends StatelessWidget {
                 width: 18,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Colors.white,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  // color: Colors.white,
                 ),
               )
             : Text(text, style: TextStyle(color: Colors.white)),

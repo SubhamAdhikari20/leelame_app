@@ -1,33 +1,82 @@
 // lib/features/auth/presentation/pages/sign_up_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/login_screen.dart';
+import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
+import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
 import 'package:leelame/core/widgets/custom_outlined_button.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
 import 'package:leelame/features/auth/presentation/widgets/or_divider.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+class BuyerSignUpPage extends ConsumerStatefulWidget {
+  const BuyerSignUpPage({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  ConsumerState<BuyerSignUpPage> createState() => _BuyerSignUpPageState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _BuyerSignUpPageState extends ConsumerState<BuyerSignUpPage> {
   final _signUpFormKey = GlobalKey<FormState>();
 
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController contactController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneNumber = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _agreeToTerms = false;
-  final bool _loading = false;
+
+  Future<void> _handleSignup() async {
+    if (!_agreeToTerms) {
+      SnackbarUtil.showError(context, 'Please agree to the Terms & Conditions');
+      return;
+    }
+
+    if (_signUpFormKey.currentState!.validate()) {
+      // Pass the form data to view model
+      ref
+          .read(buyerAuthViewModelProvider.notifier)
+          .signUp(
+            fullName: _fullNameController.text,
+            username: _usernameController.text,
+            email: _emailController.text,
+            phoneNumber: _phoneNumber.text,
+            password: _passwordController.text,
+            role: "buyer",
+            isVerified: true,
+            termsAccepted: _agreeToTerms,
+            isPermanentlyBanned: false,
+          );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Auth State
+    final buyerAuthState = ref.watch(buyerAuthViewModelProvider);
+
+    // listen for auth state changes
+    ref.listen<BuyerAuthState>(buyerAuthViewModelProvider, (previous, next) {
+      if (next.buyerAuthStatus == BuyerAuthStatus.error) {
+        SnackbarUtil.showError(context, next.errorMessage ?? "Sign Up Failed!");
+      } else if (next.buyerAuthStatus == BuyerAuthStatus.created) {
+        // Sign Up Successful
+        SnackbarUtil.showSuccess(
+          context,
+          "Sign Up Successful",
+          // next.errorMessage ?? "Sign Up Successful",
+        );
+
+        // Navigate to login
+        AppRoutes.push(context, const LoginScreen());
+      }
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -74,44 +123,112 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           children: [
                             // FullName Text Field
                             CustomAuthTextField(
-                              controller: fullNameController,
+                              controller: _fullNameController,
                               hintText: "Full Name",
                               labelText: "Full Name",
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your name';
+                                }
+                                if (value.length < 3) {
+                                  return 'Name must be at least 3 characters';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 20),
 
                             // Username Text Field
                             CustomAuthTextField(
-                              controller: usernameController,
+                              controller: _usernameController,
                               hintText: "Username",
                               labelText: "Username",
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your username';
+                                }
+                                if (value.length < 3) {
+                                  return 'Username must be at least 3 characters';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 20),
 
                             // Email Text Field
                             CustomAuthTextField(
-                              controller: emailController,
+                              controller: _emailController,
                               hintText: "Email",
                               labelText: "Email",
                               keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your email';
+                                }
+                                if (!RegExp(
+                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                ).hasMatch(value)) {
+                                  return 'Please enter a valid email';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 20),
 
                             // Contact Text Field
                             CustomAuthTextField(
-                              controller: contactController,
+                              controller: _phoneNumber,
                               hintText: "Phone Number",
                               labelText: "Phone Number",
                               keyboardType: TextInputType.phone,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter phone number';
+                                }
+                                if (value.length != 10) {
+                                  return 'Phone must be 10 digits';
+                                }
+                                if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                                  return 'Only numbers allowed';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 20),
 
                             // Password Text Field
                             CustomAuthTextField(
-                              controller: passwordController,
+                              controller: _passwordController,
                               hintText: "Password",
                               labelText: "Password",
                               isPassword: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter a password';
+                                }
+                                if (value.length < 8) {
+                                  return 'Password must be at least 8 characters';
+                                }
+                                return null;
+                              },
+                            ),
+                            SizedBox(height: 20),
+
+                            // Confirm Password Text Field
+                            CustomAuthTextField(
+                              controller: _confirmPasswordController,
+                              hintText: "Confirm Password",
+                              labelText: "Confirm Password",
+                              isPassword: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please confirm your password';
+                                }
+                                if (value != _passwordController.text) {
+                                  return 'Passwords do not match';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 10),
 
@@ -146,12 +263,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                             // Sign up Button
                             CustomPrimaryButton(
-                              onPressed: () {
-                                if (_signUpFormKey.currentState?.validate() ==
-                                    true) {}
-                              },
+                              onPressed: _handleSignup,
                               text: "Sign up",
-                              isLoading: _loading,
+                              isLoading:
+                                  buyerAuthState.buyerAuthStatus ==
+                                  BuyerAuthStatus.loading,
                             ),
                             const SizedBox(height: 20),
                           ],

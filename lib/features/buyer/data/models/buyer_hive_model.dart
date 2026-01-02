@@ -45,8 +45,9 @@ class BuyerHiveModel extends HiveObject {
     this.profilePictureUrl,
     this.bio,
     required this.termsAccepted,
-    this.userId,
-  }) : buyerId = buyerId ?? Uuid().v4();
+    String? userId,
+  }) : buyerId = buyerId ?? Uuid().v4(),
+       userId = userId ?? Uuid().v4();
 
   // Convert Model to Buyer Entity
   BuyerEntity toEntity({UserEntity? userEntity}) {

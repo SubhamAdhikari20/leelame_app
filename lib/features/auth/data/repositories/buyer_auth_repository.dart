@@ -27,7 +27,11 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
     String role,
   ) async {
     try {
-      final buyer = await _buyerAuthDatasource.login(identifier, password, role);
+      final buyer = await _buyerAuthDatasource.login(
+        identifier,
+        password,
+        role,
+      );
       if (buyer == null) {
         return const Left(
           LocalDatabaseFailure(message: "Failed to login buyer!"),
@@ -69,8 +73,61 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
     BuyerEntity buyerEntity,
   ) async {
     try {
+      // Validate email, username, phoneNumber fields
+      if (userEntity.email.isEmpty) {
+        return const Left(
+          LocalDatabaseFailure(message: "Sign up failed! Email is required."),
+        );
+      }
+      if (buyerEntity.username == null || buyerEntity.username!.isEmpty) {
+        return const Left(
+          LocalDatabaseFailure(
+            message: "Sign up failed! Username is required.",
+          ),
+        );
+      }
+      if (buyerEntity.phoneNumber == null || buyerEntity.phoneNumber!.isEmpty) {
+        return const Left(
+          LocalDatabaseFailure(
+            message: "Sign up failed! Phone number is required.",
+          ),
+        );
+      }
+
       final userModel = UserHiveModel.fromEntity(userEntity);
       final buyerModel = BuyerHiveModel.fromEntity(buyerEntity);
+
+      final checkEmailExist = await _buyerAuthDatasource.isEmailExists(
+        userModel.email,
+      );
+      if (checkEmailExist) {
+        return const Left(
+          LocalDatabaseFailure(
+            message: "Sign Up failed! Email already exists.",
+          ),
+        );
+      }
+
+      final checkUsernameExist = await _buyerAuthDatasource.isUsernameExists(
+        buyerModel.username!,
+      );
+      if (checkUsernameExist) {
+        return const Left(
+          LocalDatabaseFailure(
+            message: "Sign Up failed! Username already exists.",
+          ),
+        );
+      }
+
+      final checkPhoneNumberExist = await _buyerAuthDatasource
+          .isPhoneNumberExists(buyerModel.phoneNumber!);
+      if (checkPhoneNumberExist) {
+        return const Left(
+          LocalDatabaseFailure(
+            message: "Sign Up failed! Phone Number already exists.",
+          ),
+        );
+      }
 
       final result = await _buyerAuthDatasource.signUp(userModel, buyerModel);
       if (result == null) {

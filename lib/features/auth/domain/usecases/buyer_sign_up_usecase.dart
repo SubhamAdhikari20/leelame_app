@@ -8,6 +8,7 @@ import 'package:leelame/features/auth/data/repositories/buyer_auth_repository.da
 import 'package:leelame/features/auth/domain/entities/user_entity.dart';
 import 'package:leelame/features/auth/domain/repositories/buyer_auth_repository.dart';
 import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
+import 'package:uuid/uuid.dart';
 
 // Buyer Sign Up Params
 class BuyerSignUpUsecaseParams extends Equatable {
@@ -50,7 +51,16 @@ class BuyerSignUpUsecaseParams extends Equatable {
   });
 
   @override
-  List<Object?> get props => [fullName, username, email, role, isVerified];
+  List<Object?> get props => [
+    fullName,
+    username,
+    email,
+    phoneNumber,
+    password,
+    role,
+    isVerified,
+    userId,
+  ];
 }
 
 // Provider for SignUp Usecase
@@ -69,9 +79,11 @@ class BuyerSignUpUsecase
 
   @override
   Future<Either<Failures, BuyerEntity>> call(BuyerSignUpUsecaseParams params) {
+    final userId = params.userId ?? Uuid().v4();
+
     // create user and buyer entities
     UserEntity userEntity = UserEntity(
-      userId: params.userId,
+      userId: userId,
       email: params.email,
       role: params.role,
       isVerified: params.isVerified,
@@ -83,7 +95,7 @@ class BuyerSignUpUsecase
       phoneNumber: params.phoneNumber,
       password: params.password,
       termsAccepted: params.termsAccepted,
-      userId: params.userId,
+      userId: userId,
     );
 
     return _buyerAuthRepository.signUp(userEntity, buyerEntity);

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/features/auth/presentation/pages/forgot_password_screen.dart';
-import 'package:leelame/features/auth/presentation/pages/sign_up_screen.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer_sign_up_page.dart';
 import 'package:leelame/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:leelame/core/widgets/custom_outlined_button.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
@@ -161,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Create account
                       CustomOutlinedButton(
                         onPressed: () {
-                          AppRoutes.push(context, const SignUpScreen());
+                          AppRoutes.push(context, const BuyerSignUpPage());
                         },
                         text: "Create account",
                       ),

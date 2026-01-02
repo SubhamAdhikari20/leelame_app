@@ -17,4 +17,6 @@ abstract interface class IBuyerAuthDatasource {
   Future<bool> logout();
 
   Future<bool> isEmailExists(String email);
+  Future<bool> isUsernameExists(String username);
+  Future<bool> isPhoneNumberExists(String phoneNumber);
 }

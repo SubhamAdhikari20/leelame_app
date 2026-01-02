@@ -42,6 +42,17 @@ class HiveService {
     await Hive.close();
   }
 
+  // The box file is deleted. Need to open the box again to use it.
+  Future<void> deleteEntireBox() async {
+    var box = await Hive.openBox('myBox');
+    await box.deleteFromDisk();
+  }
+
+  // All Hive data associated with the application is removed.
+  Future<void> deleteAllDatabases() async {
+    await Hive.deleteFromDisk();
+  }
+
   // ========================= CRUD Operations ========================
   // ---------------------------- Users ------------------------------
   // Get users box
@@ -80,7 +91,7 @@ class HiveService {
     await _usersBox.clear();
   }
 
-  // Does Email Exists
+  // Check Email Exists
   Future<bool> isEmailExists(String email) async {
     final users = _usersBox.values.where((user) => user.email == email);
     return users.isNotEmpty;
@@ -96,11 +107,33 @@ class HiveService {
   Box<BuyerHiveModel> get _buyersBox =>
       Hive.box<BuyerHiveModel>(HiveTableConstant.buyersTable);
 
+  // Check Username Exists
+  Future<bool> isUsernameExists(String username) async {
+    final buyers = _buyersBox.values.where(
+      (buyer) => buyer.username == username,
+    );
+    return buyers.isNotEmpty;
+  }
+
+  // Check Phone Number Exists
+  Future<bool> isPhoneNumberExists(String phoneNumber) async {
+    final buyers = _buyersBox.values.where(
+      (buyer) => buyer.phoneNumber == phoneNumber,
+    );
+    return buyers.isNotEmpty;
+  }
+
   // Sign Up Buyer
   Future<BuyerHiveModel?> signUpBuyer(
     UserHiveModel userModel,
     BuyerHiveModel buyerModel,
   ) async {
+    // final users = _usersBox.values.where(
+    //   (user) => user.email == userModel.email,
+    // );
+    // if (users.isNotEmpty) {
+    //   return null;
+    // }
     await _usersBox.put(userModel.userId, userModel);
     await _buyersBox.put(buyerModel.buyerId, buyerModel);
     return buyerModel;
