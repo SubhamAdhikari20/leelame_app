@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/app/theme/app_colors.dart';
+import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/buyer_login_page.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -27,15 +28,15 @@ class ProfileScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    Text(
-                      'My Profile',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
+                    // Text(
+                    //   'My Profile',
+                    //   style: TextStyle(
+                    //     fontSize: 20,
+                    //     fontWeight: FontWeight.bold,
+                    //     color: Colors.white,
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 32),
 
                     // Profile Picture
                     Container(
@@ -56,7 +57,7 @@ class ProfileScreen extends StatelessWidget {
                         child: Icon(
                           Icons.person_rounded,
                           size: 60,
-                          color: AppColors.primaryColor,
+                          color: Colors.black54,
                         ),
                       ),
                     ),
@@ -71,6 +72,13 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
+
+                    Text(
+                      'Ram20',
+                      style: TextStyle(fontSize: 16, color: Colors.white70),
+                    ),
+                    const SizedBox(height: 4),
+
                     Text(
                       'ramshahi@gmail.com.np',
                       style: TextStyle(fontSize: 14, color: Colors.white70),
@@ -83,19 +91,19 @@ class ProfileScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _StatItem(title: 'Lost', value: '12'),
+                          _StatItem(title: 'Active Bids', value: '12'),
                           Container(
                             width: 1,
                             height: 40,
                             color: AppColors.white30,
                           ),
-                          _StatItem(title: 'Found', value: '8'),
+                          _StatItem(title: 'Won Bids', value: '8'),
                           Container(
                             width: 1,
                             height: 40,
                             color: AppColors.white30,
                           ),
-                          _StatItem(title: 'Returned', value: '5'),
+                          _StatItem(title: 'Watchlist', value: '5'),
                         ],
                       ),
                     ),
@@ -204,6 +212,11 @@ class ProfileScreen extends StatelessWidget {
             onPressed: () {
               Navigator.pop(context);
               AppRoutes.pushAndRemoveUntil(context, const BuyerLoginPage());
+              SnackbarUtil.showSuccess(
+                context,
+                "Logged out successfully.",
+                // next.errorMessage ?? "Login Successful",
+              );
             },
             child: Text(
               'Logout',
