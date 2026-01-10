@@ -16,6 +16,13 @@ class LocalDatabaseFailure extends Failures {
   }) : super(message);
 }
 
+// Validation Failure
+class ValidationFailure extends Failures {
+  const ValidationFailure({
+    String message = "Validation error",
+  }) : super(message);
+}
+
 // API Failure with status code
 class ApiFailure extends Failures {
   final int? statusCode;

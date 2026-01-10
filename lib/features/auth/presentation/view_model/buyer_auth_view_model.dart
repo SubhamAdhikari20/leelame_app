@@ -1,6 +1,7 @@
 // lib/features/auth/presentation/view_model/buyer_auth_view_model.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer_login_usecase.dart';
+import 'package:leelame/features/auth/domain/usecases/buyer_logout_usecase.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer_sign_up_usecase.dart';
 import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
 
@@ -13,12 +14,14 @@ final buyerAuthViewModelProvider =
 class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
   late final BuyerSignUpUsecase _buyerSignUpUsecase;
   late final BuyerLoginUsecase _buyerLoginUsecase;
+  late final BuyerLogoutUsecase _buyerLogoutUsecase;
 
   @override
   BuyerAuthState build() {
     // Initialize
     _buyerSignUpUsecase = ref.read(buyerSignUpUsecaseProvider);
     _buyerLoginUsecase = ref.read(buyerLoginUsecaseProvider);
+    _buyerLogoutUsecase = ref.read(buyerLogoutUsecaseProvider);
     return BuyerAuthState();
   }
 
@@ -89,6 +92,27 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
       },
       (buyer) {
         state = state.copywith(buyerAuthStatus: BuyerAuthStatus.authenticated);
+      },
+    );
+  }
+
+  Future<void> logout() async {
+    state = state.copywith(buyerAuthStatus: BuyerAuthStatus.loading);
+    // Wait for few seconds
+    await Future.delayed(Duration(seconds: 2));
+    final result = await _buyerLogoutUsecase();
+
+    result.fold(
+      (failure) {
+        state = state.copywith(
+          buyerAuthStatus: BuyerAuthStatus.error,
+          errorMessage: failure.message,
+        );
+      },
+      (isLoggedOut) {
+        state = state.copywith(
+          buyerAuthStatus: BuyerAuthStatus.unauthenticated,
+        );
       },
     );
   }

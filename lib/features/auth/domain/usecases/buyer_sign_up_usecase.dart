@@ -78,7 +78,23 @@ class BuyerSignUpUsecase
     : _buyerAuthRepository = buyerAuthRepository;
 
   @override
-  Future<Either<Failures, BuyerEntity>> call(BuyerSignUpUsecaseParams params) {
+  Future<Either<Failures, BuyerEntity>> call(
+    BuyerSignUpUsecaseParams params,
+  ) async {
+    // Validate email, username, phoneNumber fields
+    if (params.email.isEmpty) {
+      return const Left(ValidationFailure(message: "Email is required."));
+    }
+    if (params.username == null || params.username!.isEmpty) {
+      return const Left(ValidationFailure(message: "Username is required."));
+    }
+    if (params.phoneNumber == null || params.phoneNumber!.isEmpty) {
+      return const Left(
+        ValidationFailure(message: "Phone number is required."),
+      );
+    }
+
+    // Generate userId
     final userId = params.userId ?? Uuid().v4();
 
     // create user and buyer entities
@@ -98,6 +114,6 @@ class BuyerSignUpUsecase
       userId: userId,
     );
 
-    return _buyerAuthRepository.signUp(userEntity, buyerEntity);
+    return await _buyerAuthRepository.signUp(userEntity, buyerEntity);
   }
 }

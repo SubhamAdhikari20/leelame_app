@@ -38,14 +38,14 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
         );
       }
 
-      final user = await _buyerAuthDatasource.getCurrentUser(buyer.userId!);
-      if (user == null) {
+      final baseUser = await _buyerAuthDatasource.getCurrentUser(buyer.userId!);
+      if (baseUser == null) {
         return const Left(
           LocalDatabaseFailure(message: "Failed to get current base user!"),
         );
       }
 
-      return Right(buyer.toEntity(userEntity: user.toEntity()));
+      return Right(buyer.toEntity(userEntity: baseUser.toEntity()));
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
     }
@@ -73,27 +73,6 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
     BuyerEntity buyerEntity,
   ) async {
     try {
-      // Validate email, username, phoneNumber fields
-      if (userEntity.email.isEmpty) {
-        return const Left(
-          LocalDatabaseFailure(message: "Sign up failed! Email is required."),
-        );
-      }
-      if (buyerEntity.username == null || buyerEntity.username!.isEmpty) {
-        return const Left(
-          LocalDatabaseFailure(
-            message: "Sign up failed! Username is required.",
-          ),
-        );
-      }
-      if (buyerEntity.phoneNumber == null || buyerEntity.phoneNumber!.isEmpty) {
-        return const Left(
-          LocalDatabaseFailure(
-            message: "Sign up failed! Phone number is required.",
-          ),
-        );
-      }
-
       final userModel = UserHiveModel.fromEntity(userEntity);
       final buyerModel = BuyerHiveModel.fromEntity(buyerEntity);
 

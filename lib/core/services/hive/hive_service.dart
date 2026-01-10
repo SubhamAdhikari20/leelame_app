@@ -170,7 +170,9 @@ class HiveService {
   }
 
   // Logout
-  Future<void> logoutBuyer() async {}
+  Future<bool> logoutBuyer() async {
+    return true;
+  }
 
   // get current buyer
   Future<BuyerHiveModel?> getCurrentBuyer(String buyerId) async {

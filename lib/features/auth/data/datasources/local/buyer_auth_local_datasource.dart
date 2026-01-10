@@ -1,20 +1,29 @@
 // lib/features/auth/data/datasources/local/buyer_auth_local_datasource.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/core/services/hive/hive_service.dart';
+import 'package:leelame/core/services/storage/user_session_service.dart';
 import 'package:leelame/features/auth/data/datasources/buyer_auth_datasource.dart';
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 
 final buyerAuthLocalDatasourceProvider = Provider<IBuyerAuthDatasource>((ref) {
   final hiveService = ref.read(hiveServiceProvider);
-  return BuyerAuthLocalDatasource(hiveService: hiveService);
+  final userSessionService = ref.read(userSessionServiceProvider);
+  return BuyerAuthLocalDatasource(
+    hiveService: hiveService,
+    userSessionService: userSessionService,
+  );
 });
 
 class BuyerAuthLocalDatasource implements IBuyerAuthDatasource {
   final HiveService _hiveService;
+  final UserSessionService _userSessionService;
 
-  BuyerAuthLocalDatasource({required HiveService hiveService})
-    : _hiveService = hiveService;
+  BuyerAuthLocalDatasource({
+    required HiveService hiveService,
+    required UserSessionService userSessionService,
+  }) : _hiveService = hiveService,
+       _userSessionService = userSessionService;
 
   @override
   Future<BuyerHiveModel?> login(
@@ -24,6 +33,20 @@ class BuyerAuthLocalDatasource implements IBuyerAuthDatasource {
   ) async {
     try {
       final buyer = await _hiveService.loginBuyer(identifier, password, role);
+      if (buyer != null) {
+        final baseUser = await _hiveService.getUserById(buyer.userId!);
+        if (baseUser != null) {
+          await _userSessionService.storeUserSession(
+            userId: buyer.buyerId!,
+            email: baseUser.email,
+            role: baseUser.role,
+            fullName: buyer.fullName,
+            username: buyer.username,
+            phoneNumber: buyer.phoneNumber,
+            profilePictureUrl: buyer.profilePictureUrl,
+          );
+        }
+      }
       return Future.value(buyer);
     } catch (e) {
       return Future.value(null);
@@ -33,8 +56,13 @@ class BuyerAuthLocalDatasource implements IBuyerAuthDatasource {
   @override
   Future<bool> logout() async {
     try {
-      await _hiveService.logoutBuyer();
-      return Future.value(true);
+      final isLoggedOut = await _hiveService.logoutBuyer();
+
+      if (isLoggedOut) {
+        await _userSessionService.clearUserSession();
+      }
+
+      return Future.value(isLoggedOut);
     } catch (e) {
       return Future.value(false);
     }

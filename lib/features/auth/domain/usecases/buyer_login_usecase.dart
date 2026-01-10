@@ -37,7 +37,13 @@ class BuyerLoginUsecase
     : _buyerAuthRepository = buyerAuthRepository;
 
   @override
-  Future<Either<Failures, BuyerEntity>> call(BuyerLoginUsecaseParams params) {
-    return _buyerAuthRepository.login(params.identifier, params.password, params.role);
+  Future<Either<Failures, BuyerEntity>> call(
+    BuyerLoginUsecaseParams params,
+  ) async {
+    return await _buyerAuthRepository.login(
+      params.identifier,
+      params.password,
+      params.role,
+    );
   }
 }

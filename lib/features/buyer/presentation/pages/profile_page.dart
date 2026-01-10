@@ -1,12 +1,30 @@
 // lib/features/buyer/presentation/pages/profile_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/app/theme/app_colors.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/buyer_login_page.dart';
+import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class ProfilePage extends ConsumerStatefulWidget {
+  const ProfilePage({super.key});
+
+  @override
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends ConsumerState<ProfilePage> {
+  Future<void> _logout() async {
+    ref.read(buyerAuthViewModelProvider.notifier).logout();
+    Navigator.pop(context);
+    AppRoutes.pushAndRemoveUntil(context, const BuyerLoginPage());
+    SnackbarUtil.showSuccess(
+      context,
+      "Logged out successfully.",
+      // next.errorMessage ?? "Login Successful",
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,15 +227,7 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              AppRoutes.pushAndRemoveUntil(context, const BuyerLoginPage());
-              SnackbarUtil.showSuccess(
-                context,
-                "Logged out successfully.",
-                // next.errorMessage ?? "Login Successful",
-              );
-            },
+            onPressed: _logout,
             child: Text(
               'Logout',
               style: TextStyle(

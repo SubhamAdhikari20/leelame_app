@@ -27,7 +27,7 @@ class _DashboardPageState extends State<DashboardPage> {
     HomeScreen(),
     MyBidsScreen(),
     WatchlistScreen(),
-    ProfileScreen(),
+    ProfilePage(),
   ];
 
   @override

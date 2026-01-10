@@ -1,18 +1,21 @@
-// lib/features/splash/presentation/pages/splash_screen.dart
+// lib/features/splash/presentation/pages/splash_page.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:leelame/features/onboarding/presentation/pages/onboarding_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/core/services/storage/user_session_service.dart';
+import 'package:leelame/features/buyer/presentation/pages/dashboard_page.dart';
+import 'package:leelame/features/onboarding/presentation/pages/onboarding_page.dart';
 
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class SplashPage extends ConsumerStatefulWidget {
+  const SplashPage({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashPageState extends ConsumerState<SplashPage>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animationController;
   Animation<double>? _scaleAnimation;
@@ -21,7 +24,12 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    _setupAnimations();
+    _startAnimations();
+    _navigateToNext();
+  }
 
+  void _setupAnimations() {
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 1800),
@@ -34,19 +42,24 @@ class _SplashScreenState extends State<SplashScreen>
     _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Interval(0.3, 1.0)),
     );
+  }
 
+  void _startAnimations() async {
     _animationController.forward();
+  }
 
-    Timer(Duration(milliseconds: 3000), () {
-      if (!mounted) {
-        return;
-      }
+  Future<void> _navigateToNext() async {
+    await Future.delayed(const Duration(seconds: 3));
+    if (!mounted) return;
+    // Check if user is already logged in
+    final userSessionService = ref.read(userSessionServiceProvider);
+    final isLoggedIn = userSessionService.isLoggedIn();
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => OnboardingScreen()),
-      );
-    });
+    if (isLoggedIn) {
+      AppRoutes.pushReplacement(context, const DashboardPage());
+    } else {
+      AppRoutes.pushReplacement(context, const OnboardingPage());
+    }
   }
 
   @override
