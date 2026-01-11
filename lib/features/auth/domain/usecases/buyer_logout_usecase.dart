@@ -12,7 +12,7 @@ final buyerLogoutUsecaseProvider = Provider<BuyerLogoutUsecase>((ref) {
   return BuyerLogoutUsecase(buyerAuthRepository: buyerAuthRepository);
 });
 
-class BuyerLogoutUsecase implements UsecaseWithoutParams {
+class BuyerLogoutUsecase implements UsecaseWithoutParams<bool> {
   final IBuyerAuthRepository _buyerAuthRepository;
 
   BuyerLogoutUsecase({required IBuyerAuthRepository buyerAuthRepository})

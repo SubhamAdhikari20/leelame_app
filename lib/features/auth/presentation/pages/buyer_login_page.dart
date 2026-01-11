@@ -29,7 +29,7 @@ class _BuyerLoginPageState extends ConsumerState<BuyerLoginPage> {
   Future<void> _handleLogin() async {
     if (_loginFormKey.currentState!.validate()) {
       // Pass the login form data to view model
-      ref
+      await ref
           .read(buyerAuthViewModelProvider.notifier)
           .login(
             identifier: identifierController.text.trim(),

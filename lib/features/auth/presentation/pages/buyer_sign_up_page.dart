@@ -39,7 +39,7 @@ class _BuyerSignUpPageState extends ConsumerState<BuyerSignUpPage> {
 
     if (_signUpFormKey.currentState!.validate()) {
       // Pass the sign up form data to view model
-      ref
+      await ref
           .read(buyerAuthViewModelProvider.notifier)
           .signUp(
             fullName: _fullNameController.text.trim(),

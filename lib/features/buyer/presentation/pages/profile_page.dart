@@ -16,7 +16,8 @@ class ProfilePage extends ConsumerStatefulWidget {
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   Future<void> _logout() async {
-    ref.read(buyerAuthViewModelProvider.notifier).logout();
+    await ref.read(buyerAuthViewModelProvider.notifier).logout();
+    if (!mounted) return;
     Navigator.pop(context);
     AppRoutes.pushAndRemoveUntil(context, const BuyerLoginPage());
     SnackbarUtil.showSuccess(
