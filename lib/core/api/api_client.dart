@@ -156,7 +156,7 @@ class _AuthInterceptor extends Interceptor {
 
     final isAuthEndpoint =
         options.path == ApiEndpoints.buyerLogin ||
-        options.path == ApiEndpoints.buyers;
+        options.path == ApiEndpoints.buyerSignUp;
 
     if (!isPublicGet && !isAuthEndpoint) {
       final token = await _storage.read(key: _tokenKey);
