@@ -1,0 +1,140 @@
+// lib/features/auth/data/datasources/remote/buyer_auth_remote_datasource.dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:leelame/core/api/api_client.dart';
+import 'package:leelame/core/api/api_endpoints.dart';
+import 'package:leelame/core/services/storage/user_session_service.dart';
+import 'package:leelame/features/auth/data/datasources/buyer_auth_datasource.dart';
+import 'package:leelame/features/auth/data/models/user_api_model.dart';
+import 'package:leelame/features/buyer/data/models/buyer_api_model.dart';
+
+final buyerAuthRemoteDatasourceProvider = Provider<IBuyerAuthRemoteDatasource>((
+  ref,
+) {
+  final apiClient = ref.read(apiClientProvider);
+  final userSessionService = ref.read(userSessionServiceProvider);
+  return BuyerAuthRemoteDatasource(
+    apiClient: apiClient,
+    userSessionService: userSessionService,
+  );
+});
+
+class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
+  final ApiClient _apiClient;
+  final UserSessionService _userSessionService;
+
+  BuyerAuthRemoteDatasource({
+    required ApiClient apiClient,
+    required UserSessionService userSessionService,
+  }) : _apiClient = apiClient,
+       _userSessionService = userSessionService;
+
+  @override
+  Future<BuyerApiModel?> signUp(
+    UserApiModel userModel,
+    BuyerApiModel buyerModel,
+  ) async {
+    final response = await _apiClient.post(
+      ApiEndpoints.buyerSignUp,
+      data: buyerModel.toJson(),
+    );
+
+    if (!(response.data["success"] as bool)) {
+      return null;
+    }
+
+    final data = response.data["data"] as Map<String, dynamic>;
+    final newBuyer = BuyerApiModel.fromJson(data);
+    return newBuyer;
+  }
+
+  @override
+  Future<BuyerApiModel?> login(
+    String identifier,
+    String password,
+    String role,
+  ) async {
+    final response = await _apiClient.post(
+      ApiEndpoints.buyerLogin,
+      data: {"identifier": identifier, "password": password, "role": role},
+    );
+
+    if (!(response.data["success"] as bool)) {
+      return null;
+    }
+
+    final data = response.data["data"] as Map<String, dynamic>;
+    final buyer = BuyerApiModel.fromJson(data);
+    final baseUser = buyer.baseUser;
+    if (baseUser == null) {
+      return null;
+    }
+
+    await _userSessionService.storeUserSession(
+      userId: buyer.id!,
+      email: baseUser.email,
+      role: baseUser.role,
+      fullName: buyer.fullName,
+      username: buyer.username,
+      phoneNumber: buyer.phoneNumber,
+      profilePictureUrl: buyer.profilePictureUrl,
+    );
+    return buyer;
+  }
+
+  @override
+  Future<bool> logout() async {
+    final response = await _apiClient.get(ApiEndpoints.buyerLogout);
+    if (!(response.data["success"] as bool)) {
+      return false;
+    }
+
+    await _userSessionService.clearUserSession();
+    return true;
+  }
+
+  @override
+  Future<BuyerApiModel?> getCurrentBuyer(String buyerId) async {
+    final response = await _apiClient.get(ApiEndpoints.buyerById(buyerId));
+    if (!(response.data["success"] as bool)) {
+      return null;
+    }
+
+    final data = response.data["data"] as Map<String, dynamic>;
+    final buyer = BuyerApiModel.fromJson(data);
+    return buyer;
+  }
+
+  @override
+  Future<UserApiModel?> getCurrentUser(String userId) async {
+    final response = await _apiClient.get(ApiEndpoints.userById(userId));
+    if (!(response.data["success"] as bool)) {
+      return null;
+    }
+
+    final data = response.data["data"] as Map<String, dynamic>;
+    final baseUser = UserApiModel.fromJson(data);
+    return baseUser;
+  }
+
+  @override
+  Future<bool> isEmailExists(String email) async {
+    final response = await _apiClient.get(ApiEndpoints.userByEmail(email));
+    return response.data["success"] as bool;
+  }
+
+  @override
+  Future<bool> isPhoneNumberExists(String phoneNumber) async {
+    final response = await _apiClient.get(
+      ApiEndpoints.buyerByPhoneNumber(phoneNumber),
+    );
+    return response.data["success"] as bool;
+  }
+
+  @override
+  Future<bool> isUsernameExists(String username) async {
+    final response = await _apiClient.get(
+      ApiEndpoints.buyerByUsername(username),
+    );
+    return response.data["success"] as bool;
+  }
+}

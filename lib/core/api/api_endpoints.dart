@@ -20,6 +20,7 @@ class ApiEndpoints {
   static const String buyers = "/buyers";
   static const String buyerSignUp = "/buyer/sign-up";
   static const String buyerLogin = "/buyer/login";
+  static const String buyerLogout = "/buyer/logout";
   static String buyerById(String id) => "/buyer/$id";
   static String buyerByBaseUserId(String baseUserId) => "/buyer/$baseUserId";
   static String buyerByUsername(String username) => "/buyer/$username";

@@ -1,0 +1,39 @@
+// lib/core/services/connectivity/newtwork_into.dart
+import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+abstract interface class INetworkInfo {
+  Future<bool> get isConnected;
+}
+
+final networkInfoProvider = Provider<INetworkInfo>((ref) {
+  return NetworkInfo(connectivity: Connectivity());
+});
+
+class NetworkInfo implements INetworkInfo {
+  final Connectivity _connectivity;
+
+  NetworkInfo({required Connectivity connectivity})
+    : _connectivity = connectivity;
+
+  @override
+  Future<bool> get isConnected async {
+    // check for wifi or mobile data on
+    final result = await _connectivity.checkConnectivity();
+    if (result.contains(ConnectivityResult.none)) {
+      return false;
+    }
+
+    return await _hasInternetConnection();
+  }
+
+  Future<bool> _hasInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup("google.com");
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+}

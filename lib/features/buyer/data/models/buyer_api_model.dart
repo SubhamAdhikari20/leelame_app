@@ -12,7 +12,7 @@ class BuyerApiModel {
   final String? bio;
   final bool termsAccepted;
   final String? userId;
-  final UserApiModel? userModel;
+  final UserApiModel? baseUser;
 
   BuyerApiModel({
     this.id,
@@ -24,7 +24,7 @@ class BuyerApiModel {
     this.bio,
     required this.termsAccepted,
     this.userId,
-    this.userModel,
+    this.baseUser,
   });
 
   // to JSON
@@ -52,7 +52,7 @@ class BuyerApiModel {
       bio: json["bio"] as String?,
       termsAccepted: json["termsAccepted"] as bool,
       userId: json["userId"] as String?,
-      userModel: json["baseUser"] != null
+      baseUser: json["baseUser"] != null
           ? UserApiModel.fromJson(json["baseUser"] as Map<String, dynamic>)
           : null,
     );
@@ -83,7 +83,7 @@ class BuyerApiModel {
       bio: bio,
       termsAccepted: termsAccepted,
       userId: userId,
-      userEntity: userModel?.toEntity(),
+      userEntity: baseUser?.toEntity(),
     );
   }
 

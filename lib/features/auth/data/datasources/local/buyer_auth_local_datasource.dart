@@ -6,7 +6,9 @@ import 'package:leelame/features/auth/data/datasources/buyer_auth_datasource.dar
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 
-final buyerAuthLocalDatasourceProvider = Provider<IBuyerAuthDatasource>((ref) {
+final buyerAuthLocalDatasourceProvider = Provider<IBuyerAuthLocalDatasource>((
+  ref,
+) {
   final hiveService = ref.read(hiveServiceProvider);
   final userSessionService = ref.read(userSessionServiceProvider);
   return BuyerAuthLocalDatasource(
@@ -15,7 +17,7 @@ final buyerAuthLocalDatasourceProvider = Provider<IBuyerAuthDatasource>((ref) {
   );
 });
 
-class BuyerAuthLocalDatasource implements IBuyerAuthDatasource {
+class BuyerAuthLocalDatasource implements IBuyerAuthLocalDatasource {
   final HiveService _hiveService;
   final UserSessionService _userSessionService;
 
