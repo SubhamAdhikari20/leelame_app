@@ -37,10 +37,7 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
     String? username,
     String? phoneNumber,
     String? password,
-    required String role,
-    required bool isVerified,
     required bool termsAccepted,
-    required bool isPermanentlyBanned,
     String? userId,
   }) async {
     state = state.copywith(buyerAuthStatus: BuyerAuthStatus.loading);
@@ -50,10 +47,7 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
       email: email,
       phoneNumber: phoneNumber,
       password: password,
-      role: role,
-      isVerified: isVerified,
       termsAccepted: termsAccepted,
-      isPermanentlyBanned: isPermanentlyBanned,
     );
 
     // Wait for few seconds
@@ -68,7 +62,13 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
         );
       },
       (buyer) {
-        state = state.copywith(buyerAuthStatus: BuyerAuthStatus.created);
+        state = state.copywith(
+          buyerAuthStatus: BuyerAuthStatus.created,
+          createdIdentifier: CreatedIdentifier(
+            type: IdentifierType.username,
+            value: username,
+          ),
+        );
       },
     );
   }

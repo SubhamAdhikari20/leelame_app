@@ -95,6 +95,7 @@ class BuyerApiModel {
       fullName: buyerEntity.fullName,
       username: buyerEntity.username,
       phoneNumber: buyerEntity.phoneNumber,
+      password: buyerEntity.password,
       profilePictureUrl: buyerEntity.profilePictureUrl,
       bio: buyerEntity.bio,
       termsAccepted: buyerEntity.termsAccepted,

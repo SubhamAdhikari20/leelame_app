@@ -17,19 +17,8 @@ class BuyerSignUpUsecaseParams extends Equatable {
   final String? username;
   final String? phoneNumber;
   final String? password;
-  final String role;
-  final bool isVerified;
-  final String? profilePictureUrl;
-  final String? bio;
   final bool termsAccepted;
-
   final String? userId;
-
-  final bool isPermanentlyBanned;
-  final String? banReason;
-  final DateTime? bannedAt;
-  final DateTime? bannedFrom;
-  final DateTime? bannedTo;
 
   const BuyerSignUpUsecaseParams({
     required this.fullName,
@@ -37,17 +26,8 @@ class BuyerSignUpUsecaseParams extends Equatable {
     this.username,
     this.phoneNumber,
     this.password,
-    required this.role,
-    required this.isVerified,
-    this.userId,
-    this.profilePictureUrl,
-    this.bio,
     required this.termsAccepted,
-    required this.isPermanentlyBanned,
-    this.banReason,
-    this.bannedAt,
-    this.bannedFrom,
-    this.bannedTo,
+    this.userId,
   });
 
   @override
@@ -57,8 +37,6 @@ class BuyerSignUpUsecaseParams extends Equatable {
     email,
     phoneNumber,
     password,
-    role,
-    isVerified,
     userId,
   ];
 }
@@ -93,6 +71,9 @@ class BuyerSignUpUsecase
         ValidationFailure(message: "Phone number is required."),
       );
     }
+    // if (params.password == null || params.password!.isEmpty) {
+    //   return const Left(ValidationFailure(message: "Password is required."));
+    // }
 
     // Generate userId
     final userId = params.userId ?? Uuid().v4();
@@ -101,10 +82,11 @@ class BuyerSignUpUsecase
     UserEntity userEntity = UserEntity(
       userId: userId,
       email: params.email,
-      role: params.role,
-      isVerified: params.isVerified,
-      isPermanentlyBanned: params.isPermanentlyBanned,
+      role: "buyer",
+      isVerified: false,
+      isPermanentlyBanned: false,
     );
+
     BuyerEntity buyerEntity = BuyerEntity(
       fullName: params.fullName,
       username: params.username,

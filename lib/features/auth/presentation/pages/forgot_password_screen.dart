@@ -104,7 +104,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     true) {
                                   AppRoutes.push(
                                     context,
-                                    const BuyerVerifyAccountRegistrationPage(),
+                                    BuyerVerifyAccountRegistrationPage(
+                                      username: "",
+                                    ),
                                   );
                                 }
                               },

@@ -33,16 +33,22 @@ class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
     UserApiModel userModel,
     BuyerApiModel buyerModel,
   ) async {
+    final body = {
+      ...buyerModel.toJson(),
+      "email": userModel.email,
+      "role": userModel.role,
+      // "baseUser": userModel.toJson(),
+    };
     final response = await _apiClient.post(
       ApiEndpoints.buyerSignUp,
-      data: buyerModel.toJson(),
+      data: body,
     );
 
     if (!(response.data["success"] as bool)) {
       return null;
     }
 
-    final data = response.data["data"] as Map<String, dynamic>;
+    final data = response.data["user"] as Map<String, dynamic>;
     final newBuyer = BuyerApiModel.fromJson(data);
     return newBuyer;
   }
@@ -71,7 +77,7 @@ class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
       return null;
     }
 
-    final data = response.data["data"] as Map<String, dynamic>;
+    final data = response.data["user"] as Map<String, dynamic>;
     final buyer = BuyerApiModel.fromJson(data);
     final baseUser = buyer.baseUser;
     if (baseUser == null) {

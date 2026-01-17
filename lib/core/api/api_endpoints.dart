@@ -17,16 +17,18 @@ class ApiEndpoints {
   static String userByEmail(String email) => "/user/$email";
 
   // ======================= Buyer Auth Endpoints =======================
-  static const String buyers = "/buyers";
-  static const String buyerSignUp = "/buyer/sign-up";
-  static const String buyerLogin = "/buyer/login";
+  static const String buyers = "/users/buyers";
+  static const String buyerSignUp = "/users/buyer/sign-up";
+  static const String buyerLogin = "/users/buyer/login";
   static const String buyerVerifyAccountRegistration =
-      "/buyer/verify-account-registration";
+      "/users/buyer/verify-account-registration";
   static const String buyerSendVerificationEmailRegistration =
-      "/buyer/send-verification-email-registration";
-  static const String buyerLogout = "/buyer/logout";
-  static String buyerById(String id) => "/buyer/$id";
-  static String buyerByBaseUserId(String baseUserId) => "/buyer/$baseUserId";
-  static String buyerByUsername(String username) => "/buyer/$username";
-  static String buyerByPhoneNumber(String phoneNumber) => "/buyer/$phoneNumber";
+      "/users/buyer/send-verification-email-registration";
+  static const String buyerLogout = "/users/buyer/logout";
+  static String buyerById(String id) => "/users/buyer/$id";
+  static String buyerByBaseUserId(String baseUserId) =>
+      "/users/buyer/$baseUserId";
+  static String buyerByUsername(String username) => "/users/buyer/$username";
+  static String buyerByPhoneNumber(String phoneNumber) =>
+      "/users/buyer/$phoneNumber";
 }

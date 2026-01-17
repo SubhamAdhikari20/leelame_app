@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/buyer_login_page.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer_verify_account_registration_page.dart';
 import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
 import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
@@ -47,10 +48,7 @@ class _BuyerSignUpPageState extends ConsumerState<BuyerSignUpPage> {
             email: _emailController.text.trim(),
             phoneNumber: _phoneNumber.text.trim(),
             password: _passwordController.text.trim(),
-            role: "buyer".trim(),
-            isVerified: true,
             termsAccepted: _agreeToTerms,
-            isPermanentlyBanned: false,
           );
     }
   }
@@ -71,9 +69,14 @@ class _BuyerSignUpPageState extends ConsumerState<BuyerSignUpPage> {
           "Sign Up Successful",
           // next.errorMessage ?? "Sign Up Successful",
         );
+        final username =
+            next.createdIdentifier?.value ?? _usernameController.text.trim();
 
-        // Navigate to login
-        AppRoutes.push(context, const BuyerLoginPage());
+        // Navigate to verification page
+        AppRoutes.push(
+          context,
+          BuyerVerifyAccountRegistrationPage(username: username),
+        );
       }
     });
 

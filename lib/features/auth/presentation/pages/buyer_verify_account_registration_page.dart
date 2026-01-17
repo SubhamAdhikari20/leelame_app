@@ -2,11 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/buyer_login_page.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
+import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
+import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
 
 class BuyerVerifyAccountRegistrationPage extends ConsumerStatefulWidget {
-  const BuyerVerifyAccountRegistrationPage({super.key});
+  final String username;
+  const BuyerVerifyAccountRegistrationPage({super.key, required this.username});
 
   @override
   ConsumerState<BuyerVerifyAccountRegistrationPage> createState() =>
@@ -15,12 +19,12 @@ class BuyerVerifyAccountRegistrationPage extends ConsumerStatefulWidget {
 
 class _BuyerVerifyAccountRegistrationPageState
     extends ConsumerState<BuyerVerifyAccountRegistrationPage> {
+  final _verifyAccountRegistrationFormKey = GlobalKey<FormState>();
   final List<TextEditingController> _controllers = List.generate(
     6,
     (_) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
-  final bool _isLoading = false;
 
   @override
   void dispose() {
@@ -33,11 +37,20 @@ class _BuyerVerifyAccountRegistrationPageState
     super.dispose();
   }
 
+  Future<void> _handleAccountVerification() async {
+    if (_verifyAccountRegistrationFormKey.currentState!.validate()) {
+      final otp = _controllers.map((c) => c.text).join();
+      await ref
+          .read(buyerAuthViewModelProvider.notifier)
+          .verifyAccountRegistration(username: widget.username, otp: otp);
+    }
+  }
+
   Widget _buildOtpBox(int index) {
     return SizedBox(
       width: 56,
       height: 56,
-      child: TextField(
+      child: TextFormField(
         controller: _controllers[index],
         focusNode: _focusNodes[index],
         keyboardType: TextInputType.number,
@@ -71,6 +84,22 @@ class _BuyerVerifyAccountRegistrationPageState
 
   @override
   Widget build(BuildContext context) {
+    final buyerAuthState = ref.watch(buyerAuthViewModelProvider);
+
+    ref.listen<BuyerAuthState>(buyerAuthViewModelProvider, (previous, next) {
+      if (next.buyerAuthStatus == BuyerAuthStatus.error) {
+        SnackbarUtil.showError(
+          context,
+          next.errorMessage ?? "Verification Failed!",
+        );
+      } else if (next.buyerAuthStatus == BuyerAuthStatus.verified) {
+        SnackbarUtil.showSuccess(context, "Verification Successful");
+
+        // Navigate to Login
+        AppRoutes.pushReplacement(context, const BuyerLoginPage());
+      }
+    });
+
     final bool isTablet = MediaQuery.of(context).size.width > 600;
     // final bool isDesktop = MediaQuery.of(context).size.width > 900;
     // final double horizontalPadding = isDesktop ? 40 : (isTablet ? 30 : 20);
@@ -138,20 +167,23 @@ class _BuyerVerifyAccountRegistrationPageState
                       SizedBox(height: 30),
 
                       // 6 OTP Boxes
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(6, _buildOtpBox),
+                      Form(
+                        key: _verifyAccountRegistrationFormKey,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List.generate(6, _buildOtpBox),
+                        ),
                       ),
 
                       SizedBox(height: 40),
 
                       // Verify Button
                       CustomPrimaryButton(
-                        onPressed: () {
-                          AppRoutes.push(context, const BuyerLoginPage());
-                        },
+                        onPressed: _handleAccountVerification,
                         text: "Verify",
-                        isLoading: _isLoading,
+                        isLoading:
+                            buyerAuthState.buyerAuthStatus ==
+                            BuyerAuthStatus.loading,
                       ),
 
                       SizedBox(height: 30),

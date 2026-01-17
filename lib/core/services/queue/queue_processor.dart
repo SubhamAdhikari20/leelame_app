@@ -72,7 +72,7 @@ class QueueProcessor {
       for (final item in pending) {
         final key = item['key'] as String? ?? '';
         final toEmail = item['toEmail'] as String? ?? '';
-        final fullName = item['fullName'] as String? ?? '';
+        // final fullName = item['fullName'] as String? ?? '';
         final otp = item['otp'] as String? ?? '';
         final attempts = item['attempts'] as int? ?? 0;
 

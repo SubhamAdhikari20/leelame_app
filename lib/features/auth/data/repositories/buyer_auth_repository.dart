@@ -1,8 +1,8 @@
 // lib/features/auth/data/repositories/buyer_auth_repository.dart
 import 'dart:math';
+import 'package:bcrypt/bcrypt.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_bcrypt/flutter_bcrypt.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/core/error/failures.dart';
 import 'package:leelame/core/services/connectivity/network_info.dart';
@@ -114,9 +114,14 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
           (_) => Random().nextInt(10),
         ).join().toString();
 
-        final hashedPassword = await FlutterBcrypt.hashPw(
-          password: buyerEntity.password ?? "",
-          salt: await FlutterBcrypt.salt(),
+        // final hashedPassword = await FlutterBcrypt.hashPw(
+        //   password: buyerEntity.password ?? "",
+        //   salt: await FlutterBcrypt.salt(),
+        // );
+
+        final hashedPassword = BCrypt.hashpw(
+          buyerEntity.password ?? "",
+          BCrypt.gensalt(),
         );
 
         final expiryDate = DateTime.now().add(
@@ -181,10 +186,10 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
             userModel.copyWith(
               email: userEntity.email,
               role: userEntity.role,
-              isVerified: false,
+              isVerified: userEntity.isVerified,
               verifyCode: otp,
               verifyCodeExpiryDate: expiryDate,
-              isPermanentlyBanned: false,
+              isPermanentlyBanned: userEntity.isPermanentlyBanned,
               pendingOtpSend: true,
             ),
           );
@@ -307,10 +312,12 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
               );
             }
 
-            final isMatched = await FlutterBcrypt.verify(
-              password: password,
-              hash: hashedPassword,
-            );
+            // final isMatched = await FlutterBcrypt.verify(
+            //   password: password,
+            //   hash: hashedPassword,
+            // );
+
+            final isMatched = BCrypt.checkpw(password, hashedPassword);
 
             if (!isMatched) {
               return const Left(
@@ -343,10 +350,12 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
             );
           }
 
-          final isMatched = await FlutterBcrypt.verify(
-            password: password,
-            hash: hashedPassword,
-          );
+          // final isMatched = await FlutterBcrypt.verify(
+          //   password: password,
+          //   hash: hashedPassword,
+          // );
+
+          final isMatched = BCrypt.checkpw(password, hashedPassword);
 
           if (!isMatched) {
             return const Left(
