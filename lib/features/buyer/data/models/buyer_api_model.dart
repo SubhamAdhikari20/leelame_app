@@ -10,7 +10,7 @@ class BuyerApiModel {
   final String? password;
   final String? profilePictureUrl;
   final String? bio;
-  final bool termsAccepted;
+  final bool? termsAccepted;
   final String? userId;
   final UserApiModel? baseUser;
 
@@ -22,7 +22,7 @@ class BuyerApiModel {
     this.password,
     this.profilePictureUrl,
     this.bio,
-    required this.termsAccepted,
+    this.termsAccepted,
     this.userId,
     this.baseUser,
   });
@@ -32,12 +32,13 @@ class BuyerApiModel {
     return {
       "fullName": fullName,
       "username": username,
-      "phoneNumber": phoneNumber,
+      "contact": phoneNumber,
       "password": password,
       "profilePictureUrl": profilePictureUrl,
       "bio": bio,
-      "termsAccepted": termsAccepted,
+      "terms": termsAccepted,
       "userId": userId,
+      "baseUser": baseUser,
     };
   }
 
@@ -47,10 +48,10 @@ class BuyerApiModel {
       id: json["_id"] as String,
       fullName: json["fullName"] as String,
       username: json["username"] as String,
-      phoneNumber: json["phoneNumber"] as String?,
+      phoneNumber: json["contact"] as String?,
       profilePictureUrl: json["profilePictureUrl"] as String?,
       bio: json["bio"] as String?,
-      termsAccepted: json["termsAccepted"] as bool,
+      termsAccepted: json["terms"] as bool?,
       userId: json["userId"] as String?,
       baseUser: json["baseUser"] != null
           ? UserApiModel.fromJson(json["baseUser"] as Map<String, dynamic>)

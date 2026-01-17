@@ -48,6 +48,15 @@ class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
   }
 
   @override
+  Future<bool> verifyAccountRegistration(String username, String otp) async {
+    final response = await _apiClient.put(
+      ApiEndpoints.buyerVerifyAccountRegistration,
+      data: {"username": username, "otp": otp},
+    );
+    return response.data["success"] as bool;
+  }
+
+  @override
   Future<BuyerApiModel?> login(
     String identifier,
     String password,
@@ -134,6 +143,25 @@ class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
   Future<bool> isUsernameExists(String username) async {
     final response = await _apiClient.get(
       ApiEndpoints.buyerByUsername(username),
+    );
+    return response.data["success"] as bool;
+  }
+
+  @override
+  Future<bool> sendQueuedVerificationEmail({
+    String? userId,
+    required String email,
+    required String otp,
+    DateTime? expiry,
+  }) async {
+    final response = await _apiClient.post(
+      ApiEndpoints.buyerSendVerificationEmailRegistration,
+      data: {
+        "userId": userId,
+        "email": email,
+        "otp": otp,
+        "expiry": expiry?.toIso8601String(),
+      },
     );
     return response.data["success"] as bool;
   }

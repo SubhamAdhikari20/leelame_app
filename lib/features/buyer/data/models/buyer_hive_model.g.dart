@@ -24,7 +24,7 @@ class BuyerHiveModelAdapter extends TypeAdapter<BuyerHiveModel> {
       password: fields[4] as String?,
       profilePictureUrl: fields[5] as String?,
       bio: fields[6] as String?,
-      termsAccepted: fields[7] as bool,
+      termsAccepted: fields[7] as bool?,
       userId: fields[8] as String?,
     );
   }

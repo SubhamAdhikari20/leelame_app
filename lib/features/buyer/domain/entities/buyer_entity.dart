@@ -10,7 +10,7 @@ class BuyerEntity extends Equatable {
   final String? password;
   final String? profilePictureUrl;
   final String? bio;
-  final bool termsAccepted;
+  final bool? termsAccepted;
 
   // Reference from base user
   final String? userId;
@@ -24,7 +24,7 @@ class BuyerEntity extends Equatable {
     this.password,
     this.profilePictureUrl,
     this.bio,
-    required this.termsAccepted,
+    this.termsAccepted,
     this.userId,
     this.userEntity,
   });

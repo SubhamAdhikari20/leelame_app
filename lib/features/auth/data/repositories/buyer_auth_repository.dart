@@ -1,9 +1,12 @@
 // lib/features/auth/data/repositories/buyer_auth_repository.dart
+import 'dart:math';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_bcrypt/flutter_bcrypt.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/core/error/failures.dart';
 import 'package:leelame/core/services/connectivity/network_info.dart';
+import 'package:leelame/core/services/storage/user_session_service.dart';
 import 'package:leelame/features/auth/data/datasources/buyer_auth_datasource.dart';
 import 'package:leelame/features/auth/data/datasources/local/buyer_auth_local_datasource.dart';
 import 'package:leelame/features/auth/data/datasources/remote/buyer_auth_remote_datasource.dart';
@@ -18,10 +21,13 @@ import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
 final buyerAuthRepositoryProvider = Provider<IBuyerAuthRepository>((ref) {
   final buyerAuthLocalDatasource = ref.read(buyerAuthLocalDatasourceProvider);
   final buyerAuthRemoteDatasource = ref.read(buyerAuthRemoteDatasourceProvider);
+  final userSessionService = ref.read(userSessionServiceProvider);
   final networkInfo = ref.read(networkInfoProvider);
+
   return BuyerAuthRepository(
     buyerAuthLocalDatasource: buyerAuthLocalDatasource,
     buyerAuthRemoteDatasource: buyerAuthRemoteDatasource,
+    userSessionService: userSessionService,
     networkInfo: networkInfo,
   );
 });
@@ -29,14 +35,17 @@ final buyerAuthRepositoryProvider = Provider<IBuyerAuthRepository>((ref) {
 class BuyerAuthRepository implements IBuyerAuthRepository {
   final IBuyerAuthLocalDatasource _buyerAuthLocalDatasource;
   final IBuyerAuthRemoteDatasource _buyerAuthRemoteDatasource;
+  final UserSessionService _userSessionService;
   final INetworkInfo _networkInfo;
 
   BuyerAuthRepository({
     required IBuyerAuthLocalDatasource buyerAuthLocalDatasource,
     required IBuyerAuthRemoteDatasource buyerAuthRemoteDatasource,
+    required UserSessionService userSessionService,
     required INetworkInfo networkInfo,
   }) : _buyerAuthLocalDatasource = buyerAuthLocalDatasource,
        _buyerAuthRemoteDatasource = buyerAuthRemoteDatasource,
+       _userSessionService = userSessionService,
        _networkInfo = networkInfo;
 
   @override
@@ -74,48 +83,145 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
         final userModel = UserHiveModel.fromEntity(userEntity);
         final buyerModel = BuyerHiveModel.fromEntity(buyerEntity);
 
-        final checkEmailExist = await _buyerAuthLocalDatasource.isEmailExists(
-          userModel.email,
+        // Check existing user
+        final existingUserByEmail = await _buyerAuthLocalDatasource
+            .getUserByEmail(userModel.email);
+
+        // Check for existing username
+        final existingBuyerByUsername = await _buyerAuthLocalDatasource
+            .getBuyerByUsername(buyerModel.username ?? "");
+
+        if ((existingBuyerByUsername != null) &&
+            (existingUserByEmail?.isVerified == true)) {
+          return const Left(
+            LocalDatabaseFailure(message: "Username already exists!"),
+          );
+        }
+
+        // Check for existing contact number
+        final existingBuyerByContact = await _buyerAuthLocalDatasource
+            .getBuyerByPhoneNumber(buyerModel.phoneNumber ?? "");
+
+        if ((existingBuyerByContact != null) &&
+            (existingUserByEmail?.isVerified == true)) {
+          return const Left(
+            LocalDatabaseFailure(message: "Phone Number already exists!"),
+          );
+        }
+
+        final otp = List.generate(
+          6,
+          (_) => Random().nextInt(10),
+        ).join().toString();
+
+        final hashedPassword = await FlutterBcrypt.hashPw(
+          password: buyerEntity.password ?? "",
+          salt: await FlutterBcrypt.salt(),
         );
-        if (checkEmailExist) {
-          return const Left(
-            LocalDatabaseFailure(
-              message: "Sign Up failed! Email already exists.",
+
+        final expiryDate = DateTime.now().add(
+          const Duration(minutes: 10),
+        ); // Add 10 mins from 'now'
+
+        UserHiveModel? newUser;
+        BuyerHiveModel? buyerProfile;
+        bool isNewUserCreated = false;
+        bool isNewProfileCreated = false;
+
+        // Check for existing email
+        if (existingUserByEmail != null) {
+          if (existingUserByEmail.isVerified) {
+            return const Left(
+              LocalDatabaseFailure(message: "Email already registered!"),
+            );
+          }
+
+          // Update existing unverified user
+          newUser = await _buyerAuthLocalDatasource.updateBaseUser(
+            existingUserByEmail.copyWith(
+              verifyCode: otp,
+              verifyCodeExpiryDate: expiryDate,
+              role: userEntity.role,
+              pendingOtpSend: true,
             ),
           );
-        }
 
-        final checkUsernameExist = await _buyerAuthLocalDatasource
-            .isUsernameExists(buyerModel.username!);
-        if (checkUsernameExist) {
-          return const Left(
-            LocalDatabaseFailure(
-              message: "Sign Up failed! Username already exists.",
+          if (newUser == null) {
+            return const Left(
+              LocalDatabaseFailure(message: "Failed to update new user!"),
+            );
+          }
+
+          // If buyerProfile does not exist for this user, create one
+          buyerProfile = await _buyerAuthLocalDatasource.getBuyerById(
+            newUser.userId ?? "",
+          );
+
+          if (buyerProfile == null) {
+            buyerProfile = await _buyerAuthLocalDatasource.createBuyer(
+              buyerModel,
+            );
+
+            isNewProfileCreated = true;
+          } else {
+            // Update if exists
+            buyerProfile = await _buyerAuthLocalDatasource.updateBuyer(
+              existingBuyerByUsername!.copyWith(
+                fullName: buyerModel.fullName,
+                username: buyerModel.username,
+                phoneNumber: buyerModel.phoneNumber,
+                password: hashedPassword,
+                termsAccepted: buyerModel.termsAccepted,
+              ),
+            );
+          }
+        } else {
+          // Create new user
+          newUser = await _buyerAuthLocalDatasource.createBaseUser(
+            userModel.copyWith(
+              email: userEntity.email,
+              role: userEntity.role,
+              isVerified: false,
+              verifyCode: otp,
+              verifyCodeExpiryDate: expiryDate,
+              isPermanentlyBanned: false,
+              pendingOtpSend: true,
             ),
           );
-        }
 
-        final checkPhoneNumberExist = await _buyerAuthLocalDatasource
-            .isPhoneNumberExists(buyerModel.phoneNumber!);
-        if (checkPhoneNumberExist) {
-          return const Left(
-            LocalDatabaseFailure(
-              message: "Sign Up failed! Phone Number already exists.",
+          if (newUser == null) {
+            return const Left(
+              LocalDatabaseFailure(message: "Failed to create new user!"),
+            );
+          }
+
+          buyerProfile = await _buyerAuthLocalDatasource.createBuyer(
+            buyerModel.copyWith(
+              userId: newUser.userId,
+              fullName: buyerEntity.fullName,
+              username: buyerEntity.username,
+              phoneNumber: buyerEntity.phoneNumber,
+              password: hashedPassword,
+              termsAccepted: buyerEntity.termsAccepted,
             ),
           );
+
+          isNewUserCreated = true;
         }
 
-        final result = await _buyerAuthLocalDatasource.signUp(
-          userModel,
-          buyerModel,
+        if (buyerProfile == null) {
+          return const Left(LocalDatabaseFailure(message: "Buyer not found!"));
+        }
+
+        // Queue the OTP email
+        await _buyerAuthLocalDatasource.queueOtpEmail(
+          toEmail: userModel.email,
+          fullName: buyerModel.fullName,
+          otp: otp,
+          expiryDate: expiryDate,
         );
-        if (result == null) {
-          return const Left(
-            LocalDatabaseFailure(message: "Failed to sign up buyer!"),
-          );
-        }
 
-        return Right(result.toEntity(userEntity: userEntity));
+        return Right(buyerProfile.toEntity(userEntity: userEntity));
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }
@@ -152,27 +258,225 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
       }
     } else {
       try {
-        final buyer = await _buyerAuthLocalDatasource.login(
-          identifier,
-          password,
-          role,
+        // Email OR Username
+        if (role == "buyer") {
+          final emailRegex = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]{2,}$');
+          final usernameRegex = RegExp(r'^[a-zA-Z0-9_.]{3,20}$');
+
+          final isEmailFormat = emailRegex.hasMatch(identifier);
+          final isUsernameFormat = usernameRegex.hasMatch(identifier);
+
+          if (!isEmailFormat && !isUsernameFormat) {
+            return const Left(
+              LocalDatabaseFailure(
+                message:
+                    "Invalid identifier! Identifier must be a valid username or email.",
+              ),
+            );
+          }
+
+          UserHiveModel? user;
+          BuyerHiveModel? buyerProfile;
+
+          if (isEmailFormat) {
+            user = await _buyerAuthLocalDatasource.getUserByEmail(identifier);
+            if (user == null || user.role != role) {
+              return const Left(
+                LocalDatabaseFailure(
+                  message:
+                      "Invalid email! No buyer account found with this email.",
+                ),
+              );
+            }
+
+            buyerProfile = await _buyerAuthLocalDatasource.getBuyerByBaseUserId(
+              user.userId ?? "",
+            );
+            if (buyerProfile == null) {
+              return const Left(
+                LocalDatabaseFailure(
+                  message: "Buyer user not found for this base user id.",
+                ),
+              );
+            }
+
+            final hashedPassword = buyerProfile.password;
+            if (hashedPassword == null) {
+              return const Left(
+                LocalDatabaseFailure(message: "Password not found for buyer!"),
+              );
+            }
+
+            final isMatched = await FlutterBcrypt.verify(
+              password: password,
+              hash: hashedPassword,
+            );
+
+            if (!isMatched) {
+              return const Left(
+                LocalDatabaseFailure(
+                  message: "Invalid password! Please enter correct password.",
+                ),
+              );
+            }
+
+            return Right(buyerProfile.toEntity(userEntity: user.toEntity()));
+          }
+
+          // If identifier is a username;
+          buyerProfile = await _buyerAuthLocalDatasource.getBuyerByUsername(
+            identifier,
+          );
+          if (buyerProfile == null) {
+            return const Left(
+              LocalDatabaseFailure(
+                message:
+                    "Invalid username! No buyer account found with this username.",
+              ),
+            );
+          }
+
+          final hashedPassword = buyerProfile.password;
+          if (hashedPassword == null) {
+            return const Left(
+              LocalDatabaseFailure(message: "Password not found for buyer!"),
+            );
+          }
+
+          final isMatched = await FlutterBcrypt.verify(
+            password: password,
+            hash: hashedPassword,
+          );
+
+          if (!isMatched) {
+            return const Left(
+              LocalDatabaseFailure(
+                message: "Invalid password! Please enter correct password.",
+              ),
+            );
+          }
+
+          user = await _buyerAuthLocalDatasource.getUserById(
+            buyerProfile.userId ?? "",
+          );
+          if (user == null) {
+            return const Left(LocalDatabaseFailure(message: "User not found!"));
+          }
+
+          await _userSessionService.storeUserSession(
+            userId: buyerProfile.buyerId!,
+            email: user.email,
+            role: user.role,
+            fullName: buyerProfile.fullName,
+            username: buyerProfile.username,
+            phoneNumber: buyerProfile.phoneNumber,
+            profilePictureUrl: buyerProfile.profilePictureUrl,
+          );
+
+          return Right(buyerProfile.toEntity(userEntity: user.toEntity()));
+        }
+
+        return const Left(
+          LocalDatabaseFailure(message: "Invalid role! Role is unknown."),
         );
-        if (buyer == null) {
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
+    }
+  }
+
+  @override
+  Future<Either<Failures, bool>> verifyAccountRegistration(
+    String username,
+    String otp,
+  ) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final result = await _buyerAuthRemoteDatasource
+            .verifyAccountRegistration(username, otp);
+        return Right(result);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data["message"] ?? "Failed to verify account!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      try {
+        final existingBuyerByUsername = await _buyerAuthLocalDatasource
+            .getBuyerByUsername(username);
+
+        if (existingBuyerByUsername == null) {
           return const Left(
-            LocalDatabaseFailure(message: "Failed to login buyer!"),
+            LocalDatabaseFailure(
+              message: "Buyer with this username does not exist!",
+            ),
           );
         }
 
-        final baseUser = await _buyerAuthLocalDatasource.getCurrentUser(
-          buyer.userId!,
+        final existingUserById = await _buyerAuthLocalDatasource.getUserById(
+          existingBuyerByUsername.userId ?? "",
         );
-        if (baseUser == null) {
+
+        if (existingUserById == null) {
           return const Left(
-            LocalDatabaseFailure(message: "Failed to get current base user!"),
+            LocalDatabaseFailure(message: "User with this id does not exist!"),
           );
         }
 
-        return Right(buyer.toEntity(userEntity: baseUser.toEntity()));
+        if (existingUserById.isVerified) {
+          return const Left(
+            LocalDatabaseFailure(
+              message: "This account is already verified! Please login.",
+            ),
+          );
+        }
+
+        if (existingUserById.verifyCode == null ||
+            existingUserById.verifyCodeExpiryDate == null) {
+          return const Left(
+            LocalDatabaseFailure(
+              message: "No OTP request found! Please request for a new OTP.",
+            ),
+          );
+        }
+
+        final expiryDate = DateTime.parse(
+          existingUserById.verifyCodeExpiryDate.toString(),
+        );
+        if (DateTime.now().isAfter(expiryDate)) {
+          return const Left(
+            LocalDatabaseFailure(
+              message: "OTP has expired! Please request for a new OTP.",
+            ),
+          );
+        }
+
+        if (existingUserById.verifyCode != otp) {
+          return const Left(
+            LocalDatabaseFailure(message: "Invalid OTP! Please try again."),
+          );
+        }
+
+        final updatedUser = await _buyerAuthLocalDatasource.updateBaseUser(
+          existingUserById.copyWith(
+            isVerified: true,
+            verifyCode: null,
+            verifyCodeExpiryDate: null,
+          ),
+        );
+
+        if (updatedUser == null) {
+          return const Left(
+            LocalDatabaseFailure(message: "User is not updated and not found!"),
+          );
+        }
+
+        return Right(true);
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }
@@ -201,13 +505,7 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
       }
     } else {
       try {
-        final result = await _buyerAuthLocalDatasource.logout();
-        if (!result) {
-          return const Left(
-            LocalDatabaseFailure(message: "Failed to logout buyer!"),
-          );
-        }
-
+        await _userSessionService.clearUserSession();
         return const Right(true);
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
@@ -240,16 +538,14 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
       }
     } else {
       try {
-        final buyer = await _buyerAuthLocalDatasource.getCurrentBuyer(buyerId);
+        final buyer = await _buyerAuthLocalDatasource.getBuyerById(buyerId);
         if (buyer == null) {
           return const Left(
             LocalDatabaseFailure(message: "Failed to get current buyer!"),
           );
         }
 
-        final user = await _buyerAuthLocalDatasource.getCurrentUser(
-          buyer.userId!,
-        );
+        final user = await _buyerAuthLocalDatasource.getUserById(buyer.userId!);
         if (user == null) {
           return const Left(
             LocalDatabaseFailure(message: "Failed to get current base user!"),

@@ -7,7 +7,7 @@ import 'package:uuid/uuid.dart';
 part "user_hive_model.g.dart";
 
 @HiveType(typeId: HiveTableConstant.usersTypeId)
-class UserHiveModel extends HiveObject{
+class UserHiveModel extends HiveObject {
   @HiveField(0)
   final String? userId;
 
@@ -35,10 +35,25 @@ class UserHiveModel extends HiveObject{
   @HiveField(8)
   final DateTime? bannedTo;
 
-  // @HiveField(9)
+  @HiveField(9)
+  final String? verifyCode;
+
+  @HiveField(10)
+  final DateTime? verifyCodeExpiryDate;
+
+  @HiveField(11)
+  final String? verifyEmailResetPassword;
+
+  @HiveField(12)
+  final DateTime? verifyEmailResetPasswordExpiryDate;
+
+  @HiveField(13)
+  final bool pendingOtpSend;
+
+  // @HiveField(13)
   // final String? buyerProfileId;
 
-  // @HiveField(10)
+  // @HiveField(14)
   // final String? sellerProfileId;
 
   UserHiveModel({
@@ -51,6 +66,11 @@ class UserHiveModel extends HiveObject{
     this.bannedAt,
     this.bannedFrom,
     this.bannedTo,
+    this.verifyCode,
+    this.verifyCodeExpiryDate,
+    this.verifyEmailResetPassword,
+    this.verifyEmailResetPasswordExpiryDate,
+    this.pendingOtpSend = false,
     // this.buyerProfileId,
     // this.sellerProfileId,
   }) : userId = userId ?? Uuid().v4();
@@ -67,6 +87,10 @@ class UserHiveModel extends HiveObject{
       bannedAt: bannedAt,
       bannedFrom: bannedFrom,
       bannedTo: bannedTo,
+      verifyCode: verifyCode,
+      verifyCodeExpiryDate: verifyCodeExpiryDate,
+      verifyEmailResetPassword: verifyEmailResetPassword,
+      verifyEmailResetPasswordExpiryDate: verifyEmailResetPasswordExpiryDate,
       // buyerId: buyerProfileId,
       // sellerId: sellerProfileId,
     );
@@ -84,6 +108,11 @@ class UserHiveModel extends HiveObject{
       bannedAt: userEntity.bannedAt,
       bannedFrom: userEntity.bannedFrom,
       bannedTo: userEntity.bannedTo,
+      verifyCode: userEntity.verifyCode,
+      verifyCodeExpiryDate: userEntity.verifyCodeExpiryDate,
+      verifyEmailResetPassword: userEntity.verifyEmailResetPassword,
+      verifyEmailResetPasswordExpiryDate:
+          userEntity.verifyEmailResetPasswordExpiryDate,
       // buyerProfileId: userEntity.buyerId,
       // sellerProfileId: userEntity.sellerId,
     );
@@ -92,5 +121,43 @@ class UserHiveModel extends HiveObject{
   // Convert List of Models to List of User Entities
   static List<UserEntity> toEntityList(List<UserHiveModel> userModels) {
     return userModels.map((userModel) => userModel.toEntity()).toList();
+  }
+
+  // copyWith helper to create updated instances (used before saving to Hive)
+  UserHiveModel copyWith({
+    String? userId,
+    String? email,
+    String? role,
+    bool? isVerified,
+    bool? isPermanentlyBanned,
+    String? banReason,
+    DateTime? bannedAt,
+    DateTime? bannedFrom,
+    DateTime? bannedTo,
+    String? verifyCode,
+    DateTime? verifyCodeExpiryDate,
+    String? verifyEmailResetPassword,
+    DateTime? verifyEmailResetPasswordExpiryDate,
+    bool? pendingOtpSend,
+  }) {
+    return UserHiveModel(
+      userId: userId ?? this.userId,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      isVerified: isVerified ?? this.isVerified,
+      isPermanentlyBanned: isPermanentlyBanned ?? this.isPermanentlyBanned,
+      banReason: banReason ?? this.banReason,
+      bannedAt: bannedAt ?? this.bannedAt,
+      bannedFrom: bannedFrom ?? this.bannedFrom,
+      bannedTo: bannedTo ?? this.bannedTo,
+      verifyCode: verifyCode ?? this.verifyCode,
+      verifyCodeExpiryDate: verifyCodeExpiryDate ?? this.verifyCodeExpiryDate,
+      verifyEmailResetPassword:
+          verifyEmailResetPassword ?? this.verifyEmailResetPassword,
+      verifyEmailResetPasswordExpiryDate:
+          verifyEmailResetPasswordExpiryDate ??
+          this.verifyEmailResetPasswordExpiryDate,
+      pendingOtpSend: pendingOtpSend ?? this.pendingOtpSend,
+    );
   }
 }

@@ -15,6 +15,12 @@ class UserEntity extends Equatable {
   final DateTime? bannedFrom;
   final DateTime? bannedTo;
 
+  // Verify Account with OTP and Expiry Time
+  final String? verifyCode;
+  final DateTime? verifyCodeExpiryDate;
+  final String? verifyEmailResetPassword;
+  final DateTime? verifyEmailResetPasswordExpiryDate;
+
   // Users references
   // final String? buyerId;
   // final String? sellerId;
@@ -36,6 +42,10 @@ class UserEntity extends Equatable {
     this.bannedAt,
     this.bannedFrom,
     this.bannedTo,
+    this.verifyCode,
+    this.verifyCodeExpiryDate,
+    this.verifyEmailResetPassword,
+    this.verifyEmailResetPasswordExpiryDate,
     // this.buyerId,
     // this.sellerId,
   });
@@ -51,6 +61,10 @@ class UserEntity extends Equatable {
     bannedAt,
     bannedFrom,
     bannedTo,
+    verifyCode,
+    verifyCodeExpiryDate,
+    verifyEmailResetPassword,
+    verifyEmailResetPasswordExpiryDate,
     // buyerId,
     // sellerId,
   ];

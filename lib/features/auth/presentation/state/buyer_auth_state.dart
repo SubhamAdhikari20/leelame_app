@@ -8,6 +8,7 @@ enum BuyerAuthStatus {
   authenticated,
   unauthenticated,
   created,
+  verified,
   error,
 }
 

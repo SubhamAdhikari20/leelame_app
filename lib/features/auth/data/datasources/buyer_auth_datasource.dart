@@ -5,22 +5,24 @@ import 'package:leelame/features/buyer/data/models/buyer_api_model.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 
 abstract interface class IBuyerAuthLocalDatasource {
-  Future<BuyerHiveModel?> signUp(
-    UserHiveModel userModel,
-    BuyerHiveModel buyerModel,
-  );
-  Future<BuyerHiveModel?> login(
-    String identifier,
-    String password,
-    String role,
-  );
-  Future<UserHiveModel?> getCurrentUser(String userId);
-  Future<BuyerHiveModel?> getCurrentBuyer(String buyerId);
-  Future<bool> logout();
+  Future<BuyerHiveModel?> createBuyer(BuyerHiveModel buyerModel);
+  Future<BuyerHiveModel?> updateBuyer(BuyerHiveModel buyerModel);
+  Future<BuyerHiveModel?> getBuyerById(String buyerId);
+  Future<BuyerHiveModel?> getBuyerByUsername(String username);
+  Future<BuyerHiveModel?> getBuyerByPhoneNumber(String phoneNumber);
+  Future<BuyerHiveModel?> getBuyerByBaseUserId(String userId);
 
-  Future<bool> isEmailExists(String email);
-  Future<bool> isUsernameExists(String username);
-  Future<bool> isPhoneNumberExists(String phoneNumber);
+  Future<UserHiveModel?> createBaseUser(UserHiveModel userModel);
+  Future<UserHiveModel?> updateBaseUser(UserHiveModel userModel);
+  Future<UserHiveModel?> getUserById(String userId);
+  Future<UserHiveModel?> getUserByEmail(String email);
+
+  Future<void> queueOtpEmail({
+    required String toEmail,
+    required String fullName,
+    required String otp,
+    DateTime? expiryDate,
+  });
 }
 
 abstract interface class IBuyerAuthRemoteDatasource {
@@ -28,10 +30,18 @@ abstract interface class IBuyerAuthRemoteDatasource {
     UserApiModel userModel,
     BuyerApiModel buyerModel,
   );
+  Future<bool> verifyAccountRegistration(String username, String otp);
   Future<BuyerApiModel?> login(String identifier, String password, String role);
   Future<UserApiModel?> getCurrentUser(String userId);
   Future<BuyerApiModel?> getCurrentBuyer(String buyerId);
   Future<bool> logout();
+
+  Future<bool> sendQueuedVerificationEmail({
+    String? userId,
+    required String email,
+    required String otp,
+    DateTime? expiry,
+  });
 
   Future<bool> isEmailExists(String email);
   Future<bool> isUsernameExists(String username);

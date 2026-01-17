@@ -1,19 +1,20 @@
-// lib/features/auth/presentation/pages/verification_registration_screen.dart
+// lib/features/auth/presentation/pages/buyer_verify_account_registration_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
-import 'package:leelame/features/auth/presentation/pages/reset_password_screen.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer_login_page.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
 
-class VerificationRegistrationScreen extends StatefulWidget {
-  const VerificationRegistrationScreen({super.key});
+class BuyerVerifyAccountRegistrationPage extends ConsumerStatefulWidget {
+  const BuyerVerifyAccountRegistrationPage({super.key});
 
   @override
-  State<VerificationRegistrationScreen> createState() =>
-      _VerificationRegistrationScreenState();
+  ConsumerState<BuyerVerifyAccountRegistrationPage> createState() =>
+      _BuyerVerifyAccountRegistrationPageState();
 }
 
-class _VerificationRegistrationScreenState
-    extends State<VerificationRegistrationScreen> {
+class _BuyerVerifyAccountRegistrationPageState
+    extends ConsumerState<BuyerVerifyAccountRegistrationPage> {
   final List<TextEditingController> _controllers = List.generate(
     6,
     (_) => TextEditingController(),
@@ -147,7 +148,7 @@ class _VerificationRegistrationScreenState
                       // Verify Button
                       CustomPrimaryButton(
                         onPressed: () {
-                          AppRoutes.push(context, const ResetPasswordScreen());
+                          AppRoutes.push(context, const BuyerLoginPage());
                         },
                         text: "Verify",
                         isLoading: _isLoading,

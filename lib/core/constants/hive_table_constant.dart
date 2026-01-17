@@ -11,5 +11,6 @@ class HiveTableConstant {
   static const int buyersTypeId = 1;
   static const String buyersTable = "buyers";
 
-  static const int authTypeId = 2;
+  static const int pendingEmailsTypeId = 2;
+  static const String pendingEmailsTable = "pending_emails";
 }

@@ -31,7 +31,7 @@ class BuyerHiveModel extends HiveObject {
   final String? bio;
 
   @HiveField(7)
-  final bool termsAccepted;
+  final bool? termsAccepted;
 
   @HiveField(8)
   final String? userId;
@@ -44,7 +44,7 @@ class BuyerHiveModel extends HiveObject {
     this.password,
     this.profilePictureUrl,
     this.bio,
-    required this.termsAccepted,
+    this.termsAccepted,
     String? userId,
   }) : buyerId = buyerId ?? Uuid().v4(),
        userId = userId ?? Uuid().v4();
@@ -83,5 +83,30 @@ class BuyerHiveModel extends HiveObject {
   // Convert List of Models to List of Buyer Entities
   static List<BuyerEntity> toEntityList(List<BuyerHiveModel> buyerModels) {
     return buyerModels.map((buyerModel) => buyerModel.toEntity()).toList();
+  }
+
+  // copyWith helper to create updated instances (used before saving to Hive)
+  BuyerHiveModel copyWith({
+    String? buyerId,
+    String? fullName,
+    String? username,
+    String? phoneNumber,
+    String? password,
+    String? profilePictureUrl,
+    String? bio,
+    bool? termsAccepted,
+    String? userId,
+  }) {
+    return BuyerHiveModel(
+      buyerId: buyerId ?? this.buyerId,
+      fullName: fullName ?? this.fullName,
+      username: username ?? this.username,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      password: password ?? this.password,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      bio: bio ?? this.bio,
+      termsAccepted: termsAccepted ?? this.termsAccepted,
+      userId: userId ?? this.userId,
+    );
   }
 }

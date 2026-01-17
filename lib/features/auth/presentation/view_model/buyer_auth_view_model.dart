@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer_login_usecase.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer_logout_usecase.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer_sign_up_usecase.dart';
+import 'package:leelame/features/auth/domain/usecases/buyer_verify_account_registration_usecase.dart';
 import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
 
 // Buyer Auth View Model Notifier Provider
@@ -15,6 +16,8 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
   late final BuyerSignUpUsecase _buyerSignUpUsecase;
   late final BuyerLoginUsecase _buyerLoginUsecase;
   late final BuyerLogoutUsecase _buyerLogoutUsecase;
+  late final BuyerVerifyAccountRegistrationUsecase
+  _buyerVerifyAccountRegistrationUsecase;
 
   @override
   BuyerAuthState build() {
@@ -22,6 +25,9 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
     _buyerSignUpUsecase = ref.read(buyerSignUpUsecaseProvider);
     _buyerLoginUsecase = ref.read(buyerLoginUsecaseProvider);
     _buyerLogoutUsecase = ref.read(buyerLogoutUsecaseProvider);
+    _buyerVerifyAccountRegistrationUsecase = ref.read(
+      buyerVerifyAccountRegistrationUsecaseProvider,
+    );
     return BuyerAuthState();
   }
 
@@ -80,7 +86,7 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
     );
 
     // Wait for few seconds
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(Duration(seconds: 3));
     final result = await _buyerLoginUsecase(buyerLoginParams);
 
     result.fold(
@@ -99,7 +105,7 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
   Future<void> logout() async {
     state = state.copywith(buyerAuthStatus: BuyerAuthStatus.loading);
     // Wait for few seconds
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(Duration(seconds: 3));
     final result = await _buyerLogoutUsecase();
 
     result.fold(
@@ -113,6 +119,36 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
         state = state.copywith(
           buyerAuthStatus: BuyerAuthStatus.unauthenticated,
         );
+      },
+    );
+  }
+
+  Future<void> verifyAccountRegistration({
+    required String username,
+    required String otp,
+  }) async {
+    state = state.copywith(buyerAuthStatus: BuyerAuthStatus.loading);
+    final buyerVerifyAccountRegistrationParams =
+        BuyerVerifyAccountRegistrationUsecaseParams(
+          username: username,
+          otp: otp,
+        );
+
+    // Wait for few seconds
+    await Future.delayed(Duration(seconds: 3));
+    final result = await _buyerVerifyAccountRegistrationUsecase(
+      buyerVerifyAccountRegistrationParams,
+    );
+
+    result.fold(
+      (failure) {
+        state = state.copywith(
+          buyerAuthStatus: BuyerAuthStatus.error,
+          errorMessage: failure.message,
+        );
+      },
+      (success) {
+        state = state.copywith(buyerAuthStatus: BuyerAuthStatus.verified);
       },
     );
   }

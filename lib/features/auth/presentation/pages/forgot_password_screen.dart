@@ -1,7 +1,7 @@
 // lib/features/auth/presentation/pages/forgot_password_screen.dart
 import 'package:flutter/material.dart';
 import 'package:leelame/app/routes/app_routes.dart';
-import 'package:leelame/features/auth/presentation/pages/verification_registration_screen.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer_verify_account_registration_page.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
 
@@ -104,7 +104,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     true) {
                                   AppRoutes.push(
                                     context,
-                                    const VerificationRegistrationScreen(),
+                                    const BuyerVerifyAccountRegistrationPage(),
                                   );
                                 }
                               },

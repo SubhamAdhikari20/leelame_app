@@ -9,6 +9,10 @@ abstract interface class IBuyerAuthRepository {
     UserEntity userEntity,
     BuyerEntity buyerEntity,
   );
+  Future<Either<Failures, bool>> verifyAccountRegistration(
+    String username,
+    String otp,
+  );
   Future<Either<Failures, BuyerEntity>> login(
     String identifier,
     String password,

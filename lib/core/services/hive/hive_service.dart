@@ -29,12 +29,16 @@ class HiveService {
     if (!Hive.isAdapterRegistered(HiveTableConstant.buyersTypeId)) {
       Hive.registerAdapter(BuyerHiveModelAdapter());
     }
+    // if (!Hive.isAdapterRegistered(HiveTableConstant.pendingEmailsTypeId)) {
+    //   Hive.registerAdapter(BuyerHiveModelAdapter());
+    // }
   }
 
   // Open all boxes
   Future<void> _openBoxes() async {
     await Hive.openBox<UserHiveModel>(HiveTableConstant.usersTable);
     await Hive.openBox<BuyerHiveModel>(HiveTableConstant.buyersTable);
+    await Hive.openBox<BuyerHiveModel>(HiveTableConstant.pendingEmailsTable);
   }
 
   // Close all boxes
@@ -76,6 +80,12 @@ class HiveService {
     return _usersBox.get(userId);
   }
 
+  // Get a existing user by email
+  Future<UserHiveModel?> getUserByEmail(String email) async {
+    final users = _usersBox.values.where((user) => user.email == email);
+    return users.first;
+  }
+
   // Get all users
   Future<List<UserHiveModel>> getAllUsers() async {
     return _usersBox.values.toList();
@@ -91,92 +101,14 @@ class HiveService {
     await _usersBox.clear();
   }
 
-  // Check Email Exists
-  Future<bool> isEmailExists(String email) async {
-    final users = _usersBox.values.where((user) => user.email == email);
-    return users.isNotEmpty;
-  }
-
-  // get current user
-  Future<UserHiveModel?> getCurrentUser(String userId) async {
-    return _usersBox.get(userId);
-  }
-
   // ---------------------------- Buyers ------------------------------
   // Get buyers box
   Box<BuyerHiveModel> get _buyersBox =>
       Hive.box<BuyerHiveModel>(HiveTableConstant.buyersTable);
 
-  // Check Username Exists
-  Future<bool> isUsernameExists(String username) async {
-    final buyers = _buyersBox.values.where(
-      (buyer) => buyer.username == username,
-    );
-    return buyers.isNotEmpty;
-  }
-
-  // Check Phone Number Exists
-  Future<bool> isPhoneNumberExists(String phoneNumber) async {
-    final buyers = _buyersBox.values.where(
-      (buyer) => buyer.phoneNumber == phoneNumber,
-    );
-    return buyers.isNotEmpty;
-  }
-
-  // Sign Up Buyer
-  Future<BuyerHiveModel?> signUpBuyer(
-    UserHiveModel userModel,
-    BuyerHiveModel buyerModel,
-  ) async {
-    // final users = _usersBox.values.where(
-    //   (user) => user.email == userModel.email,
-    // );
-    // if (users.isNotEmpty) {
-    //   return null;
-    // }
-    await _usersBox.put(userModel.userId, userModel);
+  Future<BuyerHiveModel?> createBuyer(BuyerHiveModel buyerModel) async {
     await _buyersBox.put(buyerModel.buyerId, buyerModel);
     return buyerModel;
-  }
-
-  // Login Buyer
-  Future<BuyerHiveModel?> loginBuyer(
-    String identifier,
-    String password,
-    String role,
-  ) async {
-    final users = _usersBox.values.where(
-      (user) => user.email == identifier && user.role == role,
-    );
-
-    if (users.isNotEmpty) {
-      final user = users.first;
-      final buyers = _buyersBox.values.where(
-        (buyer) => buyer.userId == user.userId && buyer.password == password,
-      );
-      if (buyers.isEmpty) {
-        return null;
-      }
-      return buyers.first;
-    }
-
-    final buyers = _buyersBox.values.where(
-      (buyer) => buyer.username == identifier && buyer.password == password,
-    );
-    if (buyers.isEmpty) {
-      return null;
-    }
-    return buyers.first;
-  }
-
-  // Logout
-  Future<bool> logoutBuyer() async {
-    return true;
-  }
-
-  // get current buyer
-  Future<BuyerHiveModel?> getCurrentBuyer(String buyerId) async {
-    return _buyersBox.get(buyerId);
   }
 
   // Create a existing buyer
@@ -188,6 +120,27 @@ class HiveService {
   // Get a existing buyer by ID
   Future<BuyerHiveModel?> getBuyerById(String buyerId) async {
     return _buyersBox.get(buyerId);
+  }
+
+  // Get a existing buyer by Base User ID
+  Future<BuyerHiveModel?> getBuyerByBaseUserId(String userId) async {
+    return _buyersBox.get(userId);
+  }
+
+  // Get a existing buyer by username
+  Future<BuyerHiveModel?> getBuyerByUsername(String username) async {
+    final buyers = _buyersBox.values.where(
+      (buyer) => buyer.username == username,
+    );
+    return buyers.first;
+  }
+
+  // Get a existing buyer by phoneNumber
+  Future<BuyerHiveModel?> getBuyerByPhoneNumber(String phoneNumber) async {
+    final buyers = _buyersBox.values.where(
+      (buyer) => buyer.phoneNumber == phoneNumber,
+    );
+    return buyers.first;
   }
 
   // Get all buyers
@@ -204,4 +157,75 @@ class HiveService {
   Future<void> deleteAllBuyers() async {
     await _buyersBox.clear();
   }
+
+  // ---------------------------- Pending Emails Queue ------------------------------
+  // Get pending emails box
+  Box<Map<String, dynamic>> get _pendingEmailsBox =>
+      Hive.box<Map<String, dynamic>>(HiveTableConstant.pendingEmailsTable);
+
+  // Queue OTP email
+  Future<String> queueOtpEmail({
+    required String toEmail,
+    required String fullName,
+    required String otp,
+    DateTime? expiryDate,
+  }) async {
+    final key = DateTime.now().millisecondsSinceEpoch.toString();
+    final data = {
+      'toEmail': toEmail,
+      'fullName': fullName,
+      'otp': otp,
+      'expiryDate': expiryDate,
+      'createdAt': DateTime.now().toIso8601String(),
+      'attempts': 0,
+    };
+    await _pendingEmailsBox.put(key, data);
+    return key;
+  }
+
+  // Returns a list of pending email entries. Each entry ALWAYS includes 'key' for deletion.
+  Future<List<Map<String, dynamic>>> getPendingEmails() async {
+    final List<Map<String, dynamic>> out = [];
+    for (final key in _pendingEmailsBox.keys) {
+      final value = _pendingEmailsBox.get(key);
+      if (value is Map) {
+        final map = Map<String, dynamic>.from(value as Map);
+        map['key'] = key.toString();
+        out.add(map);
+      }
+    }
+    return out;
+  }
+
+  // Delete from queue
+  Future<void> deleteFromQueue(String key) async {
+    await _pendingEmailsBox.delete(key);
+  }
+
+  // Increment attempts counter for a queue item
+  Future<void> incrementQueueAttempts(String key) async {
+    final value = _pendingEmailsBox.get(key);
+    if (value is Map) {
+      final m = Map<String, dynamic>.from(value as Map);
+      final attempts = (m['attempts'] as int?) ?? 0;
+      m['attempts'] = attempts + 1;
+      await _pendingEmailsBox.put(key, m);
+    }
+  }
+
+  // Get pending emails
+  // Future<List<Map<String, dynamic>>> getPendingEmails() async {
+  //   return _pendingEmailsBox.values.toList();
+  // }
+
+  // // Keys List
+  // List<dynamic> getPendingEmailsKeysList(Map<String, dynamic> data) {
+  //   final keys = _pendingEmailsBox.keys.where((key) {
+  //     final value = _pendingEmailsBox.get(key);
+  //     return value?['toEmail'] == data['toEmail'] &&
+  //         value?['fullName'] == data['fullName'] &&
+  //         value?['otp'] == data['otp'];
+  //   }).toList();
+  //   return keys;
+  // }
 }
