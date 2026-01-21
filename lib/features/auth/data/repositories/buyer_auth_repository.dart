@@ -250,6 +250,23 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
           return const Left(ApiFailure(message: "Failed to login buyer!"));
         }
 
+        final baseUser = result.baseUser;
+        if (baseUser == null) {
+          return const Left(
+            ApiFailure(message: "Login Failed! Base user doesnot exist."),
+          );
+        }
+
+        await _userSessionService.storeUserSession(
+          userId: result.id!,
+          email: baseUser.email,
+          role: baseUser.role,
+          fullName: result.fullName,
+          username: result.username,
+          phoneNumber: result.phoneNumber,
+          profilePictureUrl: result.profilePictureUrl,
+        );
+
         return Right(result.toEntity());
       } on DioException catch (e) {
         return Left(
@@ -500,7 +517,7 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
         if (!result) {
           return const Left(ApiFailure(message: "Failed to logout buyer!"));
         }
-
+        await _userSessionService.clearUserSession();
         return Right(result);
       } on DioException catch (e) {
         return Left(

@@ -2,7 +2,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/core/api/api_client.dart';
 import 'package:leelame/core/api/api_endpoints.dart';
-import 'package:leelame/core/services/storage/user_session_service.dart';
 import 'package:leelame/features/auth/data/datasources/buyer_auth_datasource.dart';
 import 'package:leelame/features/auth/data/models/user_api_model.dart';
 import 'package:leelame/features/buyer/data/models/buyer_api_model.dart';
@@ -11,22 +10,14 @@ final buyerAuthRemoteDatasourceProvider = Provider<IBuyerAuthRemoteDatasource>((
   ref,
 ) {
   final apiClient = ref.read(apiClientProvider);
-  final userSessionService = ref.read(userSessionServiceProvider);
-  return BuyerAuthRemoteDatasource(
-    apiClient: apiClient,
-    userSessionService: userSessionService,
-  );
+  return BuyerAuthRemoteDatasource(apiClient: apiClient);
 });
 
 class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
   final ApiClient _apiClient;
-  final UserSessionService _userSessionService;
 
-  BuyerAuthRemoteDatasource({
-    required ApiClient apiClient,
-    required UserSessionService userSessionService,
-  }) : _apiClient = apiClient,
-       _userSessionService = userSessionService;
+  BuyerAuthRemoteDatasource({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   @override
   Future<BuyerApiModel?> signUp(
@@ -79,20 +70,6 @@ class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
 
     final data = response.data["user"] as Map<String, dynamic>;
     final buyer = BuyerApiModel.fromJson(data);
-    final baseUser = buyer.baseUser;
-    if (baseUser == null) {
-      return null;
-    }
-
-    await _userSessionService.storeUserSession(
-      userId: buyer.id!,
-      email: baseUser.email,
-      role: baseUser.role,
-      fullName: buyer.fullName,
-      username: buyer.username,
-      phoneNumber: buyer.phoneNumber,
-      profilePictureUrl: buyer.profilePictureUrl,
-    );
     return buyer;
   }
 
@@ -102,8 +79,6 @@ class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
     if (!(response.data["success"] as bool)) {
       return false;
     }
-
-    await _userSessionService.clearUserSession();
     return true;
   }
 
