@@ -37,7 +37,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const LoginPage()),
+        MaterialPageRoute(builder: (_) => const BuyerLoginPage()),
       );
     }
   }

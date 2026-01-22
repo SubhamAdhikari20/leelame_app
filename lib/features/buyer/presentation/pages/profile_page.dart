@@ -19,7 +19,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     await ref.read(buyerAuthViewModelProvider.notifier).logout();
     if (!mounted) return;
     Navigator.pop(context);
-    AppRoutes.pushAndRemoveUntil(context, const LoginPage());
+    AppRoutes.pushAndRemoveUntil(context, const BuyerLoginPage());
     SnackbarUtil.showSuccess(
       context,
       "Logged out successfully.",
