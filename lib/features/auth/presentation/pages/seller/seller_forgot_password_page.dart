@@ -1,19 +1,19 @@
-// lib/features/auth/presentation/pages/buyer/forgot_password_page.dart
+// lib/features/auth/presentation/pages/seller/seller_forgot_password_page.dart
 import 'package:flutter/material.dart';
 import 'package:leelame/app/routes/app_routes.dart';
-import 'package:leelame/features/auth/presentation/pages/buyer/verify_account_registration_page.dart';
-import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
+import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
 
-class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({super.key});
+class SellerForgotPasswordPage extends StatefulWidget {
+  const SellerForgotPasswordPage({super.key});
 
   @override
-  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+  State<SellerForgotPasswordPage> createState() =>
+      _SellerForgotPasswordPageState();
 }
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
-  final _forgotPasswordFormKey = GlobalKey<FormState>();
+class _SellerForgotPasswordPageState extends State<SellerForgotPasswordPage> {
+  final _sellerForgotPasswordFormKey = GlobalKey<FormState>();
 
   final TextEditingController emailController = TextEditingController();
   final bool _loading = false;
@@ -84,7 +84,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                       // Forgot Password Form
                       Form(
-                        key: _forgotPasswordFormKey,
+                        key: _sellerForgotPasswordFormKey,
                         child: Column(
                           children: [
                             // Email Text Field
@@ -99,15 +99,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             // Send Code Button
                             CustomPrimaryButton(
                               onPressed: () {
-                                if (_forgotPasswordFormKey.currentState
+                                if (_sellerForgotPasswordFormKey.currentState
                                         ?.validate() ==
                                     true) {
-                                  AppRoutes.push(
-                                    context,
-                                    VerifyAccountRegistrationPage(
-                                      username: "",
-                                    ),
-                                  );
+                                  // logic
                                 }
                               },
                               text: "Send Code",

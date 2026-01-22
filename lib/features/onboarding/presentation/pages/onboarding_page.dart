@@ -1,6 +1,6 @@
 // lib/features/onboarding/presentation/pages/onboarding_page.dart
 import 'package:flutter/material.dart';
-import 'package:leelame/features/auth/presentation/pages/buyer/login_page.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer/buyer_login_page.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});

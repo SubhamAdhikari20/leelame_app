@@ -1,19 +1,19 @@
-// lib/features/auth/presentation/pages/page/reset_passsword_page.dart
+// lib/features/auth/presentation/pages/seller/seller_reset_passsword_page.dart
 import 'package:flutter/material.dart';
 import 'package:leelame/app/routes/app_routes.dart';
-import 'package:leelame/features/auth/presentation/pages/buyer/login_page.dart';
-import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
+import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
 
-class ResetPasswordPage extends StatefulWidget {
-  const ResetPasswordPage({super.key});
+class SellerResetPasswordPage extends StatefulWidget {
+  const SellerResetPasswordPage({super.key});
 
   @override
-  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
+  State<SellerResetPasswordPage> createState() =>
+      _SellerResetPasswordPageState();
 }
 
-class _ResetPasswordPageState extends State<ResetPasswordPage> {
-  final _resetPasswordFormKey = GlobalKey<FormState>();
+class _SellerResetPasswordPageState extends State<SellerResetPasswordPage> {
+  final _sellerResetPasswordFormKey = GlobalKey<FormState>();
 
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -77,7 +77,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
                       // Forgot Password Form
                       Form(
-                        key: _resetPasswordFormKey,
+                        key: _sellerResetPasswordFormKey,
                         child: Column(
                           children: [
                             // New Password Text Field
@@ -101,13 +101,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             // Reset Password Button
                             CustomPrimaryButton(
                               onPressed: () {
-                                if (_resetPasswordFormKey.currentState
+                                if (_sellerResetPasswordFormKey.currentState
                                         ?.validate() ==
                                     true) {
-                                  AppRoutes.pushReplacement(
-                                    context,
-                                    const LoginPage(),
-                                  );
+                                  // Logic
                                 }
                               },
                               text: "Reset",

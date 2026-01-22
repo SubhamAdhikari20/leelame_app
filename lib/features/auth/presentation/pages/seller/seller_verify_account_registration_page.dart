@@ -1,25 +1,20 @@
-// lib/features/auth/presentation/pages/buyer/verify_account_registration_page.dart
+// lib/features/auth/presentation/pages/seller/seller_verify_account_registration_page.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
-import 'package:leelame/core/utils/snackbar_util.dart';
-import 'package:leelame/features/auth/presentation/pages/buyer/login_page.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
-import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
-import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
 
-class VerifyAccountRegistrationPage extends ConsumerStatefulWidget {
-  final String username;
-  const VerifyAccountRegistrationPage({super.key, required this.username});
+class SellerVerifyAccountRegistrationPage extends StatefulWidget {
+  final String email;
+  const SellerVerifyAccountRegistrationPage({super.key, required this.email});
 
   @override
-  ConsumerState<VerifyAccountRegistrationPage> createState() =>
-      _VerifyAccountRegistrationPageState();
+  State<SellerVerifyAccountRegistrationPage> createState() =>
+      _SellerVerifyAccountRegistrationPageState();
 }
 
-class _VerifyAccountRegistrationPageState
-    extends ConsumerState<VerifyAccountRegistrationPage> {
-  final _verifyAccountRegistrationFormKey = GlobalKey<FormState>();
+class _SellerVerifyAccountRegistrationPageState
+    extends State<SellerVerifyAccountRegistrationPage> {
+  final _sellerVerifyAccountRegistrationFormKey = GlobalKey<FormState>();
   final List<TextEditingController> _controllers = List.generate(
     6,
     (_) => TextEditingController(),
@@ -35,15 +30,6 @@ class _VerifyAccountRegistrationPageState
       node.dispose();
     }
     super.dispose();
-  }
-
-  Future<void> _handleAccountVerification() async {
-    if (_verifyAccountRegistrationFormKey.currentState!.validate()) {
-      final otp = _controllers.map((c) => c.text).join();
-      await ref
-          .read(buyerAuthViewModelProvider.notifier)
-          .verifyAccountRegistration(username: widget.username, otp: otp);
-    }
   }
 
   Widget _buildOtpBox(int index) {
@@ -84,22 +70,6 @@ class _VerifyAccountRegistrationPageState
 
   @override
   Widget build(BuildContext context) {
-    final buyerAuthState = ref.watch(buyerAuthViewModelProvider);
-
-    ref.listen<BuyerAuthState>(buyerAuthViewModelProvider, (previous, next) {
-      if (next.buyerAuthStatus == BuyerAuthStatus.error) {
-        SnackbarUtil.showError(
-          context,
-          next.errorMessage ?? "Verification Failed!",
-        );
-      } else if (next.buyerAuthStatus == BuyerAuthStatus.verified) {
-        SnackbarUtil.showSuccess(context, "Verification Successful");
-
-        // Navigate to Login
-        AppRoutes.pushReplacement(context, const LoginPage());
-      }
-    });
-
     final bool isTablet = MediaQuery.of(context).size.width > 600;
     // final bool isDesktop = MediaQuery.of(context).size.width > 900;
     // final double horizontalPadding = isDesktop ? 40 : (isTablet ? 30 : 20);
@@ -168,7 +138,7 @@ class _VerifyAccountRegistrationPageState
 
                       // 6 OTP Boxes
                       Form(
-                        key: _verifyAccountRegistrationFormKey,
+                        key: _sellerVerifyAccountRegistrationFormKey,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: List.generate(6, _buildOtpBox),
@@ -179,11 +149,14 @@ class _VerifyAccountRegistrationPageState
 
                       // Verify Button
                       CustomPrimaryButton(
-                        onPressed: _handleAccountVerification,
+                        onPressed: () {
+                          if (_sellerVerifyAccountRegistrationFormKey
+                              .currentState!
+                              .validate()) {
+                            // verify otp up logic
+                          }
+                        },
                         text: "Verify",
-                        isLoading:
-                            buyerAuthState.buyerAuthStatus ==
-                            BuyerAuthStatus.loading,
                       ),
 
                       SizedBox(height: 30),

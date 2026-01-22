@@ -1,29 +1,30 @@
-// lib/features/auth/presentation/pages/seller/login_sign_up_page.dart
+// lib/features/auth/presentation/pages/seller/seller_login_sign_up_page.dart
 import 'package:flutter/material.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
+import 'package:leelame/features/auth/presentation/pages/seller/seller_forgot_password_page.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
 
-class LoginSignUpPage extends StatefulWidget {
-  const LoginSignUpPage({super.key});
+class SellerLoginSignUpPage extends StatefulWidget {
+  const SellerLoginSignUpPage({super.key});
 
   @override
-  State<LoginSignUpPage> createState() => _LoginSignUpPageState();
+  State<SellerLoginSignUpPage> createState() => _SellerLoginSignUpPageState();
 }
 
-class _LoginSignUpPageState extends State<LoginSignUpPage>
+class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
   // Login form
-  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _sellerLoginFormKey = GlobalKey<FormState>();
   final TextEditingController _loginIdentifierController =
       TextEditingController();
   final TextEditingController _loginPasswordController =
       TextEditingController();
 
   // Sign up form
-  final GlobalKey<FormState> _signUpFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _sellerSignUpFormKey = GlobalKey<FormState>();
   final TextEditingController _signFullNameController = TextEditingController();
   final TextEditingController _signEmailController = TextEditingController();
   final TextEditingController _signPhoneNumberController =
@@ -140,7 +141,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage>
                                 vertical: 5,
                               ),
                               child: Form(
-                                key: _loginFormKey,
+                                key: _sellerLoginFormKey,
                                 child: Column(
                                   children: [
                                     CustomAuthTextField(
@@ -172,10 +173,16 @@ class _LoginSignUpPageState extends State<LoginSignUpPage>
                                       },
                                     ),
                                     const SizedBox(height: 20),
+
                                     Align(
                                       alignment: Alignment.centerRight,
                                       child: TextButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          AppRoutes.push(
+                                            context,
+                                            const SellerForgotPasswordPage(),
+                                          );
+                                        },
                                         style: TextButton.styleFrom(
                                           minimumSize: Size.zero,
                                           padding: EdgeInsets.zero,
@@ -193,9 +200,10 @@ class _LoginSignUpPageState extends State<LoginSignUpPage>
                                       ),
                                     ),
                                     const SizedBox(height: 20),
+
                                     CustomPrimaryButton(
                                       onPressed: () {
-                                        if (_loginFormKey.currentState!
+                                        if (_sellerLoginFormKey.currentState!
                                             .validate()) {
                                           // Handle login logic
                                         }
@@ -239,7 +247,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage>
                                 vertical: 5,
                               ),
                               child: Form(
-                                key: _signUpFormKey,
+                                key: _sellerSignUpFormKey,
                                 child: Column(
                                   children: [
                                     CustomAuthTextField(
@@ -333,7 +341,7 @@ class _LoginSignUpPageState extends State<LoginSignUpPage>
 
                                     CustomPrimaryButton(
                                       onPressed: () {
-                                        if (_signUpFormKey.currentState!
+                                        if (_sellerSignUpFormKey.currentState!
                                             .validate()) {
                                           // Handle sign up logic
                                         }

@@ -1,10 +1,10 @@
-// lib/features/auth/presentation/pages/buyer/sign_up_page.dart
+// lib/features/auth/presentation/pages/buyer/buyer_sign_up_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
-import 'package:leelame/features/auth/presentation/pages/buyer/verify_account_registration_page.dart';
-import 'package:leelame/features/auth/presentation/pages/seller/login_sign_up_page.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer/buyer_verify_account_registration_page.dart';
+import 'package:leelame/features/auth/presentation/pages/seller/seller_login_sign_up_page.dart';
 import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
 import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
@@ -12,14 +12,14 @@ import 'package:leelame/core/widgets/custom_outlined_button.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
 import 'package:leelame/features/auth/presentation/widgets/or_divider.dart';
 
-class SignUpPage extends ConsumerStatefulWidget {
-  const SignUpPage({super.key});
+class BuyerSignUpPage extends ConsumerStatefulWidget {
+  const BuyerSignUpPage({super.key});
 
   @override
-  ConsumerState<SignUpPage> createState() => _SignUpPageState();
+  ConsumerState<BuyerSignUpPage> createState() => _BuyerSignUpPageState();
 }
 
-class _SignUpPageState extends ConsumerState<SignUpPage> {
+class _BuyerSignUpPageState extends ConsumerState<BuyerSignUpPage> {
   final _signUpFormKey = GlobalKey<FormState>();
 
   final TextEditingController _fullNameController = TextEditingController();
@@ -75,7 +75,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
         // Navigate to verification page
         AppRoutes.push(
           context,
-          VerifyAccountRegistrationPage(username: username),
+          BuyerVerifyAccountRegistrationPage(username: username),
         );
       }
     });
@@ -314,7 +314,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                       // Become a seller
                       TextButton(
                         onPressed: () {
-                          AppRoutes.push(context, const LoginSignUpPage());
+                          AppRoutes.push(
+                            context,
+                            const SellerLoginSignUpPage(),
+                          );
                         },
                         style: TextButton.styleFrom(
                           minimumSize: Size.zero,
