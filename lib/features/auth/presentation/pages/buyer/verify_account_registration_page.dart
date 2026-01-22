@@ -1,24 +1,24 @@
-// lib/features/auth/presentation/pages/buyer_verify_account_registration_page.dart
+// lib/features/auth/presentation/pages/buyer/verify_account_registration_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
-import 'package:leelame/features/auth/presentation/pages/buyer_login_page.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer/login_page.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
 import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
 import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
 
-class BuyerVerifyAccountRegistrationPage extends ConsumerStatefulWidget {
+class VerifyAccountRegistrationPage extends ConsumerStatefulWidget {
   final String username;
-  const BuyerVerifyAccountRegistrationPage({super.key, required this.username});
+  const VerifyAccountRegistrationPage({super.key, required this.username});
 
   @override
-  ConsumerState<BuyerVerifyAccountRegistrationPage> createState() =>
-      _BuyerVerifyAccountRegistrationPageState();
+  ConsumerState<VerifyAccountRegistrationPage> createState() =>
+      _VerifyAccountRegistrationPageState();
 }
 
-class _BuyerVerifyAccountRegistrationPageState
-    extends ConsumerState<BuyerVerifyAccountRegistrationPage> {
+class _VerifyAccountRegistrationPageState
+    extends ConsumerState<VerifyAccountRegistrationPage> {
   final _verifyAccountRegistrationFormKey = GlobalKey<FormState>();
   final List<TextEditingController> _controllers = List.generate(
     6,
@@ -96,7 +96,7 @@ class _BuyerVerifyAccountRegistrationPageState
         SnackbarUtil.showSuccess(context, "Verification Successful");
 
         // Navigate to Login
-        AppRoutes.pushReplacement(context, const BuyerLoginPage());
+        AppRoutes.pushReplacement(context, const LoginPage());
       }
     });
 

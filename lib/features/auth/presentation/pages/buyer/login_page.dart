@@ -1,10 +1,11 @@
-// lib/features/auth/presentation/pages/buyer_login_page.dart
+// lib/features/auth/presentation/pages/buyer/login_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
-import 'package:leelame/features/auth/presentation/pages/forgot_password_screen.dart';
-import 'package:leelame/features/auth/presentation/pages/buyer_sign_up_page.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer/forgot_password_page.dart';
+import 'package:leelame/features/auth/presentation/pages/buyer/sign_up_page.dart';
+import 'package:leelame/features/auth/presentation/pages/seller/login_sign_up_page.dart';
 import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
 import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
 import 'package:leelame/features/buyer/presentation/pages/dashboard_page.dart';
@@ -13,14 +14,14 @@ import 'package:leelame/core/widgets/custom_primary_button.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
 import 'package:leelame/features/auth/presentation/widgets/or_divider.dart';
 
-class BuyerLoginPage extends ConsumerStatefulWidget {
-  const BuyerLoginPage({super.key});
+class LoginPage extends ConsumerStatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  ConsumerState<BuyerLoginPage> createState() => _BuyerLoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _BuyerLoginPageState extends ConsumerState<BuyerLoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _loginFormKey = GlobalKey<FormState>();
 
   final TextEditingController identifierController = TextEditingController();
@@ -142,7 +143,7 @@ class _BuyerLoginPageState extends ConsumerState<BuyerLoginPage> {
                                 onPressed: () {
                                   AppRoutes.push(
                                     context,
-                                    const ForgotPasswordScreen(),
+                                    const ForgotPasswordPage(),
                                   );
                                 },
                                 style: TextButton.styleFrom(
@@ -207,7 +208,7 @@ class _BuyerLoginPageState extends ConsumerState<BuyerLoginPage> {
                       // Create account
                       CustomOutlinedButton(
                         onPressed: () {
-                          AppRoutes.push(context, const BuyerSignUpPage());
+                          AppRoutes.push(context, const SignUpPage());
                         },
                         text: "Create account",
                       ),
@@ -215,7 +216,9 @@ class _BuyerLoginPageState extends ConsumerState<BuyerLoginPage> {
 
                       // Become a seller
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          AppRoutes.push(context, const LoginSignUpPage());
+                        },
                         style: TextButton.styleFrom(
                           minimumSize: Size.zero,
                           padding: EdgeInsets.zero,
