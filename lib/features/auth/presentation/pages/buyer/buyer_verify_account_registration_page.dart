@@ -5,8 +5,8 @@ import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/buyer/buyer_login_page.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
-import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
-import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
+import 'package:leelame/features/auth/presentation/states/buyer_auth_state.dart';
+import 'package:leelame/features/auth/presentation/view_models/buyer_auth_view_model.dart';
 
 class BuyerVerifyAccountRegistrationPage extends ConsumerStatefulWidget {
   final String username;

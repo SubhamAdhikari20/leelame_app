@@ -1,4 +1,4 @@
-// lib/features/auth/presentation/state/buyer_auth_state.dart
+// lib/features/auth/presentation/states/buyer_auth_state.dart
 import 'package:equatable/equatable.dart';
 import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
 

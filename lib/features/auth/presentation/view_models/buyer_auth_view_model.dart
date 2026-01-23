@@ -1,10 +1,10 @@
-// lib/features/auth/presentation/view_model/buyer_auth_view_model.dart
+// lib/features/auth/presentation/view_models/buyer_auth_view_model.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer/buyer_login_usecase.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer/buyer_logout_usecase.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer/buyer_sign_up_usecase.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer/buyer_verify_account_registration_usecase.dart';
-import 'package:leelame/features/auth/presentation/state/buyer_auth_state.dart';
+import 'package:leelame/features/auth/presentation/states/buyer_auth_state.dart';
 
 // Buyer Auth View Model Notifier Provider
 final buyerAuthViewModelProvider =

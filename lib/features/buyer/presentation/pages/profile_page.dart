@@ -5,7 +5,7 @@ import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/app/theme/app_colors.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/buyer/buyer_login_page.dart';
-import 'package:leelame/features/auth/presentation/view_model/buyer_auth_view_model.dart';
+import 'package:leelame/features/auth/presentation/view_models/buyer_auth_view_model.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
