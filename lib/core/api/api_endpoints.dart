@@ -31,4 +31,19 @@ class ApiEndpoints {
   static String buyerByUsername(String username) => "/users/buyer/$username";
   static String buyerByPhoneNumber(String phoneNumber) =>
       "/users/buyer/$phoneNumber";
+
+  // ======================= Seller Auth Endpoints =======================
+  static const String sellers = "/users/sellers";
+  static const String sellerSignUp = "/users/seller/sign-up";
+  static const String sellerLogin = "/users/seller/login";
+  static const String sellerVerifyAccountRegistration =
+      "/users/seller/verify-account-registration";
+  static const String sellerSendVerificationEmailRegistration =
+      "/users/seller/send-verification-email-registration";
+  static const String sellerLogout = "/users/seller/logout";
+  static String sellerById(String id) => "/users/seller/$id";
+  static String sellerByBaseUserId(String baseUserId) =>
+      "/users/seller/$baseUserId";
+  static String sellerByPhoneNumber(String phoneNumber) =>
+      "/users/seller/$phoneNumber";
 }
