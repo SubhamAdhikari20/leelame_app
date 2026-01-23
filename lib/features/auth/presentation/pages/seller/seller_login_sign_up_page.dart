@@ -1,20 +1,38 @@
 // lib/features/auth/presentation/pages/seller/seller_login_sign_up_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
 import 'package:leelame/features/auth/presentation/pages/seller/seller_forgot_password_page.dart';
+import 'package:leelame/features/auth/presentation/pages/seller/seller_verify_account_registration_page.dart';
+import 'package:leelame/features/auth/presentation/states/seller_auth_state.dart';
+import 'package:leelame/features/auth/presentation/view_models/seller_auth_view_model.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
 
-class SellerLoginSignUpPage extends StatefulWidget {
+class SellerLoginSignUpPage extends ConsumerStatefulWidget {
   const SellerLoginSignUpPage({super.key});
 
   @override
-  State<SellerLoginSignUpPage> createState() => _SellerLoginSignUpPageState();
+  ConsumerState<SellerLoginSignUpPage> createState() =>
+      _SellerLoginSignUpPageState();
 }
 
-class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
+class _SellerLoginSignUpPageState extends ConsumerState<SellerLoginSignUpPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+
+  // Sign up form
+  final GlobalKey<FormState> _sellerSignUpFormKey = GlobalKey<FormState>();
+  final TextEditingController _signUpFullNameController =
+      TextEditingController();
+  final TextEditingController _signUpEmailController = TextEditingController();
+  final TextEditingController _signUpPhoneNumberController =
+      TextEditingController();
+  final TextEditingController _signUpPasswordController =
+      TextEditingController();
+  final TextEditingController _signUpConfirmPasswordController =
+      TextEditingController();
 
   // Login form
   final GlobalKey<FormState> _sellerLoginFormKey = GlobalKey<FormState>();
@@ -23,20 +41,37 @@ class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
   final TextEditingController _loginPasswordController =
       TextEditingController();
 
-  // Sign up form
-  final GlobalKey<FormState> _sellerSignUpFormKey = GlobalKey<FormState>();
-  final TextEditingController _signFullNameController = TextEditingController();
-  final TextEditingController _signEmailController = TextEditingController();
-  final TextEditingController _signPhoneNumberController =
-      TextEditingController();
-  final TextEditingController _signPasswordController = TextEditingController();
-  final TextEditingController _signConfirmPasswordController =
-      TextEditingController();
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+  }
+
+  // Sign Up Handler
+  Future<void> _handleSignup() async {
+    if (_sellerSignUpFormKey.currentState!.validate()) {
+      await ref
+          .read(sellerAuthViewModelProvider.notifier)
+          .signUp(
+            fullName: _signUpFullNameController.text.trim(),
+            email: _signUpEmailController.text.trim(),
+            phoneNumber: _signUpPhoneNumberController.text.trim(),
+            password: _signUpPasswordController.text.trim(),
+          );
+    }
+  }
+
+  // Login Handler
+  Future<void> _handleLogin() async {
+    if (_sellerLoginFormKey.currentState!.validate()) {
+      await ref
+          .read(sellerAuthViewModelProvider.notifier)
+          .login(
+            identifier: _loginIdentifierController.text.trim(),
+            password: _loginPasswordController.text.trim(),
+            role: "seller".trim(),
+          );
+    }
   }
 
   @override
@@ -46,17 +81,56 @@ class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
     _loginIdentifierController.dispose();
     _loginPasswordController.dispose();
 
-    _signFullNameController.dispose();
-    _signEmailController.dispose();
-    _signPhoneNumberController.dispose();
-    _signPasswordController.dispose();
-    _signConfirmPasswordController.dispose();
+    _signUpFullNameController.dispose();
+    _signUpEmailController.dispose();
+    _signUpPhoneNumberController.dispose();
+    _signUpPasswordController.dispose();
+    _signUpConfirmPasswordController.dispose();
 
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Seller Auth State
+    final sellerAuthState = ref.watch(sellerAuthViewModelProvider);
+
+    // listen for buyer auth state changes
+    ref.listen<SellerAuthState>(sellerAuthViewModelProvider, (previous, next) {
+      if (next.sellerAuthStatus == SellerAuthStatus.signUpError &&
+          next.errorMessage != null) {
+        SnackbarUtil.showError(context, next.errorMessage ?? "Sign Up Failed!");
+      } else if (next.sellerAuthStatus == SellerAuthStatus.created) {
+        // Sign Up Successful
+        SnackbarUtil.showSuccess(
+          context,
+          "Sign Up Successful",
+          // next.errorMessage ?? "Sign Up Successful",
+        );
+        final email =
+            next.createdIdentifier?.value ?? _signUpEmailController.text.trim();
+
+        // Navigate to seller verification page
+        AppRoutes.push(
+          context,
+          SellerVerifyAccountRegistrationPage(email: email),
+        );
+      } else if (next.sellerAuthStatus == SellerAuthStatus.loginError &&
+          next.errorMessage != null) {
+        SnackbarUtil.showError(context, next.errorMessage ?? "Login Failed!");
+      } else if (next.sellerAuthStatus == SellerAuthStatus.authenticated) {
+        // Login Successful
+        SnackbarUtil.showSuccess(
+          context,
+          "Login Successful",
+          // next.errorMessage ?? "Login Successful",
+        );
+
+        // Navigate to seller dashboard page
+        // AppRoutes.pushReplacement(context, const DashboardPage());
+      }
+    });
+
     // final bool isDesktop = MediaQuery.of(context).size.width > 600;
     // final double horizontalPadding = isDesktop ? 30 : 20;
     // final double maxWidth = isDesktop ? 550 : double.infinity;
@@ -202,13 +276,11 @@ class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
                                     const SizedBox(height: 20),
 
                                     CustomPrimaryButton(
-                                      onPressed: () {
-                                        if (_sellerLoginFormKey.currentState!
-                                            .validate()) {
-                                          // Handle login logic
-                                        }
-                                      },
+                                      onPressed: _handleLogin,
                                       text: "Login",
+                                      isLoading:
+                                          sellerAuthState.sellerAuthStatus ==
+                                          SellerAuthStatus.loading,
                                     ),
                                     const SizedBox(height: 20),
 
@@ -251,7 +323,7 @@ class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
                                 child: Column(
                                   children: [
                                     CustomAuthTextField(
-                                      controller: _signFullNameController,
+                                      controller: _signUpFullNameController,
                                       hintText: "Full Name",
                                       labelText: "Full Name",
                                       validator: (value) {
@@ -266,7 +338,7 @@ class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
                                     ),
                                     const SizedBox(height: 20),
                                     CustomAuthTextField(
-                                      controller: _signEmailController,
+                                      controller: _signUpEmailController,
                                       hintText: "Email",
                                       labelText: "Email",
                                       keyboardType: TextInputType.emailAddress,
@@ -284,7 +356,7 @@ class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
                                     ),
                                     const SizedBox(height: 20),
                                     CustomAuthTextField(
-                                      controller: _signPhoneNumberController,
+                                      controller: _signUpPhoneNumberController,
                                       hintText: "Phone Number",
                                       labelText: "Phone Number",
                                       keyboardType: TextInputType.phone,
@@ -305,7 +377,7 @@ class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
                                     ),
                                     const SizedBox(height: 20),
                                     CustomAuthTextField(
-                                      controller: _signPasswordController,
+                                      controller: _signUpPasswordController,
                                       hintText: "Password",
                                       labelText: "Password",
                                       isPassword: true,
@@ -322,7 +394,7 @@ class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
                                     const SizedBox(height: 20),
                                     CustomAuthTextField(
                                       controller:
-                                          _signConfirmPasswordController,
+                                          _signUpConfirmPasswordController,
                                       hintText: "Confirm Password",
                                       labelText: "Confirm Password",
                                       isPassword: true,
@@ -331,7 +403,7 @@ class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
                                           return 'Please confirm your password';
                                         }
                                         if (value !=
-                                            _signPasswordController.text) {
+                                            _signUpPasswordController.text) {
                                           return 'Passwords do not match';
                                         }
                                         return null;
@@ -340,13 +412,11 @@ class _SellerLoginSignUpPageState extends State<SellerLoginSignUpPage>
                                     const SizedBox(height: 20),
 
                                     CustomPrimaryButton(
-                                      onPressed: () {
-                                        if (_sellerSignUpFormKey.currentState!
-                                            .validate()) {
-                                          // Handle sign up logic
-                                        }
-                                      },
+                                      onPressed: _handleSignup,
                                       text: "Sign up",
+                                      isLoading:
+                                          sellerAuthState.sellerAuthStatus ==
+                                          SellerAuthStatus.loading,
                                     ),
                                     const SizedBox(height: 10),
 

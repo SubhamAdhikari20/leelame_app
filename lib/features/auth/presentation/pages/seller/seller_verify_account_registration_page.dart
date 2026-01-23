@@ -1,19 +1,24 @@
 // lib/features/auth/presentation/pages/seller/seller_verify_account_registration_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
+import 'package:leelame/features/auth/presentation/pages/seller/seller_login_sign_up_page.dart';
+import 'package:leelame/features/auth/presentation/states/seller_auth_state.dart';
+import 'package:leelame/features/auth/presentation/view_models/seller_auth_view_model.dart';
 
-class SellerVerifyAccountRegistrationPage extends StatefulWidget {
+class SellerVerifyAccountRegistrationPage extends ConsumerStatefulWidget {
   final String email;
   const SellerVerifyAccountRegistrationPage({super.key, required this.email});
 
   @override
-  State<SellerVerifyAccountRegistrationPage> createState() =>
+  ConsumerState<SellerVerifyAccountRegistrationPage> createState() =>
       _SellerVerifyAccountRegistrationPageState();
 }
 
 class _SellerVerifyAccountRegistrationPageState
-    extends State<SellerVerifyAccountRegistrationPage> {
+    extends ConsumerState<SellerVerifyAccountRegistrationPage> {
   final _sellerVerifyAccountRegistrationFormKey = GlobalKey<FormState>();
   final List<TextEditingController> _controllers = List.generate(
     6,
@@ -30,6 +35,15 @@ class _SellerVerifyAccountRegistrationPageState
       node.dispose();
     }
     super.dispose();
+  }
+
+  Future<void> _handleSellerAccountVerification() async {
+    if (_sellerVerifyAccountRegistrationFormKey.currentState!.validate()) {
+      final otp = _controllers.map((c) => c.text).join();
+      await ref
+          .read(sellerAuthViewModelProvider.notifier)
+          .verifyAccountRegistration(email: widget.email, otp: otp);
+    }
   }
 
   Widget _buildOtpBox(int index) {
@@ -70,6 +84,22 @@ class _SellerVerifyAccountRegistrationPageState
 
   @override
   Widget build(BuildContext context) {
+    final sellerAuthState = ref.watch(sellerAuthViewModelProvider);
+
+    ref.listen<SellerAuthState>(sellerAuthViewModelProvider, (previous, next) {
+      if (next.sellerAuthStatus == SellerAuthStatus.error) {
+        SnackbarUtil.showError(
+          context,
+          next.errorMessage ?? "Verification Failed!",
+        );
+      } else if (next.sellerAuthStatus == SellerAuthStatus.verified) {
+        SnackbarUtil.showSuccess(context, "Verification Successful.");
+
+        // Navigate to Login
+        AppRoutes.pushReplacement(context, const SellerLoginSignUpPage());
+      }
+    });
+
     final bool isTablet = MediaQuery.of(context).size.width > 600;
     // final bool isDesktop = MediaQuery.of(context).size.width > 900;
     // final double horizontalPadding = isDesktop ? 40 : (isTablet ? 30 : 20);
@@ -144,21 +174,16 @@ class _SellerVerifyAccountRegistrationPageState
                           children: List.generate(6, _buildOtpBox),
                         ),
                       ),
-
                       SizedBox(height: 40),
 
                       // Verify Button
                       CustomPrimaryButton(
-                        onPressed: () {
-                          if (_sellerVerifyAccountRegistrationFormKey
-                              .currentState!
-                              .validate()) {
-                            // verify otp up logic
-                          }
-                        },
+                        onPressed: _handleSellerAccountVerification,
                         text: "Verify",
+                        isLoading:
+                            sellerAuthState.sellerAuthStatus ==
+                            SellerAuthStatus.loading,
                       ),
-
                       SizedBox(height: 30),
 
                       // Resend Code

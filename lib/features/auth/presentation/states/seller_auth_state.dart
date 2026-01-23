@@ -10,6 +10,8 @@ enum SellerAuthStatus {
   created,
   verified,
   error,
+  signUpError,
+  loginError,
 }
 
 enum IdentifierType { email, phoneNumber, id }

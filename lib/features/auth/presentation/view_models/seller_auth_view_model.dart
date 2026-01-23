@@ -53,7 +53,7 @@ class SellerAuthViewModel extends Notifier<SellerAuthState> {
     result.fold(
       (failure) {
         state = state.copywith(
-          sellerAuthStatus: SellerAuthStatus.error,
+          sellerAuthStatus: SellerAuthStatus.signUpError,
           errorMessage: failure.message,
         );
       },
@@ -88,7 +88,7 @@ class SellerAuthViewModel extends Notifier<SellerAuthState> {
     result.fold(
       (failure) {
         state = state.copywith(
-          sellerAuthStatus: SellerAuthStatus.error,
+          sellerAuthStatus: SellerAuthStatus.loginError,
           errorMessage: failure.message,
         );
       },
