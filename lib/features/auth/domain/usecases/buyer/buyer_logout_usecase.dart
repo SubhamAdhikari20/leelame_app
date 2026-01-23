@@ -1,4 +1,4 @@
-// lib/features/auth/domain/usecases/buyer_logout_usecase.dart
+// lib/features/auth/domain/usecases/buyer/buyer_logout_usecase.dart
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/core/error/failures.dart';

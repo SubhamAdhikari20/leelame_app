@@ -1,4 +1,4 @@
-// lib/features/auth/domain/usecases/buyer_verify_account_registration_usecase.dart
+// lib/features/auth/domain/usecases/buyer/buyer_verify_account_registration_usecase.dart
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
