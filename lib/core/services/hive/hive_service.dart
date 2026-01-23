@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:leelame/core/constants/hive_table_constant.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
+import 'package:leelame/features/seller/data/models/seller_hive_model.dart';
 import 'package:path_provider/path_provider.dart';
 
 final hiveServiceProvider = Provider<HiveService>((ref) {
@@ -29,6 +30,9 @@ class HiveService {
     if (!Hive.isAdapterRegistered(HiveTableConstant.buyersTypeId)) {
       Hive.registerAdapter(BuyerHiveModelAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.sellersTypeId)) {
+      Hive.registerAdapter(SellerHiveModelAdapter());
+    }
     // if (!Hive.isAdapterRegistered(HiveTableConstant.pendingEmailsTypeId)) {
     //   Hive.registerAdapter(BuyerHiveModelAdapter());
     // }
@@ -39,6 +43,7 @@ class HiveService {
     await Hive.openBox<UserHiveModel>(HiveTableConstant.usersTable);
     await Hive.openBox<BuyerHiveModel>(HiveTableConstant.buyersTable);
     await Hive.openBox<BuyerHiveModel>(HiveTableConstant.pendingEmailsTable);
+    await Hive.openBox<SellerHiveModel>(HiveTableConstant.sellersTable);
   }
 
   // Close all boxes
@@ -213,19 +218,52 @@ class HiveService {
     }
   }
 
-  // Get pending emails
-  // Future<List<Map<String, dynamic>>> getPendingEmails() async {
-  //   return _pendingEmailsBox.values.toList();
-  // }
+  // ---------------------------- Sellers ------------------------------
+  // Get sellers box
+  Box<SellerHiveModel> get _sellersBox =>
+      Hive.box<SellerHiveModel>(HiveTableConstant.sellersTable);
 
-  // // Keys List
-  // List<dynamic> getPendingEmailsKeysList(Map<String, dynamic> data) {
-  //   final keys = _pendingEmailsBox.keys.where((key) {
-  //     final value = _pendingEmailsBox.get(key);
-  //     return value?['toEmail'] == data['toEmail'] &&
-  //         value?['fullName'] == data['fullName'] &&
-  //         value?['otp'] == data['otp'];
-  //   }).toList();
-  //   return keys;
-  // }
+  Future<SellerHiveModel?> createSeller(SellerHiveModel sellerModel) async {
+    await _sellersBox.put(sellerModel.sellerId, sellerModel);
+    return sellerModel;
+  }
+
+  // Create a existing seller
+  Future<SellerHiveModel?> updateSeller(SellerHiveModel sellerModel) async {
+    await _sellersBox.put(sellerModel.sellerId, sellerModel);
+    return sellerModel;
+  }
+
+  // Get a existing seller by ID
+  Future<SellerHiveModel?> getSellerById(String sellerId) async {
+    return _sellersBox.get(sellerId);
+  }
+
+  // Get a existing seller by Base User ID
+  Future<SellerHiveModel?> getSellerByBaseUserId(String userId) async {
+    return _sellersBox.get(userId);
+  }
+
+  // Get a existing seller by phoneNumber
+  Future<SellerHiveModel?> getSellerByPhoneNumber(String phoneNumber) async {
+    final sellers = _sellersBox.values.where(
+      (seller) => seller.phoneNumber == phoneNumber,
+    );
+    return sellers.first;
+  }
+
+  // Get all sellers
+  Future<List<SellerHiveModel>> getAllSellers() async {
+    return _sellersBox.values.toList();
+  }
+
+  // Delete a seller
+  Future<void> deleteSeller(String sellerId) async {
+    await _sellersBox.delete(sellerId);
+  }
+
+  // Delete all sellers
+  Future<void> deleteAllSellers() async {
+    await _sellersBox.clear();
+  }
 }
