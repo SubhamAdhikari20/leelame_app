@@ -46,6 +46,23 @@ class AppColors {
   static const Color textSecondary60 = Color(0x996B7280);
   static const Color textSecondary50 = Color(0x806B7280);
 
+  // Arrow Buttons Background Color
+  static const Color arrowButtonPrimaryBackgroundColor = Color(0xFFE5E4FC);
+
+
+  // Auction Gradients
+  static const LinearGradient auctionPrimaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF2ADA03), Color(0xFF388E3C)],
+  );
+
+  static const LinearGradient auctionSecondaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFAF5FF), Color(0xFFE5E4FC)],
+  );
+
   // Item Status Gradients
   static const LinearGradient lostGradient = LinearGradient(
     begin: Alignment.topLeft,

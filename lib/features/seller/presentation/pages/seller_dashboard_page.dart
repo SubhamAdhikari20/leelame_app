@@ -1,11 +1,13 @@
 // lib/features/seller/presentation/pages/seller_dashboard_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/app/theme/app_colors.dart';
 import 'package:leelame/core/custom_icons/home_filled_icon.dart';
 import 'package:leelame/core/custom_icons/home_outlined_icon.dart';
 import 'package:leelame/core/custom_icons/person_filled_icon.dart';
 import 'package:leelame/core/custom_icons/person_outlined_icon.dart';
+import 'package:leelame/features/auction/presentation/pages/create_new_auction_page.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_analytics_screen.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_home_screen.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_orders_screen.dart';
@@ -29,6 +31,10 @@ class _SellerDashboardPageState extends ConsumerState<SellerDashboardPage> {
     SellerProfileScreen(),
   ];
 
+  void _onCreateNewAuctionPressed() {
+    AppRoutes.push(context, const CreateNewAuctionPage());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +46,7 @@ class _SellerDashboardPageState extends ConsumerState<SellerDashboardPage> {
           boxShadow: AppColors.buttonShadow,
         ),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: _onCreateNewAuctionPressed,
           backgroundColor: Colors.transparent,
           elevation: 0,
           child: Icon(Icons.add_rounded, color: Colors.white, size: 32),
