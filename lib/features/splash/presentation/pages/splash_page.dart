@@ -7,6 +7,7 @@ import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/core/services/storage/user_session_service.dart';
 import 'package:leelame/features/buyer/presentation/pages/dashboard_page.dart';
 import 'package:leelame/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:leelame/features/seller/presentation/pages/seller_dashboard_page.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
@@ -54,11 +55,14 @@ class _SplashPageState extends ConsumerState<SplashPage>
     // Check if user is already logged in
     final userSessionService = ref.read(userSessionServiceProvider);
     final isLoggedIn = userSessionService.isLoggedIn();
+    final role = userSessionService.getUserRole();
 
-    if (isLoggedIn) {
+    if (isLoggedIn && (role == "buyer")) {
       AppRoutes.pushReplacement(context, const DashboardPage());
+    } else if (isLoggedIn && (role == "seller")) {
+      AppRoutes.pushReplacement(context, const SellerDashboardPage());
     } else {
-      AppRoutes.pushReplacement(context, const OnboardingPage());
+      AppRoutes.push(context, const OnboardingPage());
     }
   }
 

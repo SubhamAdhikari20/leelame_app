@@ -9,6 +9,7 @@ import 'package:leelame/features/auth/presentation/pages/seller/seller_verify_ac
 import 'package:leelame/features/auth/presentation/states/seller_auth_state.dart';
 import 'package:leelame/features/auth/presentation/view_models/seller_auth_view_model.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
+import 'package:leelame/features/seller/presentation/pages/seller_dashboard_page.dart';
 
 class SellerLoginSignUpPage extends ConsumerStatefulWidget {
   const SellerLoginSignUpPage({super.key});
@@ -127,7 +128,7 @@ class _SellerLoginSignUpPageState extends ConsumerState<SellerLoginSignUpPage>
         );
 
         // Navigate to seller dashboard page
-        // AppRoutes.pushReplacement(context, const DashboardPage());
+        AppRoutes.pushReplacement(context, const SellerDashboardPage());
       }
     });
 

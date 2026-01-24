@@ -37,28 +37,41 @@ class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
   static const Color _focusedColor = Color(0xFF4CAF50);
   static const Color _errorColor = Colors.red;
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _obscureText = widget.isPassword ?? false;
+
+  //   widget.controller.addListener(() {
+  //     if (widget.controller.text.isNotEmpty != _hasText) {
+  //       _updateState();
+  //     }
+  //   });
+  // }
+
+  // void _updateState() {
+  //   setState(() {
+  //     _hasText = widget.controller.text.isNotEmpty;
+  //   });
+  // }
+
   @override
   void initState() {
     super.initState();
     _obscureText = widget.isPassword ?? false;
+    widget.controller.addListener(_handleControllerChange);
+    _hasText = widget.controller.text.isNotEmpty;
+  }
 
-    widget.controller.addListener(() {
-      if (widget.controller.text.isNotEmpty != _hasText) {
-        _updateState();
+  void _handleControllerChange() {
+    final bool hasText = widget.controller.text.isNotEmpty;
+    if (hasText != _hasText) {
+      if (mounted) {
+        setState(() {
+          _hasText = hasText;
+        });
       }
-    });
-  }
-
-  void _updateState() {
-    setState(() {
-      _hasText = widget.controller.text.isNotEmpty;
-    });
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_updateState);
-    super.dispose();
+    }
   }
 
   void _clearText() {
@@ -70,6 +83,18 @@ class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
       _obscureText = !_obscureText;
     });
   }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_handleControllerChange);
+    super.dispose();
+  }
+
+  // @override
+  // void dispose() {
+  //   widget.controller.removeListener(_updateState);
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +162,7 @@ class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
       validator:
           widget.validator ??
           (value) {
-            _updateState();
+            // _updateState();
             if (value == null || value.isEmpty) {
               return "Please enter ${displayLabel.toLowerCase()}";
             }

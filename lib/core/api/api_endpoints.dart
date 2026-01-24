@@ -17,7 +17,7 @@ class ApiEndpoints {
   static String userByEmail(String email) => "/user/$email";
 
   // ======================= Buyer Auth Endpoints =======================
-  static const String buyers = "/users/buyers";
+  static const String buyers = "/users/buyer";
   static const String buyerSignUp = "/users/buyer/sign-up";
   static const String buyerLogin = "/users/buyer/login";
   static const String buyerVerifyAccountRegistration =
@@ -33,7 +33,7 @@ class ApiEndpoints {
       "/users/buyer/$phoneNumber";
 
   // ======================= Seller Auth Endpoints =======================
-  static const String sellers = "/users/sellers";
+  static const String sellers = "/users/seller";
   static const String sellerSignUp = "/users/seller/sign-up";
   static const String sellerLogin = "/users/seller/login";
   static const String sellerVerifyAccountRegistration =

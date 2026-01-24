@@ -1,13 +1,15 @@
 // lib/features/seller/presentation/pages/seller_dashboard_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/app/theme/app_colors.dart';
-import 'package:leelame/core/utils/snackbar_util.dart';
-import 'package:leelame/core/widgets/custom_primary_button.dart';
-import 'package:leelame/features/auth/presentation/pages/seller/seller_login_sign_up_page.dart';
-import 'package:leelame/features/auth/presentation/states/seller_auth_state.dart';
-import 'package:leelame/features/auth/presentation/view_models/seller_auth_view_model.dart';
+import 'package:leelame/core/custom_icons/home_filled_icon.dart';
+import 'package:leelame/core/custom_icons/home_outlined_icon.dart';
+import 'package:leelame/core/custom_icons/person_filled_icon.dart';
+import 'package:leelame/core/custom_icons/person_outlined_icon.dart';
+import 'package:leelame/features/seller/presentation/pages/screens/seller_analytics_screen.dart';
+import 'package:leelame/features/seller/presentation/pages/screens/seller_home_screen.dart';
+import 'package:leelame/features/seller/presentation/pages/screens/seller_orders_screen.dart';
+import 'package:leelame/features/seller/presentation/pages/screens/seller_profile_screen.dart';
 
 class SellerDashboardPage extends ConsumerStatefulWidget {
   const SellerDashboardPage({super.key});
@@ -18,66 +20,74 @@ class SellerDashboardPage extends ConsumerStatefulWidget {
 }
 
 class _SellerDashboardPageState extends ConsumerState<SellerDashboardPage> {
-  Future<void> _handleLogout() async {
-    await ref.read(sellerAuthViewModelProvider.notifier).logout();
-  }
+  int _selectedIndex = 0;
 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Logout', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => AppRoutes.pop(context),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: AppColors.textPrimaryColor),
-            ),
-          ),
-          TextButton(
-            onPressed: _handleLogout,
-            child: Text(
-              'Logout',
-              style: TextStyle(
-                color: AppColors.error,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  List<Widget> lstBottomScreen = [
+    SellerHomeScreen(),
+    SellerOrdersScreen(),
+    SellerAnalyticsScreen(),
+    SellerProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final sellerAuthState = ref.watch(sellerAuthViewModelProvider);
-
-    ref.listen<SellerAuthState>(sellerAuthViewModelProvider, (previous, next) {
-      if (next.sellerAuthStatus == SellerAuthStatus.error &&
-          next.errorMessage != null) {
-        SnackbarUtil.showError(context, next.errorMessage ?? "Logout Failed!");
-      } else if (next.sellerAuthStatus == SellerAuthStatus.unauthenticated) {
-        SnackbarUtil.showSuccess(context, "Logged out successfully.");
-
-        // Navigate to seller login and sign up page
-        AppRoutes.pop(context);
-        AppRoutes.pushAndRemoveUntil(context, const SellerLoginSignUpPage());
-      }
-    });
-
     return Scaffold(
-      body: Center(
-        child: CustomPrimaryButton(
-          onPressed: () {
-            _showLogoutDialog(context);
+      body: lstBottomScreen[_selectedIndex],
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.primaryGradient,
+          shape: BoxShape.circle,
+          boxShadow: AppColors.buttonShadow,
+        ),
+        child: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Icon(Icons.add_rounded, color: Colors.white, size: 32),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.only(top: 10),
+        decoration: BoxDecoration(color: Colors.white),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          iconSize: 25,
+          backgroundColor: Colors.white,
+          selectedItemColor: Color(0xFF2ADA03),
+          unselectedItemColor: Color(0xFF555555),
+          selectedLabelStyle: TextStyle(fontFamily: "OpenSans SemiBold"),
+          selectedFontSize: 15,
+          unselectedFontSize: 14,
+          elevation: 0,
+          items: [
+            BottomNavigationBarItem(
+              activeIcon: Icon(HomeFilledIcon.icon),
+              icon: Icon(HomeOutlinedIcon.icon),
+              label: "Home",
+            ),
+            BottomNavigationBarItem(
+              activeIcon: Icon(Icons.shopping_bag),
+              icon: Icon(Icons.shopping_bag_outlined),
+              label: "Oders",
+            ),
+            BottomNavigationBarItem(
+              activeIcon: Icon(Icons.analytics),
+              icon: Icon(Icons.analytics_outlined),
+              label: "Analytics",
+            ),
+            BottomNavigationBarItem(
+              activeIcon: Icon(PersonFilledIcon.icon),
+              icon: Icon(PersonOutlinedIcon.icon),
+              label: "Profile",
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
           },
-          text: "Logout",
-          isLoading:
-              sellerAuthState.sellerAuthStatus == SellerAuthStatus.loading,
         ),
       ),
     );
