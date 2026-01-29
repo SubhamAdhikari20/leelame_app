@@ -13,7 +13,7 @@ class ApiEndpoints {
 
   static const bool isPhysicalDevice = false;
   static const String _ipAddress = "192.168.1.1";
-  static const int _port = 3000;
+  static const int _port = 5050;
 
   // Base URLs
   static String get _host {
@@ -29,7 +29,7 @@ class ApiEndpoints {
     return "localhost";
   }
 
-  static String get serverUrl => "http://$_host:$_port/api";
+  static String get serverUrl => "http://$_host:$_port";
   static String get baseUrl => "$serverUrl/api";
   static String get mediaServerUrl => serverUrl;
 

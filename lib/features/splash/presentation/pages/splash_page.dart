@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
+import 'package:leelame/core/services/storage/token_service.dart';
 import 'package:leelame/core/services/storage/user_session_service.dart';
 import 'package:leelame/features/buyer/presentation/pages/dashboard_page.dart';
 import 'package:leelame/features/onboarding/presentation/pages/onboarding_page.dart';
@@ -51,15 +52,25 @@ class _SplashPageState extends ConsumerState<SplashPage>
 
   Future<void> _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
     // Check if user is already logged in
     final userSessionService = ref.read(userSessionServiceProvider);
+    final tokenService = ref.read(tokenServiceProvider);
     final isLoggedIn = userSessionService.isLoggedIn();
     final role = userSessionService.getUserRole();
+    final token = tokenService.getToken();
 
-    if (isLoggedIn && (role == "buyer")) {
+    if (isLoggedIn &&
+        (role == "buyer") &&
+        (token != null) &&
+        (token.isNotEmpty)) {
       AppRoutes.pushReplacement(context, const DashboardPage());
-    } else if (isLoggedIn && (role == "seller")) {
+    } else if (isLoggedIn &&
+        (role == "seller") &&
+        (token != null) &&
+        (token.isNotEmpty)) {
       AppRoutes.pushReplacement(context, const SellerDashboardPage());
     } else {
       AppRoutes.push(context, const OnboardingPage());

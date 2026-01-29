@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/app/theme/app_colors.dart';
+import 'package:leelame/core/services/storage/user_session_service.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/buyer/buyer_login_page.dart';
+import 'package:leelame/features/auth/presentation/states/buyer_auth_state.dart';
 import 'package:leelame/features/auth/presentation/view_models/buyer_auth_view_model.dart';
+import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -15,6 +18,22 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => _loadCurrentUser());
+  }
+
+  void _loadCurrentUser() async {
+    final userSessionService = ref.read(userSessionServiceProvider);
+    final buyerId = userSessionService.getUserId();
+    if (buyerId != null) {
+      await ref
+          .read(buyerAuthViewModelProvider.notifier)
+          .getCurrentUser(buyerId: buyerId);
+    }
+  }
+
   Future<void> _logout() async {
     await ref.read(buyerAuthViewModelProvider.notifier).logout();
     if (!mounted) return;
@@ -29,6 +48,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final buyerAuthStatus = ref.watch(buyerAuthViewModelProvider);
+    final BuyerEntity? userData = buyerAuthStatus.buyer;
+
+    ref.listen<BuyerAuthState>(buyerAuthViewModelProvider, (previous, next) {
+      if ((next.buyerAuthStatus == BuyerAuthStatus.error)) {
+        SnackbarUtil.showError(
+          context,
+          next.errorMessage ?? "Error loading current user!",
+        );
+      }
+    });
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -83,7 +114,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     const SizedBox(height: 16),
 
                     Text(
-                      'Ram Shahi',
+                      userData?.fullName ?? "Guest",
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -93,13 +124,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     const SizedBox(height: 8),
 
                     Text(
-                      'Ram20',
+                      userData?.username ?? "guest07",
                       style: TextStyle(fontSize: 16, color: Colors.white70),
                     ),
                     const SizedBox(height: 4),
 
                     Text(
-                      'ramshahi@gmail.com.np',
+                      userData?.userEntity?.email ?? "guest@gmail.com.np",
                       style: TextStyle(fontSize: 14, color: Colors.white70),
                     ),
                     const SizedBox(height: 24),

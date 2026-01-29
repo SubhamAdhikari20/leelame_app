@@ -1,7 +1,9 @@
 // lib/features/auth/data/datasources/remote/buyer_auth_remote_datasource.dart
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/core/api/api_client.dart';
 import 'package:leelame/core/api/api_endpoints.dart';
+import 'package:leelame/core/services/storage/token_service.dart';
 import 'package:leelame/features/auth/data/datasources/buyer_auth_datasource.dart';
 import 'package:leelame/features/auth/data/models/user_api_model.dart';
 import 'package:leelame/features/buyer/data/models/buyer_api_model.dart';
@@ -10,36 +12,42 @@ final buyerAuthRemoteDatasourceProvider = Provider<IBuyerAuthRemoteDatasource>((
   ref,
 ) {
   final apiClient = ref.read(apiClientProvider);
-  return BuyerAuthRemoteDatasource(apiClient: apiClient);
+  final tokenService = ref.read(tokenServiceProvider);
+
+  return BuyerAuthRemoteDatasource(
+    apiClient: apiClient,
+    tokenService: tokenService,
+  );
 });
 
 class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
   final ApiClient _apiClient;
+  final TokenService _tokenService;
 
-  BuyerAuthRemoteDatasource({required ApiClient apiClient})
-    : _apiClient = apiClient;
+  BuyerAuthRemoteDatasource({
+    required ApiClient apiClient,
+    required TokenService tokenService,
+  }) : _apiClient = apiClient,
+       _tokenService = tokenService;
 
   @override
   Future<BuyerApiModel?> signUp(
     UserApiModel userModel,
     BuyerApiModel buyerModel,
   ) async {
-    final body = {
-      ...buyerModel.toJson(),
-      "email": userModel.email,
-      "role": userModel.role,
-      // "baseUser": userModel.toJson(),
-    };
+    final body = buyerModel.toJson(userApiModel: userModel);
     final response = await _apiClient.post(
       ApiEndpoints.buyerSignUp,
       data: body,
     );
 
-    if (!(response.data["success"] as bool)) {
+    final success = response.data["success"] as bool;
+    final data = response.data["user"] as Map<String, dynamic>?;
+
+    if (!success || data == null) {
       return null;
     }
 
-    final data = response.data["user"] as Map<String, dynamic>;
     final newBuyer = BuyerApiModel.fromJson(data);
     return newBuyer;
   }
@@ -64,68 +72,55 @@ class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
       data: {"identifier": identifier, "password": password, "role": role},
     );
 
-    if (!(response.data["success"] as bool)) {
+    final success = response.data["success"] as bool;
+    final data = response.data["user"] as Map<String, dynamic>?;
+    final token = response.data["token"] as String?;
+
+    if (!success || data == null || token == null) {
       return null;
     }
 
-    final data = response.data["user"] as Map<String, dynamic>;
+    // save token locally
+    await _tokenService.saveToken(token);
+
     final buyer = BuyerApiModel.fromJson(data);
     return buyer;
   }
 
   @override
   Future<bool> logout() async {
-    final response = await _apiClient.get(ApiEndpoints.buyerLogout);
-    if (!(response.data["success"] as bool)) {
+    final token = _tokenService.getToken();
+    final response = await _apiClient.get(
+      ApiEndpoints.buyerLogout,
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+
+    final success = response.data["success"] as bool;
+    if (!success) {
       return false;
     }
+
+    await _tokenService.removeToken();
     return true;
   }
 
   @override
   Future<BuyerApiModel?> getCurrentBuyer(String buyerId) async {
-    final response = await _apiClient.get(ApiEndpoints.buyerById(buyerId));
-    if (!(response.data["success"] as bool)) {
+    final token = _tokenService.getToken();
+    final response = await _apiClient.get(
+      ApiEndpoints.buyerById(buyerId),
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+
+    final success = response.data["success"] as bool;
+    final data = response.data["user"] as Map<String, dynamic>?;
+
+    if (!success || data == null) {
       return null;
     }
 
-    final data = response.data["data"] as Map<String, dynamic>;
     final buyer = BuyerApiModel.fromJson(data);
     return buyer;
-  }
-
-  @override
-  Future<UserApiModel?> getCurrentUser(String userId) async {
-    final response = await _apiClient.get(ApiEndpoints.userById(userId));
-    if (!(response.data["success"] as bool)) {
-      return null;
-    }
-
-    final data = response.data["data"] as Map<String, dynamic>;
-    final baseUser = UserApiModel.fromJson(data);
-    return baseUser;
-  }
-
-  @override
-  Future<bool> isEmailExists(String email) async {
-    final response = await _apiClient.get(ApiEndpoints.userByEmail(email));
-    return response.data["success"] as bool;
-  }
-
-  @override
-  Future<bool> isPhoneNumberExists(String phoneNumber) async {
-    final response = await _apiClient.get(
-      ApiEndpoints.buyerByPhoneNumber(phoneNumber),
-    );
-    return response.data["success"] as bool;
-  }
-
-  @override
-  Future<bool> isUsernameExists(String username) async {
-    final response = await _apiClient.get(
-      ApiEndpoints.buyerByUsername(username),
-    );
-    return response.data["success"] as bool;
   }
 
   @override
@@ -144,6 +139,8 @@ class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
         "expiry": expiry?.toIso8601String(),
       },
     );
-    return response.data["success"] as bool;
+
+    final success = response.data["success"] as bool;
+    return success;
   }
 }

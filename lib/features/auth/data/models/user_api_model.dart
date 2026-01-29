@@ -1,8 +1,14 @@
 // lib/features/auth/data/models/user_api_model.dart
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:leelame/features/auth/domain/entities/user_entity.dart';
 
+part "user_api_model.g.dart";
+
+@JsonSerializable()
 class UserApiModel {
+  @JsonKey(name: "_id")
   final String? id;
+
   final String email;
   final String role;
   final bool isVerified;
@@ -24,39 +30,14 @@ class UserApiModel {
     this.bannedTo,
   });
 
-  // to JSON
+  // to Json
   Map<String, dynamic> toJson() {
-    return {
-      "email": email,
-      "role": role,
-      "isVerified": isVerified,
-      "isPermanentlyBanned": isPermanentlyBanned,
-      "banReason": banReason,
-      "bannedAt": bannedAt?.toIso8601String(),
-      "bannedFrom": bannedFrom?.toIso8601String(),
-      "bannedTo": bannedTo?.toIso8601String(),
-    };
+    return _$UserApiModelToJson(this);
   }
 
   // From JSON
   factory UserApiModel.fromJson(Map<String, dynamic> json) {
-    return UserApiModel(
-      id: json["_id"] as String,
-      email: json["email"] as String,
-      role: json["role"] as String,
-      isVerified: json["isVerified"] as bool,
-      isPermanentlyBanned: json["isPermanentlyBanned"] as bool,
-      banReason: json["banReason"] as String?,
-      bannedAt: json["bannedAt"] != null
-          ? DateTime.parse(json["bannedAt"])
-          : null,
-      bannedFrom: json["bannedFrom"] != null
-          ? DateTime.parse(json["bannedFrom"])
-          : null,
-      bannedTo: json["bannedTo"] != null
-          ? DateTime.parse(json["bannedTo"])
-          : null,
-    );
+    return _$UserApiModelFromJson(json);
   }
 
   // to JSON List

@@ -9,6 +9,7 @@ enum BuyerAuthStatus {
   unauthenticated,
   created,
   verified,
+  loaded,
   error,
 }
 
@@ -30,12 +31,14 @@ class CreatedIdentifier extends Equatable {
 class BuyerAuthState extends Equatable {
   final BuyerAuthStatus buyerAuthStatus;
   final List<BuyerEntity> buyers;
+  final BuyerEntity? buyer;
   final String? errorMessage;
   final CreatedIdentifier? createdIdentifier;
 
   const BuyerAuthState({
     this.buyerAuthStatus = BuyerAuthStatus.initial,
     this.buyers = const [],
+    this.buyer,
     this.errorMessage,
     this.createdIdentifier,
   });
@@ -44,12 +47,14 @@ class BuyerAuthState extends Equatable {
   BuyerAuthState copywith({
     BuyerAuthStatus? buyerAuthStatus,
     List<BuyerEntity>? buyers,
+    BuyerEntity? buyer,
     String? errorMessage,
     CreatedIdentifier? createdIdentifier,
   }) {
     return BuyerAuthState(
       buyerAuthStatus: buyerAuthStatus ?? this.buyerAuthStatus,
       buyers: buyers ?? this.buyers,
+      buyer: buyer ?? this.buyer,
       errorMessage: errorMessage ?? this.errorMessage,
       createdIdentifier: createdIdentifier ?? this.createdIdentifier,
     );
@@ -59,6 +64,7 @@ class BuyerAuthState extends Equatable {
   List<Object?> get props => [
     buyerAuthStatus,
     buyers,
+    buyer,
     errorMessage,
     createdIdentifier,
   ];

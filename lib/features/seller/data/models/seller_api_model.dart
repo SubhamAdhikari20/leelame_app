@@ -43,22 +43,23 @@ class SellerApiModel {
   });
 
   // to JSON
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson({UserApiModel? userApiModel}) {
     return {
       "fullName": fullName,
       "contact": phoneNumber,
       "password": password,
       "profilePictureUrl": profilePictureUrl,
       "bio": bio,
-      "baseUserId": baseUserId ?? baseUser?.id,
-      "email": baseUser?.email,
-      "role": baseUser?.role,
-      "isVerified": baseUser?.isVerified,
-      "isPermanentlyBanned": baseUser?.isVerified,
-      "banReason": baseUser?.banReason,
-      "bannedAt": baseUser?.bannedAt,
-      "bannedFrom": baseUser?.bannedFrom,
-      "bannedTo": baseUser?.bannedTo,
+      "baseUserId": baseUserId ?? baseUser?.id ?? userApiModel?.id,
+      "email": baseUser?.email ?? userApiModel?.email,
+      "role": baseUser?.role ?? userApiModel?.role,
+      "isVerified": baseUser?.isVerified ?? userApiModel?.isVerified,
+      "isPermanentlyBanned":
+          baseUser?.isPermanentlyBanned ?? userApiModel?.isPermanentlyBanned,
+      "banReason": baseUser?.banReason ?? userApiModel?.banReason,
+      "bannedAt": baseUser?.bannedAt ?? userApiModel?.bannedAt,
+      "bannedFrom": baseUser?.bannedFrom ?? userApiModel?.bannedFrom,
+      "bannedTo": baseUser?.bannedTo ?? userApiModel?.bannedTo,
       "sellerNotes": sellerNotes,
       "sellerStatus": sellerStatus,
       "sellerVerificationDate": sellerVerificationDate?.toIso8601String(),
