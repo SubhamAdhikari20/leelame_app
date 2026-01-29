@@ -23,7 +23,7 @@ class SellerHiveModelAdapter extends TypeAdapter<SellerHiveModel> {
       password: fields[3] as String?,
       profilePictureUrl: fields[4] as String?,
       bio: fields[5] as String?,
-      userId: fields[6] as String?,
+      baseUserId: fields[6] as String?,
       sellerNotes: fields[7] as String?,
       sellerStatus: fields[8] as String?,
       sellerVerificationDate: fields[9] as DateTime?,
@@ -53,7 +53,7 @@ class SellerHiveModelAdapter extends TypeAdapter<SellerHiveModel> {
       ..writeByte(5)
       ..write(obj.bio)
       ..writeByte(6)
-      ..write(obj.userId)
+      ..write(obj.baseUserId)
       ..writeByte(7)
       ..write(obj.sellerNotes)
       ..writeByte(8)

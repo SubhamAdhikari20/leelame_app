@@ -2,7 +2,6 @@
 import 'package:equatable/equatable.dart';
 
 class UserEntity extends Equatable {
-  // id is optional because we dont need id while adding but required when updating and deleting
   final String? userId;
   final String email;
   final String role;

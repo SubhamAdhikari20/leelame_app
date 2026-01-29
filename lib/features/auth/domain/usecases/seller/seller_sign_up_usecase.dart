@@ -15,18 +15,24 @@ class SellerSignUpUsecaseParams extends Equatable {
   final String email;
   final String? phoneNumber;
   final String? password;
-  final String? userId;
+  final String? baseUserId;
 
   const SellerSignUpUsecaseParams({
     required this.fullName,
     required this.email,
     this.phoneNumber,
     this.password,
-    this.userId,
+    this.baseUserId,
   });
 
   @override
-  List<Object?> get props => [fullName, email, phoneNumber, password, userId];
+  List<Object?> get props => [
+    fullName,
+    email,
+    phoneNumber,
+    password,
+    baseUserId,
+  ];
 }
 
 // Provider for SignUp Usecase
@@ -46,12 +52,12 @@ class SellerSignUpUsecase
   Future<Either<Failures, SellerEntity>> call(
     SellerSignUpUsecaseParams params,
   ) async {
-    // Generate userId
-    final userId = params.userId ?? Uuid().v4();
+    // Generate baseUserId
+    final baseUserId = params.baseUserId ?? Uuid().v4();
 
     // create user and seller entities
     UserEntity userEntity = UserEntity(
-      userId: userId,
+      userId: baseUserId,
       email: params.email,
       role: "seller",
       isVerified: false,
@@ -62,7 +68,7 @@ class SellerSignUpUsecase
       fullName: params.fullName,
       phoneNumber: params.phoneNumber,
       password: params.password,
-      userId: userId,
+      baseUserId: baseUserId,
     );
 
     return await _sellerAuthRepository.signUp(userEntity, sellerEntity);

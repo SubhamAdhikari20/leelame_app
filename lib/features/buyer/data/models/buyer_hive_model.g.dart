@@ -25,7 +25,7 @@ class BuyerHiveModelAdapter extends TypeAdapter<BuyerHiveModel> {
       profilePictureUrl: fields[5] as String?,
       bio: fields[6] as String?,
       termsAccepted: fields[7] as bool?,
-      userId: fields[8] as String?,
+      baseUserId: fields[8] as String?,
     );
   }
 
@@ -50,7 +50,7 @@ class BuyerHiveModelAdapter extends TypeAdapter<BuyerHiveModel> {
       ..writeByte(7)
       ..write(obj.termsAccepted)
       ..writeByte(8)
-      ..write(obj.userId);
+      ..write(obj.baseUserId);
   }
 
   @override

@@ -28,7 +28,7 @@ class SellerHiveModel extends HiveObject {
   final String? bio;
 
   @HiveField(6)
-  final String? userId;
+  final String? baseUserId;
 
   @HiveField(7)
   final String? sellerNotes;
@@ -64,7 +64,7 @@ class SellerHiveModel extends HiveObject {
     this.password,
     this.profilePictureUrl,
     this.bio,
-    String? userId,
+    String? baseUserId,
     this.sellerNotes,
     this.sellerStatus,
     this.sellerVerificationDate,
@@ -75,7 +75,7 @@ class SellerHiveModel extends HiveObject {
     this.sellerBannedDateFrom,
     this.sellerBannedDateTo,
   }) : sellerId = sellerId ?? Uuid().v4(),
-       userId = userId ?? Uuid().v4();
+       baseUserId = baseUserId ?? Uuid().v4();
 
   // Convert Model to Seller Entity
   SellerEntity toEntity({UserEntity? userEntity}) {
@@ -86,7 +86,7 @@ class SellerHiveModel extends HiveObject {
       password: password,
       profilePictureUrl: profilePictureUrl,
       bio: bio,
-      userId: userId,
+      baseUserId: baseUserId,
       userEntity: userEntity,
       sellerNotes: sellerNotes,
       sellerStatus: sellerStatus,
@@ -109,7 +109,7 @@ class SellerHiveModel extends HiveObject {
       password: sellerEntity.password,
       profilePictureUrl: sellerEntity.profilePictureUrl,
       bio: sellerEntity.bio,
-      userId: sellerEntity.userId,
+      baseUserId: sellerEntity.baseUserId,
       sellerNotes: sellerEntity.sellerNotes,
       sellerStatus: sellerEntity.sellerStatus,
       sellerVerificationDate: sellerEntity.sellerVerificationDate,
@@ -135,7 +135,7 @@ class SellerHiveModel extends HiveObject {
     String? password,
     String? profilePictureUrl,
     String? bio,
-    String? userId,
+    String? baseUserId,
     String? sellerNotes,
     String? sellerStatus,
     DateTime? sellerVerificationDate,
@@ -153,7 +153,7 @@ class SellerHiveModel extends HiveObject {
       password: password ?? this.password,
       profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
       bio: bio ?? this.bio,
-      userId: userId ?? this.userId,
+      baseUserId: baseUserId ?? this.baseUserId,
       sellerNotes: sellerNotes ?? this.sellerNotes,
       sellerStatus: sellerStatus ?? this.sellerStatus,
       sellerVerificationDate:

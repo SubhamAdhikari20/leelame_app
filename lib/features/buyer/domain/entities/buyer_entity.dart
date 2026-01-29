@@ -13,7 +13,7 @@ class BuyerEntity extends Equatable {
   final bool? termsAccepted;
 
   // Reference from base user
-  final String? userId;
+  final String? baseUserId;
   final UserEntity? userEntity;
 
   const BuyerEntity({
@@ -25,7 +25,7 @@ class BuyerEntity extends Equatable {
     this.profilePictureUrl,
     this.bio,
     this.termsAccepted,
-    this.userId,
+    this.baseUserId,
     this.userEntity,
   });
 
@@ -39,6 +39,6 @@ class BuyerEntity extends Equatable {
     profilePictureUrl,
     bio,
     termsAccepted,
-    userId,
+    baseUserId,
   ];
 }

@@ -10,7 +10,7 @@ class SellerEntity extends Equatable {
   final String? profilePictureUrl;
   final String? bio;
 
-  final String? userId;
+  final String? baseUserId;
   final UserEntity? userEntity;
 
   final String? sellerNotes;
@@ -30,7 +30,7 @@ class SellerEntity extends Equatable {
     this.password,
     this.profilePictureUrl,
     this.bio,
-    this.userId,
+    this.baseUserId,
     this.userEntity,
     this.sellerNotes,
     this.sellerStatus,
@@ -51,7 +51,7 @@ class SellerEntity extends Equatable {
     password,
     profilePictureUrl,
     bio,
-    userId,
+    baseUserId,
     userEntity,
     sellerNotes,
     sellerStatus,

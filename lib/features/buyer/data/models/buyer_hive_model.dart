@@ -34,7 +34,7 @@ class BuyerHiveModel extends HiveObject {
   final bool? termsAccepted;
 
   @HiveField(8)
-  final String? userId;
+  final String? baseUserId;
 
   BuyerHiveModel({
     String? buyerId,
@@ -45,9 +45,9 @@ class BuyerHiveModel extends HiveObject {
     this.profilePictureUrl,
     this.bio,
     this.termsAccepted,
-    String? userId,
+    String? baseUserId,
   }) : buyerId = buyerId ?? Uuid().v4(),
-       userId = userId ?? Uuid().v4();
+       baseUserId = baseUserId ?? Uuid().v4();
 
   // Convert Model to Buyer Entity
   BuyerEntity toEntity({UserEntity? userEntity}) {
@@ -60,7 +60,7 @@ class BuyerHiveModel extends HiveObject {
       profilePictureUrl: profilePictureUrl,
       bio: bio,
       termsAccepted: termsAccepted,
-      userId: userId,
+      baseUserId: baseUserId,
       userEntity: userEntity,
     );
   }
@@ -76,7 +76,7 @@ class BuyerHiveModel extends HiveObject {
       profilePictureUrl: buyerEntity.profilePictureUrl,
       bio: buyerEntity.bio,
       termsAccepted: buyerEntity.termsAccepted,
-      userId: buyerEntity.userId,
+      baseUserId: buyerEntity.baseUserId,
     );
   }
 
@@ -95,7 +95,7 @@ class BuyerHiveModel extends HiveObject {
     String? profilePictureUrl,
     String? bio,
     bool? termsAccepted,
-    String? userId,
+    String? baseUserId,
   }) {
     return BuyerHiveModel(
       buyerId: buyerId ?? this.buyerId,
@@ -106,7 +106,7 @@ class BuyerHiveModel extends HiveObject {
       profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
       bio: bio ?? this.bio,
       termsAccepted: termsAccepted ?? this.termsAccepted,
-      userId: userId ?? this.userId,
+      baseUserId: baseUserId ?? this.baseUserId,
     );
   }
 }

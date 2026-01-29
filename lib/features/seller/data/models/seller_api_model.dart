@@ -9,7 +9,7 @@ class SellerApiModel {
   final String? password;
   final String? profilePictureUrl;
   final String? bio;
-  final String? userId;
+  final String? baseUserId;
   final UserApiModel? baseUser;
 
   final String? sellerNotes;
@@ -29,7 +29,7 @@ class SellerApiModel {
     this.password,
     this.profilePictureUrl,
     this.bio,
-    this.userId,
+    this.baseUserId,
     this.baseUser,
     this.sellerNotes,
     this.sellerStatus,
@@ -50,8 +50,15 @@ class SellerApiModel {
       "password": password,
       "profilePictureUrl": profilePictureUrl,
       "bio": bio,
-      "userId": userId,
-      "baseUser": baseUser,
+      "baseUserId": baseUserId ?? baseUser?.id,
+      "email": baseUser?.email,
+      "role": baseUser?.role,
+      "isVerified": baseUser?.isVerified,
+      "isPermanentlyBanned": baseUser?.isVerified,
+      "banReason": baseUser?.banReason,
+      "bannedAt": baseUser?.bannedAt,
+      "bannedFrom": baseUser?.bannedFrom,
+      "bannedTo": baseUser?.bannedTo,
       "sellerNotes": sellerNotes,
       "sellerStatus": sellerStatus,
       "sellerVerificationDate": sellerVerificationDate?.toIso8601String(),
@@ -72,10 +79,26 @@ class SellerApiModel {
       phoneNumber: json["contact"] as String?,
       profilePictureUrl: json["profilePictureUrl"] as String?,
       bio: json["bio"] as String?,
-      userId: json["userId"] as String?,
-      baseUser: json["baseUser"] != null
-          ? UserApiModel.fromJson(json["baseUser"] as Map<String, dynamic>)
-          : null,
+      baseUserId: json["baseUserId"] as String?,
+      baseUser: UserApiModel(
+        email: json["email"] as String,
+        role: json["role"] as String,
+        isVerified: json["isVerified"] as bool,
+        isPermanentlyBanned: json["isPermanentlyBanned"] as bool,
+        banReason: json["banReason"] as String?,
+        bannedAt: json["bannedAt"] != null
+            ? DateTime.parse(json["bannedAt"])
+            : null,
+        bannedFrom: json["bannedFrom"] != null
+            ? DateTime.parse(json["bannedFrom"])
+            : null,
+        bannedTo: json["bannedTo"] != null
+            ? DateTime.parse(json["bannedTo"])
+            : null,
+      ),
+      // baseUser: json["baseUser"] != null
+      //     ? UserApiModel.fromJson(json["baseUser"] as Map<String, dynamic>)
+      //     : null,
       sellerNotes: json["sellerNotes"] as String?,
       sellerStatus: json["sellerStatus"] as String?,
       sellerVerificationDate: json["sellerVerificationDate"] != null
@@ -118,7 +141,7 @@ class SellerApiModel {
       phoneNumber: phoneNumber,
       profilePictureUrl: profilePictureUrl,
       bio: bio,
-      userId: userId,
+      baseUserId: baseUserId,
       userEntity: baseUser?.toEntity(),
       sellerNotes: sellerNotes,
       sellerStatus: sellerStatus,
@@ -141,7 +164,7 @@ class SellerApiModel {
       password: sellerEntity.password,
       profilePictureUrl: sellerEntity.profilePictureUrl,
       bio: sellerEntity.bio,
-      userId: sellerEntity.userId,
+      baseUserId: sellerEntity.baseUserId,
       sellerNotes: sellerEntity.sellerNotes,
       sellerStatus: sellerEntity.sellerStatus,
       sellerVerificationDate: sellerEntity.sellerVerificationDate,

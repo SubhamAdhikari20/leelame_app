@@ -18,7 +18,7 @@ class BuyerSignUpUsecaseParams extends Equatable {
   final String? phoneNumber;
   final String? password;
   final bool termsAccepted;
-  final String? userId;
+  final String? baseUserId;
 
   const BuyerSignUpUsecaseParams({
     required this.fullName,
@@ -27,7 +27,7 @@ class BuyerSignUpUsecaseParams extends Equatable {
     this.phoneNumber,
     this.password,
     required this.termsAccepted,
-    this.userId,
+    this.baseUserId,
   });
 
   @override
@@ -37,7 +37,7 @@ class BuyerSignUpUsecaseParams extends Equatable {
     email,
     phoneNumber,
     password,
-    userId,
+    baseUserId,
   ];
 }
 
@@ -75,12 +75,12 @@ class BuyerSignUpUsecase
     //   return const Left(ValidationFailure(message: "Password is required."));
     // }
 
-    // Generate userId
-    final userId = params.userId ?? Uuid().v4();
+    // Generate baseUserId
+    final baseUserId = params.baseUserId ?? Uuid().v4();
 
     // create user and buyer entities
     UserEntity userEntity = UserEntity(
-      userId: userId,
+      userId: baseUserId,
       email: params.email,
       role: "buyer",
       isVerified: false,
@@ -93,7 +93,7 @@ class BuyerSignUpUsecase
       phoneNumber: params.phoneNumber,
       password: params.password,
       termsAccepted: params.termsAccepted,
-      userId: userId,
+      baseUserId: baseUserId,
     );
 
     return await _buyerAuthRepository.signUp(userEntity, buyerEntity);

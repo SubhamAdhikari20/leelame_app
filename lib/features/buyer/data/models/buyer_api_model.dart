@@ -11,7 +11,7 @@ class BuyerApiModel {
   final String? profilePictureUrl;
   final String? bio;
   final bool? termsAccepted;
-  final String? userId;
+  final String? baseUserId;
   final UserApiModel? baseUser;
 
   BuyerApiModel({
@@ -23,7 +23,7 @@ class BuyerApiModel {
     this.profilePictureUrl,
     this.bio,
     this.termsAccepted,
-    this.userId,
+    this.baseUserId,
     this.baseUser,
   });
 
@@ -37,8 +37,15 @@ class BuyerApiModel {
       "profilePictureUrl": profilePictureUrl,
       "bio": bio,
       "terms": termsAccepted,
-      "userId": userId,
-      "baseUser": baseUser,
+      "baseUserId": baseUserId ?? baseUser?.id,
+      "email": baseUser?.email,
+      "role": baseUser?.role,
+      "isVerified": baseUser?.isVerified,
+      "isPermanentlyBanned": baseUser?.isVerified,
+      "banReason": baseUser?.banReason,
+      "bannedAt": baseUser?.bannedAt,
+      "bannedFrom": baseUser?.bannedFrom,
+      "bannedTo": baseUser?.bannedTo,
     };
   }
 
@@ -52,10 +59,26 @@ class BuyerApiModel {
       profilePictureUrl: json["profilePictureUrl"] as String?,
       bio: json["bio"] as String?,
       termsAccepted: json["terms"] as bool?,
-      userId: json["userId"] as String?,
-      baseUser: json["baseUser"] != null
-          ? UserApiModel.fromJson(json["baseUser"] as Map<String, dynamic>)
-          : null,
+      baseUserId: json["baseUserId"] as String?,
+      baseUser: UserApiModel(
+        email: json["email"] as String,
+        role: json["role"] as String,
+        isVerified: json["isVerified"] as bool,
+        isPermanentlyBanned: json["isPermanentlyBanned"] as bool,
+        banReason: json["banReason"] as String?,
+        bannedAt: json["bannedAt"] != null
+            ? DateTime.parse(json["bannedAt"])
+            : null,
+        bannedFrom: json["bannedFrom"] != null
+            ? DateTime.parse(json["bannedFrom"])
+            : null,
+        bannedTo: json["bannedTo"] != null
+            ? DateTime.parse(json["bannedTo"])
+            : null,
+      ),
+      // baseUser: json["baseUser"] != null
+      //     ? UserApiModel.fromJson(json["baseUser"] as Map<String, dynamic>)
+      //     : null,
     );
   }
 
@@ -83,7 +106,7 @@ class BuyerApiModel {
       profilePictureUrl: profilePictureUrl,
       bio: bio,
       termsAccepted: termsAccepted,
-      userId: userId,
+      baseUserId: baseUserId,
       userEntity: baseUser?.toEntity(),
     );
   }
@@ -99,7 +122,7 @@ class BuyerApiModel {
       profilePictureUrl: buyerEntity.profilePictureUrl,
       bio: buyerEntity.bio,
       termsAccepted: buyerEntity.termsAccepted,
-      userId: buyerEntity.userId,
+      baseUserId: buyerEntity.baseUserId,
     );
   }
 

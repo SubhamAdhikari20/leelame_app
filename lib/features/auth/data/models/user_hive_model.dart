@@ -50,12 +50,6 @@ class UserHiveModel extends HiveObject {
   @HiveField(13)
   final bool pendingOtpSend;
 
-  // @HiveField(13)
-  // final String? buyerProfileId;
-
-  // @HiveField(14)
-  // final String? sellerProfileId;
-
   UserHiveModel({
     String? userId,
     required this.email,
@@ -71,8 +65,6 @@ class UserHiveModel extends HiveObject {
     this.verifyEmailResetPassword,
     this.verifyEmailResetPasswordExpiryDate,
     this.pendingOtpSend = false,
-    // this.buyerProfileId,
-    // this.sellerProfileId,
   }) : userId = userId ?? Uuid().v4();
 
   // Convert Model to User Entity
@@ -91,8 +83,6 @@ class UserHiveModel extends HiveObject {
       verifyCodeExpiryDate: verifyCodeExpiryDate,
       verifyEmailResetPassword: verifyEmailResetPassword,
       verifyEmailResetPasswordExpiryDate: verifyEmailResetPasswordExpiryDate,
-      // buyerId: buyerProfileId,
-      // sellerId: sellerProfileId,
     );
   }
 
@@ -113,8 +103,6 @@ class UserHiveModel extends HiveObject {
       verifyEmailResetPassword: userEntity.verifyEmailResetPassword,
       verifyEmailResetPasswordExpiryDate:
           userEntity.verifyEmailResetPasswordExpiryDate,
-      // buyerProfileId: userEntity.buyerId,
-      // sellerProfileId: userEntity.sellerId,
     );
   }
 

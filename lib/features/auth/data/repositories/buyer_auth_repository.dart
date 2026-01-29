@@ -202,7 +202,7 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
 
           buyerProfile = await _buyerAuthLocalDatasource.createBuyer(
             buyerModel.copyWith(
-              userId: newUser.userId,
+              baseUserId: newUser.userId,
               fullName: buyerEntity.fullName,
               username: buyerEntity.username,
               phoneNumber: buyerEntity.phoneNumber,
@@ -383,7 +383,7 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
           }
 
           user = await _buyerAuthLocalDatasource.getUserById(
-            buyerProfile.userId ?? "",
+            buyerProfile.baseUserId ?? "",
           );
           if (user == null) {
             return const Left(LocalDatabaseFailure(message: "User not found!"));
@@ -445,7 +445,7 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
         }
 
         final existingUserById = await _buyerAuthLocalDatasource.getUserById(
-          existingBuyerByUsername.userId ?? "",
+          existingBuyerByUsername.baseUserId ?? "",
         );
 
         if (existingUserById == null) {
@@ -571,7 +571,9 @@ class BuyerAuthRepository implements IBuyerAuthRepository {
           );
         }
 
-        final user = await _buyerAuthLocalDatasource.getUserById(buyer.userId!);
+        final user = await _buyerAuthLocalDatasource.getUserById(
+          buyer.baseUserId!,
+        );
         if (user == null) {
           return const Left(
             LocalDatabaseFailure(message: "Failed to get current base user!"),

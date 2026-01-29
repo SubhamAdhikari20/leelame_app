@@ -190,7 +190,7 @@ class SellerAuthRepository implements ISellerAuthRepository {
 
           sellerProfile = await _sellerAuthLocalDatasource.createSeller(
             sellerModel.copyWith(
-              userId: newUser.userId,
+              baseUserId: newUser.userId,
               fullName: sellerEntity.fullName,
               phoneNumber: sellerEntity.phoneNumber,
               password: hashedPassword,
@@ -366,7 +366,7 @@ class SellerAuthRepository implements ISellerAuthRepository {
           }
 
           user = await _sellerAuthLocalDatasource.getUserById(
-            sellerProfile.userId ?? "",
+            sellerProfile.baseUserId ?? "",
           );
           if (user == null) {
             return const Left(LocalDatabaseFailure(message: "User not found!"));
@@ -559,7 +559,7 @@ class SellerAuthRepository implements ISellerAuthRepository {
         }
 
         final user = await _sellerAuthLocalDatasource.getUserById(
-          seller.userId!,
+          seller.baseUserId ?? "",
         );
         if (user == null) {
           return const Left(
