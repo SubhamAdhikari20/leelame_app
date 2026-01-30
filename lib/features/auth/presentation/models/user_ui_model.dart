@@ -1,17 +1,12 @@
-// lib/features/auth/data/models/user_api_model.dart
-import 'package:freezed_annotation/freezed_annotation.dart';
+// lib/features/auth/presentation/models/user_ui_model.dart
 import 'package:leelame/features/auth/domain/entities/user_entity.dart';
 
-part "user_api_model.g.dart";
-
-@JsonSerializable()
-class UserApiModel {
-  @JsonKey(name: "_id")
-  final String? id;
+class UserUiModel {
+  final String? userId;
   final String email;
   final String role;
   final bool isVerified;
-
+  
   final bool isPermanentlyBanned;
   final String? banReason;
   final DateTime? bannedAt;
@@ -23,8 +18,8 @@ class UserApiModel {
   final String? verifyEmailResetPassword;
   final DateTime? verifyEmailResetPasswordExpiryDate;
 
-  UserApiModel({
-    this.id,
+  const UserUiModel({
+    this.userId,
     required this.email,
     required this.role,
     required this.isVerified,
@@ -39,32 +34,10 @@ class UserApiModel {
     this.verifyEmailResetPasswordExpiryDate,
   });
 
-  // to Json
-  Map<String, dynamic> toJson() {
-    return _$UserApiModelToJson(this);
-  }
-
-  // From JSON
-  factory UserApiModel.fromJson(Map<String, dynamic> json) {
-    return _$UserApiModelFromJson(json);
-  }
-
-  // to JSON List
-  static List<Map<String, dynamic>> toJsonList(List<UserApiModel> userModels) {
-    return userModels.map((userModel) => userModel.toJson()).toList();
-  }
-
-  // from JSON List
-  static List<UserApiModel> fromJsonList(List<dynamic> jsonList) {
-    return jsonList
-        .map((json) => UserApiModel.fromJson(json as Map<String, dynamic>))
-        .toList();
-  }
-
   // to Entity
   UserEntity toEntity() {
     return UserEntity(
-      userId: id,
+      userId: userId,
       email: email,
       role: role,
       isVerified: isVerified,
@@ -81,9 +54,9 @@ class UserApiModel {
   }
 
   // from Entity
-  factory UserApiModel.fromEntity(UserEntity userEntity) {
-    return UserApiModel(
-      id: userEntity.userId,
+  factory UserUiModel.fromEntity(UserEntity userEntity) {
+    return UserUiModel(
+      userId: userEntity.userId,
       email: userEntity.email,
       role: userEntity.role,
       isVerified: userEntity.isVerified,
@@ -101,14 +74,49 @@ class UserApiModel {
   }
 
   // to Entity List
-  static List<UserEntity> toEntityList(List<UserApiModel> userModels) {
-    return userModels.map((userModel) => userModel.toEntity()).toList();
+  static List<UserEntity> toEntityList(List<UserUiModel> userUiModels) {
+    return userUiModels.map((userModel) => userModel.toEntity()).toList();
   }
 
   // from Entity List
-  static List<UserApiModel> fromEntityList(List<UserEntity> userEntities) {
+  static List<UserUiModel> fromEntityList(List<UserEntity> userEntities) {
     return userEntities
-        .map((userEntity) => UserApiModel.fromEntity(userEntity))
+        .map((userEntity) => UserUiModel.fromEntity(userEntity))
         .toList();
+  }
+
+  UserUiModel copyWith({
+    String? userId,
+    String? email,
+    String? role,
+    bool? isVerified,
+    bool? isPermanentlyBanned,
+    String? banReason,
+    DateTime? bannedAt,
+    DateTime? bannedFrom,
+    DateTime? bannedTo,
+    String? verifyCode,
+    DateTime? verifyCodeExpiryDate,
+    String? verifyEmailResetPassword,
+    DateTime? verifyEmailResetPasswordExpiryDate,
+  }) {
+    return UserUiModel(
+      userId: userId ?? this.userId,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      isVerified: isVerified ?? this.isVerified,
+      isPermanentlyBanned: isPermanentlyBanned ?? this.isPermanentlyBanned,
+      banReason: banReason ?? this.banReason,
+      bannedAt: bannedAt ?? this.bannedAt,
+      bannedFrom: bannedFrom ?? this.bannedFrom,
+      bannedTo: bannedTo ?? this.bannedTo,
+      verifyCode: verifyCode ?? this.verifyCode,
+      verifyCodeExpiryDate: verifyCodeExpiryDate ?? this.verifyCodeExpiryDate,
+      verifyEmailResetPassword:
+          verifyEmailResetPassword ?? this.verifyEmailResetPassword,
+      verifyEmailResetPasswordExpiryDate:
+          verifyEmailResetPasswordExpiryDate ??
+          this.verifyEmailResetPasswordExpiryDate,
+    );
   }
 }

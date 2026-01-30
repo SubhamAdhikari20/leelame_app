@@ -8,7 +8,8 @@ import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/buyer/buyer_login_page.dart';
 import 'package:leelame/features/auth/presentation/states/buyer_auth_state.dart';
 import 'package:leelame/features/auth/presentation/view_models/buyer_auth_view_model.dart';
-import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
+import 'package:leelame/features/buyer/presentation/models/buyer_ui_model.dart';
+import 'package:leelame/features/buyer/presentation/pages/edit_profile_page.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -36,20 +37,18 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Future<void> _logout() async {
     await ref.read(buyerAuthViewModelProvider.notifier).logout();
-    if (!mounted) return;
-    Navigator.pop(context);
+    if (!mounted) {
+      return;
+    }
+    AppRoutes.pop(context);
     AppRoutes.pushAndRemoveUntil(context, const BuyerLoginPage());
-    SnackbarUtil.showSuccess(
-      context,
-      "Logged out successfully.",
-      // next.errorMessage ?? "Login Successful",
-    );
+    SnackbarUtil.showSuccess(context, "Logged out successfully.");
   }
 
   @override
   Widget build(BuildContext context) {
     final buyerAuthStatus = ref.watch(buyerAuthViewModelProvider);
-    final BuyerEntity? userData = buyerAuthStatus.buyer;
+    final userData = buyerAuthStatus.buyer;
 
     ref.listen<BuyerAuthState>(buyerAuthViewModelProvider, (previous, next) {
       if ((next.buyerAuthStatus == BuyerAuthStatus.error)) {
@@ -67,6 +66,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             children: [
               // Header with gradient background
               Container(
+                padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
                 width: double.infinity,
                 decoration: BoxDecoration(
                   gradient: AppColors.primaryGradient,
@@ -77,17 +77,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
                 child: Column(
                   children: [
-                    const SizedBox(height: 20),
-                    // Text(
-                    //   'My Profile',
-                    //   style: TextStyle(
-                    //     fontSize: 20,
-                    //     fontWeight: FontWeight.bold,
-                    //     color: Colors.white,
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 32),
-
                     // Profile Picture
                     Container(
                       decoration: BoxDecoration(
@@ -161,7 +150,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 24),
 
               // Menu Items
@@ -172,7 +160,16 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     _MenuItem(
                       icon: Icons.person_outline_rounded,
                       title: 'Edit Profile',
-                      onTap: () {},
+                      onTap: () {
+                        AppRoutes.push(
+                          context,
+                          EditProfilePage(
+                            buyerUiModel: userData != null
+                                ? BuyerUiModel.fromEntity(userData)
+                                : null,
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 12),
                     _MenuItem(
@@ -372,24 +369,3 @@ class _MenuItem extends StatelessWidget {
     );
   }
 }
-
-
-// return Scaffold(
-    //   appBar: AppBar(
-    //     backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-    //   ),
-    //   body: SizedBox.expand(
-    //     child: Center(
-    //       child: Text(
-    //         "Welcome to Profile",
-    //         style: TextStyle(
-    //           fontSize: 20,
-    //           fontWeight: FontWeight.bold,
-    //           color: Colors.black87,
-    //           height: 1.2,
-    //         ),
-    //         textAlign: TextAlign.center,
-    //       ),
-    //     ),
-    //   ),
-    // );

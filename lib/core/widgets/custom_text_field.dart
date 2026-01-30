@@ -1,17 +1,16 @@
-// lib/features/auth/presentation/widgets/custom_auth_text_field.dart
+//
 import 'package:flutter/material.dart';
 
-class CustomAuthTextField extends StatefulWidget {
+class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
   final String? errorText;
   final String? labelText;
   final TextInputType? keyboardType;
   final bool? isPassword;
-  final bool? showClearButton;
   final FormFieldValidator<String>? validator;
 
-  const CustomAuthTextField({
+  const CustomTextField({
     super.key,
     required this.controller,
     required this.hintText,
@@ -19,42 +18,21 @@ class CustomAuthTextField extends StatefulWidget {
     this.labelText,
     this.keyboardType,
     this.isPassword,
-    this.showClearButton,
     this.validator,
   });
 
   @override
-  State<CustomAuthTextField> createState() => _CustomAuthTextFieldState();
+  State<CustomTextField> createState() => _CustomTextFieldState();
 }
 
-class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
+class _CustomTextFieldState extends State<CustomTextField> {
   late bool _obscureText;
   bool _hasText = false;
 
-  final GlobalKey<FormFieldState<String>> _customAuthTextFieldKey =
+  final GlobalKey<FormFieldState<String>> _customTextFieldKey =
       GlobalKey<FormFieldState<String>>();
-
   static const Color _hintColor = Color(0xFF999999);
-  static const Color _focusedColor = Color(0xFF4CAF50);
   static const Color _errorColor = Colors.red;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _obscureText = widget.isPassword ?? false;
-
-  //   widget.controller.addListener(() {
-  //     if (widget.controller.text.isNotEmpty != _hasText) {
-  //       _updateState();
-  //     }
-  //   });
-  // }
-
-  // void _updateState() {
-  //   setState(() {
-  //     _hasText = widget.controller.text.isNotEmpty;
-  //   });
-  // }
 
   @override
   void initState() {
@@ -75,10 +53,6 @@ class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
     }
   }
 
-  void _clearText() {
-    widget.controller.clear();
-  }
-
   void _toggleVisibility() {
     setState(() {
       _obscureText = !_obscureText;
@@ -91,27 +65,18 @@ class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
     super.dispose();
   }
 
-  // @override
-  // void dispose() {
-  //   widget.controller.removeListener(_updateState);
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
     final String displayLabel = widget.labelText ?? widget.hintText;
 
     final bool hasError =
-        _customAuthTextFieldKey.currentState?.errorText != null &&
-        _customAuthTextFieldKey.currentState!.errorText!.isNotEmpty;
+        _customTextFieldKey.currentState?.errorText != null &&
+        _customTextFieldKey.currentState!.errorText!.isNotEmpty;
 
     final Color effectiveHintColor = hasError ? _errorColor : _hintColor;
-    final Color effectiveFloatingLabelColor = hasError
-        ? _errorColor
-        : _focusedColor;
 
     return TextFormField(
-      key: _customAuthTextFieldKey,
+      key: _customTextFieldKey,
       controller: widget.controller,
       obscureText: widget.isPassword == true ? _obscureText : false,
       keyboardType: widget.keyboardType ?? TextInputType.text,
@@ -119,31 +84,8 @@ class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
       decoration: InputDecoration(
         hintText: widget.hintText,
         hintStyle: TextStyle(color: effectiveHintColor, fontSize: 17),
-        labelText: widget.labelText,
-        labelStyle: TextStyle(color: effectiveHintColor),
-        floatingLabelStyle: TextStyle(
-          color: effectiveFloatingLabelColor,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-        suffixIcon: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (widget.isPassword != true &&
-                (widget.showClearButton == true || _hasText)) ...{
-              IconButton(
-                icon: const Icon(
-                  Icons.clear,
-                  color: Color(0xFF999999),
-                  size: 22,
-                ),
-                onPressed: _clearText,
-                splashRadius: 20,
-              ),
-            },
-
-            if (widget.isPassword == true && _hasText) ...{
-              IconButton(
+        suffixIcon: (widget.isPassword == true && _hasText)
+            ? IconButton(
                 icon: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
@@ -155,10 +97,8 @@ class _CustomAuthTextFieldState extends State<CustomAuthTextField> {
                 ),
                 onPressed: _toggleVisibility,
                 splashRadius: 20,
-              ),
-            },
-          ],
-        ),
+              )
+            : null,
       ),
       validator:
           widget.validator ??
