@@ -1,6 +1,7 @@
 // lib/features/buyer/data/models/buyer_hive_model.dart
 import 'package:hive/hive.dart';
 import 'package:leelame/core/constants/hive_table_constant.dart';
+import 'package:leelame/features/auth/data/models/user_hive_model.dart';
 import 'package:leelame/features/auth/domain/entities/user_entity.dart';
 import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
 import 'package:uuid/uuid.dart';
@@ -36,6 +37,9 @@ class BuyerHiveModel extends HiveObject {
   @HiveField(8)
   final String? baseUserId;
 
+  @HiveField(9)
+  final UserHiveModel? baseUser;
+
   BuyerHiveModel({
     String? buyerId,
     required this.fullName,
@@ -46,6 +50,7 @@ class BuyerHiveModel extends HiveObject {
     this.bio,
     this.termsAccepted,
     String? baseUserId,
+    this.baseUser,
   }) : buyerId = buyerId ?? Uuid().v4(),
        baseUserId = baseUserId ?? Uuid().v4();
 
@@ -77,6 +82,9 @@ class BuyerHiveModel extends HiveObject {
       bio: buyerEntity.bio,
       termsAccepted: buyerEntity.termsAccepted,
       baseUserId: buyerEntity.baseUserId,
+      baseUser: buyerEntity.userEntity != null
+          ? UserHiveModel.fromEntity(buyerEntity.userEntity!)
+          : null,
     );
   }
 

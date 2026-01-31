@@ -32,7 +32,6 @@ abstract interface class IBuyerAuthRemoteDatasource {
   );
   Future<bool> verifyAccountRegistration(String username, String otp);
   Future<BuyerApiModel?> login(String identifier, String password, String role);
-  Future<BuyerApiModel?> getCurrentBuyer(String buyerId);
   Future<bool> logout();
 
   Future<bool> sendQueuedVerificationEmail({

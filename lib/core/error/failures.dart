@@ -18,9 +18,8 @@ class LocalDatabaseFailure extends Failures {
 
 // Validation Failure
 class ValidationFailure extends Failures {
-  const ValidationFailure({
-    String message = "Validation error",
-  }) : super(message);
+  const ValidationFailure({String message = "Validation error"})
+    : super(message);
 }
 
 // API Failure with status code
@@ -30,4 +29,10 @@ class ApiFailure extends Failures {
 
   @override
   List<Object?> get props => [message, statusCode];
+}
+
+// Network Failure
+class NetworkFailure extends Failures {
+  const NetworkFailure({String message = "No internet connection"})
+    : super(message);
 }

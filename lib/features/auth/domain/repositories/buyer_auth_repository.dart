@@ -18,6 +18,5 @@ abstract interface class IBuyerAuthRepository {
     String password,
     String role,
   );
-  Future<Either<Failures, BuyerEntity>> getCurrentBuyer(String buyerId);
   Future<Either<Failures, bool>> logout();
 }

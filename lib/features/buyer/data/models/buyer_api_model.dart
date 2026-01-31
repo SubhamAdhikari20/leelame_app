@@ -123,6 +123,9 @@ class BuyerApiModel {
       bio: buyerEntity.bio,
       termsAccepted: buyerEntity.termsAccepted,
       baseUserId: buyerEntity.baseUserId,
+      baseUser: buyerEntity.userEntity != null
+          ? UserApiModel.fromEntity(buyerEntity.userEntity!)
+          : null,
     );
   }
 

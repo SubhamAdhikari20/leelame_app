@@ -20,10 +20,6 @@ class UserEntity extends Equatable {
   final String? verifyEmailResetPassword;
   final DateTime? verifyEmailResetPasswordExpiryDate;
 
-  // Users references
-  // final String? buyerId;
-  // final String? sellerId;
-
   bool get isBanned =>
       isPermanentlyBanned ||
       (bannedFrom != null &&
@@ -45,8 +41,6 @@ class UserEntity extends Equatable {
     this.verifyCodeExpiryDate,
     this.verifyEmailResetPassword,
     this.verifyEmailResetPasswordExpiryDate,
-    // this.buyerId,
-    // this.sellerId,
   });
 
   @override
@@ -64,7 +58,40 @@ class UserEntity extends Equatable {
     verifyCodeExpiryDate,
     verifyEmailResetPassword,
     verifyEmailResetPasswordExpiryDate,
-    // buyerId,
-    // sellerId,
   ];
+
+  UserEntity copyWith({
+    String? userId,
+    String? email,
+    String? role,
+    bool? isVerified,
+    bool? isPermanentlyBanned,
+    String? banReason,
+    DateTime? bannedAt,
+    DateTime? bannedFrom,
+    DateTime? bannedTo,
+    String? verifyCode,
+    DateTime? verifyCodeExpiryDate,
+    String? verifyEmailResetPassword,
+    DateTime? verifyEmailResetPasswordExpiryDate,
+  }) {
+    return UserEntity(
+      userId: userId ?? this.userId,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      isVerified: isVerified ?? this.isVerified,
+      isPermanentlyBanned: isPermanentlyBanned ?? this.isPermanentlyBanned,
+      banReason: banReason ?? this.banReason,
+      bannedAt: bannedAt ?? this.bannedAt,
+      bannedFrom: bannedFrom ?? this.bannedFrom,
+      bannedTo: bannedTo ?? this.bannedTo,
+      verifyCode: verifyCode ?? this.verifyCode,
+      verifyCodeExpiryDate: verifyCodeExpiryDate ?? this.verifyCodeExpiryDate,
+      verifyEmailResetPassword:
+          verifyEmailResetPassword ?? this.verifyEmailResetPassword,
+      verifyEmailResetPasswordExpiryDate:
+          verifyEmailResetPasswordExpiryDate ??
+          this.verifyEmailResetPasswordExpiryDate,
+    );
+  }
 }

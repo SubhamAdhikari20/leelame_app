@@ -1,6 +1,5 @@
 // lib/features/auth/presentation/view_models/buyer_auth_view_model.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:leelame/features/auth/domain/usecases/buyer/buyer_get_current_user_usecase.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer/buyer_login_usecase.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer/buyer_logout_usecase.dart';
 import 'package:leelame/features/auth/domain/usecases/buyer/buyer_sign_up_usecase.dart';
@@ -19,7 +18,6 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
   late final BuyerLogoutUsecase _buyerLogoutUsecase;
   late final BuyerVerifyAccountRegistrationUsecase
   _buyerVerifyAccountRegistrationUsecase;
-  late final BuyerGetCurrentUserUsecase _buyerGetCurrentUserUsecase;
 
   @override
   BuyerAuthState build() {
@@ -30,7 +28,6 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
     _buyerVerifyAccountRegistrationUsecase = ref.read(
       buyerVerifyAccountRegistrationUsecaseProvider,
     );
-    _buyerGetCurrentUserUsecase = ref.read(buyerGetCurrentUserUsecaseProvider);
     return BuyerAuthState();
   }
 
@@ -152,29 +149,6 @@ class BuyerAuthViewModel extends Notifier<BuyerAuthState> {
       },
       (success) {
         state = state.copywith(buyerAuthStatus: BuyerAuthStatus.verified);
-      },
-    );
-  }
-
-  Future<void> getCurrentUser({required String buyerId}) async {
-    state = state.copywith(buyerAuthStatus: BuyerAuthStatus.loading);
-
-    final result = await _buyerGetCurrentUserUsecase(
-      BuyerGetCurrentUserUsecaseParams(buyerId: buyerId),
-    );
-
-    result.fold(
-      (failure) {
-        state = state.copywith(
-          buyerAuthStatus: BuyerAuthStatus.error,
-          errorMessage: failure.message,
-        );
-      },
-      (buyer) {
-        state = state.copywith(
-          buyerAuthStatus: BuyerAuthStatus.loaded,
-          buyer: buyer,
-        );
       },
     );
   }

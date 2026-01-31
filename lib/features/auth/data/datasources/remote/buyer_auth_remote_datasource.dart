@@ -105,25 +105,6 @@ class BuyerAuthRemoteDatasource implements IBuyerAuthRemoteDatasource {
   }
 
   @override
-  Future<BuyerApiModel?> getCurrentBuyer(String buyerId) async {
-    final token = _tokenService.getToken();
-    final response = await _apiClient.get(
-      ApiEndpoints.buyerById(buyerId),
-      options: Options(headers: {"Authorization": "Bearer $token"}),
-    );
-
-    final success = response.data["success"] as bool;
-    final data = response.data["user"] as Map<String, dynamic>?;
-
-    if (!success || data == null) {
-      return null;
-    }
-
-    final buyer = BuyerApiModel.fromJson(data);
-    return buyer;
-  }
-
-  @override
   Future<bool> sendQueuedVerificationEmail({
     String? userId,
     required String email,

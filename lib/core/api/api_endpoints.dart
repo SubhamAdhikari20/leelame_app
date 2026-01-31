@@ -50,6 +50,10 @@ class ApiEndpoints {
   static const String buyerSendVerificationEmailRegistration =
       "/users/buyer/send-verification-email-registration";
   static const String buyerLogout = "/users/buyer/logout";
+  static String buyerUploadProfilePicture(String id) =>
+      "/users/buyer/upload-profile-picture/$id";
+  static String buyerUpdateById(String id) =>
+      "/users/buyer/update-profile-details/$id";
   static String buyerById(String id) => "/users/buyer/$id";
   static String buyerByBaseUserId(String baseUserId) =>
       "/users/buyer/$baseUserId";

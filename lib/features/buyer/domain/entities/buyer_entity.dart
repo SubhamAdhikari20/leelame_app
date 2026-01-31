@@ -40,5 +40,32 @@ class BuyerEntity extends Equatable {
     bio,
     termsAccepted,
     baseUserId,
+    userEntity,
   ];
+
+  BuyerEntity copyWith({
+    String? buyerId,
+    String? fullName,
+    String? username,
+    String? phoneNumber,
+    String? password,
+    String? profilePictureUrl,
+    String? bio,
+    bool? termsAccepted,
+    String? baseUserId,
+    UserEntity? userEntity,
+  }) {
+    return BuyerEntity(
+      buyerId: buyerId ?? this.buyerId,
+      fullName: fullName ?? this.fullName,
+      username: username ?? this.username,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      password: password ?? this.password,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      bio: bio ?? this.bio,
+      termsAccepted: termsAccepted ?? this.termsAccepted,
+      baseUserId: baseUserId ?? this.baseUserId,
+      userEntity: userEntity ?? this.userEntity,
+    );
+  }
 }

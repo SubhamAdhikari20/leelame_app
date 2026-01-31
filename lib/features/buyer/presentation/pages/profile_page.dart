@@ -10,6 +10,8 @@ import 'package:leelame/features/auth/presentation/states/buyer_auth_state.dart'
 import 'package:leelame/features/auth/presentation/view_models/buyer_auth_view_model.dart';
 import 'package:leelame/features/buyer/presentation/models/buyer_ui_model.dart';
 import 'package:leelame/features/buyer/presentation/pages/edit_profile_page.dart';
+import 'package:leelame/features/buyer/presentation/states/buyer_state.dart';
+import 'package:leelame/features/buyer/presentation/view_models/buyer_view_model.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -30,28 +32,23 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final buyerId = userSessionService.getUserId();
     if (buyerId != null) {
       await ref
-          .read(buyerAuthViewModelProvider.notifier)
+          .read(buyerViewModelProvider.notifier)
           .getCurrentUser(buyerId: buyerId);
     }
   }
 
-  Future<void> _logout() async {
+  Future<void> _handleLogout() async {
     await ref.read(buyerAuthViewModelProvider.notifier).logout();
-    if (!mounted) {
-      return;
-    }
-    AppRoutes.pop(context);
-    AppRoutes.pushAndRemoveUntil(context, const BuyerLoginPage());
-    SnackbarUtil.showSuccess(context, "Logged out successfully.");
   }
 
   @override
   Widget build(BuildContext context) {
-    final buyerAuthStatus = ref.watch(buyerAuthViewModelProvider);
-    final userData = buyerAuthStatus.buyer;
+    final buyerAuthState = ref.watch(buyerAuthViewModelProvider);
+    final buyerState = ref.watch(buyerViewModelProvider);
+    final userData = buyerState.buyer;
 
-    ref.listen<BuyerAuthState>(buyerAuthViewModelProvider, (previous, next) {
-      if ((next.buyerAuthStatus == BuyerAuthStatus.error)) {
+    ref.listen<BuyerState>(buyerViewModelProvider, (previous, next) {
+      if ((next.buyerStatus == BuyerStatus.error)) {
         SnackbarUtil.showError(
           context,
           next.errorMessage ?? "Error loading current user!",
@@ -59,184 +56,213 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       }
     });
 
+    ref.listen<BuyerAuthState>(buyerAuthViewModelProvider, (previous, next) {
+      if ((next.buyerAuthStatus == BuyerAuthStatus.error)) {
+        SnackbarUtil.showError(
+          context,
+          next.errorMessage ?? "Error in logging out the user!",
+        );
+      } else if (next.buyerAuthStatus == BuyerAuthStatus.unauthenticated) {
+        SnackbarUtil.showSuccess(context, "Logged out successfully.");
+
+        // Navigate to login page
+        AppRoutes.pushAndRemoveUntil(context, const BuyerLoginPage());
+      }
+    });
+
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Header with gradient background
-              Container(
-                padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(32),
-                    bottomRight: Radius.circular(32),
-                  ),
-                ),
+      body: buyerAuthState.buyerAuthStatus == BuyerAuthStatus.loading
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.blueGrey),
+                strokeWidth: 3,
+              ),
+            )
+          : SafeArea(
+              child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // Profile Picture
+                    // Header with gradient background
                     Container(
+                      padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                      width: double.infinity,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: AppColors.black20,
-                            blurRadius: 20,
-                            offset: Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: const CircleAvatar(
-                        radius: 60,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.person_rounded,
-                          size: 60,
-                          color: Colors.black54,
+                        gradient: AppColors.primaryGradient,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(32),
+                          bottomRight: Radius.circular(32),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    Text(
-                      userData?.fullName ?? "Guest",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    Text(
-                      userData?.username ?? "guest07",
-                      style: TextStyle(fontSize: 16, color: Colors.white70),
-                    ),
-                    const SizedBox(height: 4),
-
-                    Text(
-                      userData?.userEntity?.email ?? "guest@gmail.com.np",
-                      style: TextStyle(fontSize: 14, color: Colors.white70),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Stats Row
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      child: Column(
                         children: [
-                          _StatItem(title: 'Active Bids', value: '12'),
+                          // Profile Picture
                           Container(
-                            width: 1,
-                            height: 40,
-                            color: AppColors.white30,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 4),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: AppColors.black20,
+                                  blurRadius: 20,
+                                  offset: Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: const CircleAvatar(
+                              radius: 60,
+                              backgroundColor: Colors.white,
+                              child: Icon(
+                                Icons.person_rounded,
+                                size: 60,
+                                color: Colors.black54,
+                              ),
+                            ),
                           ),
-                          _StatItem(title: 'Won Bids', value: '8'),
-                          Container(
-                            width: 1,
-                            height: 40,
-                            color: AppColors.white30,
+                          const SizedBox(height: 16),
+
+                          Text(
+                            userData?.fullName ?? "Guest",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                          _StatItem(title: 'Watchlist', value: '5'),
+                          const SizedBox(height: 8),
+
+                          Text(
+                            userData?.username ?? "guest07",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+
+                          Text(
+                            userData?.userEntity?.email ?? "guest@gmail.com.np",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Stats Row
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40.0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _StatItem(title: 'Active Bids', value: '12'),
+                                Container(
+                                  width: 1,
+                                  height: 40,
+                                  color: AppColors.white30,
+                                ),
+                                _StatItem(title: 'Won Bids', value: '8'),
+                                Container(
+                                  width: 1,
+                                  height: 40,
+                                  color: AppColors.white30,
+                                ),
+                                _StatItem(title: 'Watchlist', value: '5'),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 32),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Menu Items
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  children: [
-                    _MenuItem(
-                      icon: Icons.person_outline_rounded,
-                      title: 'Edit Profile',
-                      onTap: () {
-                        AppRoutes.push(
-                          context,
-                          EditProfilePage(
-                            buyerUiModel: userData != null
-                                ? BuyerUiModel.fromEntity(userData)
-                                : null,
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    _MenuItem(
-                      icon: Icons.history_rounded,
-                      title: 'My Items',
-                      onTap: () {},
-                    ),
-                    const SizedBox(height: 12),
-                    _MenuItem(
-                      icon: Icons.notifications_outlined,
-                      title: 'Notifications',
-                      trailing: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: AppColors.secondaryGradient,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '3',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      onTap: () {},
-                    ),
-                    const SizedBox(height: 12),
-                    _MenuItem(
-                      icon: Icons.security_rounded,
-                      title: 'Privacy & Security',
-                      onTap: () {},
-                    ),
-                    const SizedBox(height: 12),
-                    _MenuItem(
-                      icon: Icons.help_outline_rounded,
-                      title: 'Help & Support',
-                      onTap: () {},
-                    ),
-                    const SizedBox(height: 12),
-                    _MenuItem(
-                      icon: Icons.info_outline_rounded,
-                      title: 'About',
-                      onTap: () {},
-                    ),
                     const SizedBox(height: 24),
-                    _MenuItem(
-                      icon: Icons.logout_rounded,
-                      title: 'Logout',
-                      iconColor: AppColors.error,
-                      titleColor: AppColors.error,
-                      onTap: () {
-                        _showLogoutDialog(context);
-                      },
+
+                    // Menu Items
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Column(
+                        children: [
+                          _MenuItem(
+                            icon: Icons.person_outline_rounded,
+                            title: 'Edit Profile',
+                            onTap: () {
+                              AppRoutes.push(
+                                context,
+                                EditProfilePage(
+                                  buyerUiModel: userData != null
+                                      ? BuyerUiModel.fromEntity(userData)
+                                      : null,
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          _MenuItem(
+                            icon: Icons.history_rounded,
+                            title: 'My Items',
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 12),
+                          _MenuItem(
+                            icon: Icons.notifications_outlined,
+                            title: 'Notifications',
+                            trailing: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: AppColors.secondaryGradient,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '3',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 12),
+                          _MenuItem(
+                            icon: Icons.security_rounded,
+                            title: 'Privacy & Security',
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 12),
+                          _MenuItem(
+                            icon: Icons.help_outline_rounded,
+                            title: 'Help & Support',
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 12),
+                          _MenuItem(
+                            icon: Icons.info_outline_rounded,
+                            title: 'About',
+                            onTap: () {},
+                          ),
+                          const SizedBox(height: 24),
+                          _MenuItem(
+                            icon: Icons.logout_rounded,
+                            title: 'Logout',
+                            iconColor: AppColors.error,
+                            titleColor: AppColors.error,
+                            onTap: () {
+                              _showLogoutDialog(context);
+                            },
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -249,14 +275,19 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         content: Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              AppRoutes.pop(context);
+            },
             child: Text(
               'Cancel',
               style: TextStyle(color: AppColors.textPrimaryColor),
             ),
           ),
           TextButton(
-            onPressed: _logout,
+            onPressed: () {
+              AppRoutes.pop(context);
+              _handleLogout();
+            },
             child: Text(
               'Logout',
               style: TextStyle(

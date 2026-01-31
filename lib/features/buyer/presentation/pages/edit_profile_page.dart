@@ -11,6 +11,8 @@ import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/core/widgets/custom_text_area_field.dart';
 import 'package:leelame/core/widgets/custom_text_field.dart';
 import 'package:leelame/features/buyer/presentation/models/buyer_ui_model.dart';
+import 'package:leelame/features/buyer/presentation/states/buyer_state.dart';
+import 'package:leelame/features/buyer/presentation/view_models/buyer_view_model.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
@@ -59,6 +61,29 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     _bioController.dispose();
 
     super.dispose();
+  }
+
+  Future<void> _handleUpdateDetails() async {
+    if (_editProfileFormKey.currentState!.validate()) {
+      final buyerId = widget.buyerUiModel?.buyerId;
+      if (buyerId != null) {
+        await ref
+            .read(buyerViewModelProvider.notifier)
+            .updateBuyer(buyerId: buyerId);
+      }
+    }
+  }
+
+  Future<void> _handleUploadProfilePicture(File profilePicture) async {
+    final buyerId = widget.buyerUiModel?.buyerId;
+    if (buyerId != null) {
+      await ref
+          .read(buyerViewModelProvider.notifier)
+          .uploadProfilePicture(
+            buyerId: buyerId,
+            profilePicture: profilePicture,
+          );
+    }
   }
 
   Future<bool> _requestPermissionFromUser(Permission permission) async {
@@ -131,7 +156,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           });
         }
 
-        // Todo: upload profile photo using your upload API
         if (mounted) {
           _showConfirmProfilePictureSheet();
         }
@@ -173,7 +197,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           });
         }
 
-        // Todo: upload profile photo using your upload API
         if (mounted) {
           _showConfirmProfilePictureSheet();
         }
@@ -348,16 +371,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         elevation: 2,
                       ),
-                      onPressed: () async {
-                        // Todo: call your upload/save profile photo API here.
-                        // For now we simply close and show success.
+                      onPressed: () {
                         AppRoutes.pop(context);
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Profile photo saved')),
-                        );
-
-                        // If you want to actually upload, call it here and handle states.
+                        if (_profileImage != null) {
+                          setState(() {
+                            _selectedMediaType = "photo";
+                          });
+                          _handleUploadProfilePicture(
+                            File(_profileImage!.path),
+                          );
+                        }
                       },
                       child: const Text(
                         "Save",
@@ -461,6 +484,27 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final buyerState = ref.watch(buyerViewModelProvider);
+
+    ref.listen<BuyerState>(buyerViewModelProvider, (previous, next) {
+      if ((next.buyerStatus == BuyerStatus.error)) {
+        SnackbarUtil.showError(
+          context,
+          next.errorMessage ?? "Error loading current user!",
+        );
+      } else if (next.buyerStatus == BuyerStatus.updated) {
+        SnackbarUtil.showSuccess(
+          context,
+          "User profile details updated successfully!",
+        );
+      } else if (next.buyerStatus == BuyerStatus.imageLoaded) {
+        SnackbarUtil.showSuccess(
+          context,
+          "User profile picture uploaded successfully!",
+        );
+      }
+    });
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -766,15 +810,24 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     padding: const EdgeInsets.all(20),
                     elevation: 2,
                   ),
-                  onPressed: () {},
-                  child: Text(
-                    "Confirm changes",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  onPressed: _handleUpdateDetails,
+                  child: buyerState.buyerStatus == BuyerStatus.loading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.blueGrey,
+                            ),
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          "Confirm changes",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
             ),
