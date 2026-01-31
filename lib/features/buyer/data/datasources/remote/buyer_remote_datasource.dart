@@ -94,8 +94,8 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
       return null;
     }
 
-    // final imageUrl = "${ApiEndpoints.mediaServerUrl}$image";
-    // return imageUrl;
-    return image;
+    final imageUrl = "${ApiEndpoints.mediaServerUrl}$image";
+    return imageUrl;
+    // return image;
   }
 }
