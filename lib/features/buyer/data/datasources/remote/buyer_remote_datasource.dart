@@ -72,10 +72,11 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
   ) async {
     final fileName = profilePicture.path.split("/").last;
     final formData = FormData.fromMap({
-      "itemPhoto": await MultipartFile.fromFile(
+      "profilePicture": await MultipartFile.fromFile(
         profilePicture.path,
         filename: fileName,
       ),
+      "folder": "profile-pictures/buyers",
     });
 
     final token = _tokenService.getToken();
@@ -87,12 +88,14 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
 
     final success = response.data["success"] as bool;
     final data = response.data["data"] as Map<String, dynamic>?;
-    final imageUrl = data?["imageUrl"] as String?;
+    final image = data?["imageUrl"] as String?;
 
-    if (!success || data == null || imageUrl == null) {
+    if (!success || data == null || image == null) {
       return null;
     }
 
-    return imageUrl;
+    // final imageUrl = "${ApiEndpoints.mediaServerUrl}$image";
+    // return imageUrl;
+    return image;
   }
 }

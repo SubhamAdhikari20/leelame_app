@@ -488,6 +488,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
     ref.listen<BuyerState>(buyerViewModelProvider, (previous, next) {
       if ((next.buyerStatus == BuyerStatus.error)) {
+        if (_profileImage != null) {
+          _profileImage = null;
+        }
         SnackbarUtil.showError(
           context,
           next.errorMessage ?? "Error loading current user!",
@@ -498,6 +501,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           "User profile details updated successfully!",
         );
       } else if (next.buyerStatus == BuyerStatus.imageLoaded) {
+        if (_profileImage != null) {
+          _profileImage = null;
+        }
         SnackbarUtil.showSuccess(
           context,
           "User profile picture uploaded successfully!",

@@ -1,4 +1,5 @@
 // lib/features/buyer/data/models/buyer_api_model.dart
+import 'package:leelame/core/api/api_endpoints.dart';
 import 'package:leelame/features/auth/data/models/user_api_model.dart';
 import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
 
@@ -103,7 +104,7 @@ class BuyerApiModel {
       fullName: fullName,
       username: username,
       phoneNumber: phoneNumber,
-      profilePictureUrl: profilePictureUrl,
+      profilePictureUrl: "${ApiEndpoints.mediaServerUrl}$profilePictureUrl",
       bio: bio,
       termsAccepted: termsAccepted,
       baseUserId: baseUserId,
