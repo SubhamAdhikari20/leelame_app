@@ -7,7 +7,7 @@ import 'package:leelame/core/custom_icons/home_filled_icon.dart';
 import 'package:leelame/core/custom_icons/home_outlined_icon.dart';
 import 'package:leelame/core/custom_icons/person_filled_icon.dart';
 import 'package:leelame/core/custom_icons/person_outlined_icon.dart';
-import 'package:leelame/features/auction/presentation/pages/create_new_auction_page.dart';
+import 'package:leelame/features/bid/presentation/pages/create_new_auction_page.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_analytics_screen.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_home_screen.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_orders_screen.dart';
