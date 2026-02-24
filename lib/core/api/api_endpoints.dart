@@ -83,4 +83,12 @@ class ApiEndpoints {
   static String deleteCategory(String id) => "/category/delete-category/$id";
   static String categoryById(String id) => "/category/$id";
   static const String getAllCategories = "/category/get-all-categories";
+
+  // ======================= Product Condition Endpoints =======================
+  static const String createProductCondition = "/product-condition/create-product-condition";
+  static String updateProductCondition(String id) =>
+      "/product-condition/update-product-condition-details/$id";
+  static String deleteProductCondition(String id) => "/product-condition/delete-product-condition/$id";
+  static String productConditionById(String id) => "/product-condition/$id";
+  static const String getAllProductConditions = "/product-condition/get-all-product-conditions";
 }

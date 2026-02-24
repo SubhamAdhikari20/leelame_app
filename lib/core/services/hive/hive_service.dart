@@ -5,6 +5,7 @@ import 'package:leelame/core/constants/hive_table_constant.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
 import 'package:leelame/features/category/data/models/category_hive_model.dart';
+import 'package:leelame/features/product_condition/data/models/product_condition_hive_model.dart';
 import 'package:leelame/features/seller/data/models/seller_hive_model.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -37,6 +38,9 @@ class HiveService {
     if (!Hive.isAdapterRegistered(HiveTableConstant.categoriesTypeId)) {
       Hive.registerAdapter(CategoryHiveModelAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.productConditionsTypeId)) {
+      Hive.registerAdapter(ProductConditionHiveModelAdapter());
+    }
     // if (!Hive.isAdapterRegistered(HiveTableConstant.pendingEmailsTypeId)) {
     //   Hive.registerAdapter(BuyerHiveModelAdapter());
     // }
@@ -49,6 +53,9 @@ class HiveService {
     await Hive.openBox<BuyerHiveModel>(HiveTableConstant.pendingEmailsTable);
     await Hive.openBox<SellerHiveModel>(HiveTableConstant.sellersTable);
     await Hive.openBox<CategoryHiveModel>(HiveTableConstant.categoriesTable);
+    await Hive.openBox<ProductConditionHiveModel>(
+      HiveTableConstant.productConditionsTable,
+    );
   }
 
   // Close all boxes
@@ -318,6 +325,68 @@ class HiveService {
   // Delete all categories
   Future<bool> deleteAllCategories() async {
     await _categoryBox.clear();
+    return true;
+  }
+
+  // ---------------------- Product Condition CRUD Operations -------------------------
+  // Get product condition box
+  Box<ProductConditionHiveModel> get _productConditionBox =>
+      Hive.box(HiveTableConstant.productConditionsTable);
+
+  // Create a new product condition
+  Future<ProductConditionHiveModel?> createProductCondition(
+    ProductConditionHiveModel productCondition,
+  ) async {
+    await _productConditionBox.put(
+      productCondition.productConditionId,
+      productCondition,
+    );
+    return productCondition;
+  }
+
+  // Update a existing product condition
+  Future<ProductConditionHiveModel?> updateProductCondition(
+    ProductConditionHiveModel productCondition,
+  ) async {
+    await _productConditionBox.put(
+      productCondition.productConditionId,
+      productCondition,
+    );
+    return productCondition;
+  }
+
+  // Get a existing product condition by ID
+  Future<ProductConditionHiveModel?> getProductConditionById(
+    String productConditionId,
+  ) async {
+    return _productConditionBox.get(productConditionId);
+  }
+
+  // Get a existing product condition by product condition name
+  Future<ProductConditionHiveModel?> getProductConditionByProductConditionName(
+    String productConditionName,
+  ) async {
+    final productConditions = _productConditionBox.values.where(
+      (productCondition) =>
+          productCondition.productConditionName == productConditionName,
+    );
+    return productConditions.first;
+  }
+
+  // Get all product conditions
+  Future<List<ProductConditionHiveModel>> getAllProductConditions() async {
+    return _productConditionBox.values.toList();
+  }
+
+  // Delete a product condition
+  Future<bool> deleteProductCondition(String productConditionId) async {
+    await _productConditionBox.delete(productConditionId);
+    return true;
+  }
+
+  // Delete all product conditions
+  Future<bool> deleteAllProductConditions() async {
+    await _productConditionBox.clear();
     return true;
   }
 }

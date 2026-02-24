@@ -59,6 +59,14 @@ class CategoryViewModel extends Notifier<CategoryState> {
     state = state.copyWith(errorMessage: null);
   }
 
+  void clearCategoryList() {
+    state = state.copyWith(categories: []);
+  }
+
+  void clearCategoryStatus() {
+    state = state.copyWith(categoryStatus: CategoryStatus.initial);
+  }
+
   void clearSelectedCategory() {
     state = state.copyWith(selectedCategory: null);
   }
