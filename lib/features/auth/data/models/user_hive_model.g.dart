@@ -8,7 +8,7 @@ part of 'user_hive_model.dart';
 
 class UserHiveModelAdapter extends TypeAdapter<UserHiveModel> {
   @override
-  final int typeId = 0;
+  final typeId = 0;
 
   @override
   UserHiveModel read(BinaryReader reader) {
@@ -30,7 +30,7 @@ class UserHiveModelAdapter extends TypeAdapter<UserHiveModel> {
       verifyCodeExpiryDate: fields[10] as DateTime?,
       verifyEmailResetPassword: fields[11] as String?,
       verifyEmailResetPasswordExpiryDate: fields[12] as DateTime?,
-      pendingOtpSend: fields[13] as bool,
+      pendingOtpSend: fields[13] == null ? false : fields[13] as bool,
     );
   }
 

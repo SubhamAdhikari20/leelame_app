@@ -1,5 +1,5 @@
 // lib/features/auth/data/models/user_hive_model.dart
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:leelame/core/constants/hive_table_constant.dart';
 import 'package:leelame/features/auth/domain/entities/user_entity.dart';
 import 'package:uuid/uuid.dart';

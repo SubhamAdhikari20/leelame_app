@@ -7,22 +7,31 @@ part of 'user_api_model.dart';
 // **************************************************************************
 
 UserApiModel _$UserApiModelFromJson(Map<String, dynamic> json) => UserApiModel(
-      id: json['_id'] as String?,
-      email: json['email'] as String,
-      role: json['role'] as String,
-      isVerified: json['isVerified'] as bool,
-      isPermanentlyBanned: json['isPermanentlyBanned'] as bool,
-      banReason: json['banReason'] as String?,
-      bannedAt: json['bannedAt'] == null
-          ? null
-          : DateTime.parse(json['bannedAt'] as String),
-      bannedFrom: json['bannedFrom'] == null
-          ? null
-          : DateTime.parse(json['bannedFrom'] as String),
-      bannedTo: json['bannedTo'] == null
-          ? null
-          : DateTime.parse(json['bannedTo'] as String),
-    );
+  id: json['_id'] as String?,
+  email: json['email'] as String,
+  role: json['role'] as String,
+  isVerified: json['isVerified'] as bool,
+  isPermanentlyBanned: json['isPermanentlyBanned'] as bool,
+  banReason: json['banReason'] as String?,
+  bannedAt: json['bannedAt'] == null
+      ? null
+      : DateTime.parse(json['bannedAt'] as String),
+  bannedFrom: json['bannedFrom'] == null
+      ? null
+      : DateTime.parse(json['bannedFrom'] as String),
+  bannedTo: json['bannedTo'] == null
+      ? null
+      : DateTime.parse(json['bannedTo'] as String),
+  verifyCode: json['verifyCode'] as String?,
+  verifyCodeExpiryDate: json['verifyCodeExpiryDate'] == null
+      ? null
+      : DateTime.parse(json['verifyCodeExpiryDate'] as String),
+  verifyEmailResetPassword: json['verifyEmailResetPassword'] as String?,
+  verifyEmailResetPasswordExpiryDate:
+      json['verifyEmailResetPasswordExpiryDate'] == null
+      ? null
+      : DateTime.parse(json['verifyEmailResetPasswordExpiryDate'] as String),
+);
 
 Map<String, dynamic> _$UserApiModelToJson(UserApiModel instance) =>
     <String, dynamic>{
@@ -35,4 +44,10 @@ Map<String, dynamic> _$UserApiModelToJson(UserApiModel instance) =>
       'bannedAt': instance.bannedAt?.toIso8601String(),
       'bannedFrom': instance.bannedFrom?.toIso8601String(),
       'bannedTo': instance.bannedTo?.toIso8601String(),
+      'verifyCode': instance.verifyCode,
+      'verifyCodeExpiryDate': instance.verifyCodeExpiryDate?.toIso8601String(),
+      'verifyEmailResetPassword': instance.verifyEmailResetPassword,
+      'verifyEmailResetPasswordExpiryDate': instance
+          .verifyEmailResetPasswordExpiryDate
+          ?.toIso8601String(),
     };

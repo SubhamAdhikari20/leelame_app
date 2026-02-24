@@ -8,7 +8,7 @@ part of 'seller_hive_model.dart';
 
 class SellerHiveModelAdapter extends TypeAdapter<SellerHiveModel> {
   @override
-  final int typeId = 3;
+  final typeId = 3;
 
   @override
   SellerHiveModel read(BinaryReader reader) {
@@ -27,8 +27,8 @@ class SellerHiveModelAdapter extends TypeAdapter<SellerHiveModel> {
       sellerNotes: fields[7] as String?,
       sellerStatus: fields[8] as String?,
       sellerVerificationDate: fields[9] as DateTime?,
-      sellerAttemptCount: fields[10] as int?,
-      sellerRuleViolationCount: fields[11] as int?,
+      sellerAttemptCount: (fields[10] as num?)?.toInt(),
+      sellerRuleViolationCount: (fields[11] as num?)?.toInt(),
       isSellerPermanentlyBanned: fields[12] as bool?,
       sellerBannedAt: fields[13] as DateTime?,
       sellerBannedDateFrom: fields[14] as DateTime?,

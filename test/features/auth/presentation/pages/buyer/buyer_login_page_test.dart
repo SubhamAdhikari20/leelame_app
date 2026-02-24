@@ -16,7 +16,7 @@ class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 class MockBuyerLoginUsecase extends Mock implements BuyerLoginUsecase {}
 
 void main() {
-  late MockNavigatorObserver mockNavigatorObserver;
+  // late MockNavigatorObserver mockNavigatorObserver;
   late MockBuyerLoginUsecase mockBuyerLoginUsecase;
 
   setUpAll(() {

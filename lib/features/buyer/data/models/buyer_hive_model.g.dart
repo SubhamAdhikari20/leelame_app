@@ -8,7 +8,7 @@ part of 'buyer_hive_model.dart';
 
 class BuyerHiveModelAdapter extends TypeAdapter<BuyerHiveModel> {
   @override
-  final int typeId = 1;
+  final typeId = 1;
 
   @override
   BuyerHiveModel read(BinaryReader reader) {
@@ -26,13 +26,14 @@ class BuyerHiveModelAdapter extends TypeAdapter<BuyerHiveModel> {
       bio: fields[6] as String?,
       termsAccepted: fields[7] as bool?,
       baseUserId: fields[8] as String?,
+      baseUser: fields[9] as UserHiveModel?,
     );
   }
 
   @override
   void write(BinaryWriter writer, BuyerHiveModel obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.buyerId)
       ..writeByte(1)
@@ -50,7 +51,9 @@ class BuyerHiveModelAdapter extends TypeAdapter<BuyerHiveModel> {
       ..writeByte(7)
       ..write(obj.termsAccepted)
       ..writeByte(8)
-      ..write(obj.baseUserId);
+      ..write(obj.baseUserId)
+      ..writeByte(9)
+      ..write(obj.baseUser);
   }
 
   @override

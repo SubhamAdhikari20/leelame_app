@@ -19,7 +19,9 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.11.0
+  # sdk: ">=3.9.0 <4.0.0"
+  # sdk: ^3.9.2
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -38,8 +40,10 @@ dependencies:
   gradient_elevated_button: ^1.1.0
 
   # Local Database (Offline Storage)
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
+  hive_ce: ^2.19.3
+  hive_ce_flutter: ^2.3.4
+  # hive: ^2.2.3
+  # hive_flutter: ^1.1.0
   path_provider: ^2.1.5
   path: ^1.9.1
 
@@ -55,7 +59,7 @@ dependencies:
   dartz: ^0.10.1
 
   # State Management
-  flutter_riverpod: ^3.1.0
+  flutter_riverpod: ^3.2.1
   riverpod_annotation: ^4.0.0
 
   # Authentication
@@ -91,9 +95,11 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
   # Code Generation
-  build_runner: ^2.4.13
-  json_serializable: ^6.8.0
-  hive_generator: ^2.0.1
+  build_runner: ^2.11.1
+  json_serializable: ^6.13.0
+  hive_ce_generator: ^1.11.1
+  # json_serializable: ^6.8.0
+  # hive_generator: ^2.0.1
 
   # Testing
   mocktail: ^1.0.4

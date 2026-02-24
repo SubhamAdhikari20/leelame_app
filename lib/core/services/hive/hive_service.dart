@@ -1,6 +1,6 @@
 // lib/core/services/hive/hive_service.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:leelame/core/constants/hive_table_constant.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
