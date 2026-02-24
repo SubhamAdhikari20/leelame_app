@@ -16,4 +16,16 @@ class HiveTableConstant {
 
   static const int sellersTypeId = 3;
   static const String sellersTable = "sellers";
+
+  static const int productsTypeId = 4;
+  static const String productsTable = "products";
+
+  static const int categoriesTypeId = 5;
+  static const String categoriesTable = "categories";
+
+  static const int productConditionsTypeId = 6;
+  static const String productConditionsTable = "product_conditions";
+
+  static const int bidsTypeId = 7;
+  static const String bidsTable = "bids";
 }

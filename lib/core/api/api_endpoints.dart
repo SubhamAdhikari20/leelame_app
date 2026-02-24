@@ -75,4 +75,12 @@ class ApiEndpoints {
       "/users/seller/$baseUserId";
   static String sellerByPhoneNumber(String phoneNumber) =>
       "/users/seller/$phoneNumber";
+
+  // ======================= Category Endpoints =======================
+  static const String createCategory = "/category/create-category";
+  static String updateCategory(String id) =>
+      "/category/update-category-details/$id";
+  static String deleteCategory(String id) => "/category/delete-category/$id";
+  static String categoryById(String id) => "/category/$id";
+  static const String getAllCategories = "/category/get-all-categories";
 }

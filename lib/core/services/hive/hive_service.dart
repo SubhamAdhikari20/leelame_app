@@ -4,6 +4,7 @@ import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:leelame/core/constants/hive_table_constant.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
+import 'package:leelame/features/category/data/models/category_hive_model.dart';
 import 'package:leelame/features/seller/data/models/seller_hive_model.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -33,6 +34,9 @@ class HiveService {
     if (!Hive.isAdapterRegistered(HiveTableConstant.sellersTypeId)) {
       Hive.registerAdapter(SellerHiveModelAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.categoriesTypeId)) {
+      Hive.registerAdapter(CategoryHiveModelAdapter());
+    }
     // if (!Hive.isAdapterRegistered(HiveTableConstant.pendingEmailsTypeId)) {
     //   Hive.registerAdapter(BuyerHiveModelAdapter());
     // }
@@ -44,6 +48,7 @@ class HiveService {
     await Hive.openBox<BuyerHiveModel>(HiveTableConstant.buyersTable);
     await Hive.openBox<BuyerHiveModel>(HiveTableConstant.pendingEmailsTable);
     await Hive.openBox<SellerHiveModel>(HiveTableConstant.sellersTable);
+    await Hive.openBox<CategoryHiveModel>(HiveTableConstant.categoriesTable);
   }
 
   // Close all boxes
@@ -265,5 +270,54 @@ class HiveService {
   // Delete all sellers
   Future<void> deleteAllSellers() async {
     await _sellersBox.clear();
+  }
+
+  // ---------------------- Category CRUD Operations -------------------------
+  // Get category box
+  Box<CategoryHiveModel> get _categoryBox =>
+      Hive.box(HiveTableConstant.categoriesTable);
+
+  // Create a new category
+  Future<CategoryHiveModel?> createCategory(CategoryHiveModel category) async {
+    await _categoryBox.put(category.categoryId, category);
+    return category;
+  }
+
+  // Update a existing category
+  Future<CategoryHiveModel?> updateCategory(CategoryHiveModel category) async {
+    await _categoryBox.put(category.categoryId, category);
+    return category;
+  }
+
+  // Get a existing category by ID
+  Future<CategoryHiveModel?> getCategoryById(String categoryId) async {
+    return _categoryBox.get(categoryId);
+  }
+
+  // Get a existing category by category name
+  Future<CategoryHiveModel?> getCategoryByCategoryName(
+    String categoryName,
+  ) async {
+    final categories = _categoryBox.values.where(
+      (category) => category.categoryName == categoryName,
+    );
+    return categories.first;
+  }
+
+  // Get all categories
+  Future<List<CategoryHiveModel>> getAllCategories() async {
+    return _categoryBox.values.toList();
+  }
+
+  // Delete a category
+  Future<bool> deleteCategory(String categoryId) async {
+    await _categoryBox.delete(categoryId);
+    return true;
+  }
+
+  // Delete all categories
+  Future<bool> deleteAllCategories() async {
+    await _categoryBox.clear();
+    return true;
   }
 }
