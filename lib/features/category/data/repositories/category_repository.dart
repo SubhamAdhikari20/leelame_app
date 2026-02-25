@@ -124,7 +124,7 @@ class CategoryRepository implements ICategoryRepository {
         final categoryHiveModel = CategoryHiveModel.fromEntity(categoryEntity);
 
         final existingCategoryById = await _categoryLocalDatasource
-            .getCategoryById(categoryEntity.categoryId!);
+            .getCategoryById(categoryHiveModel.categoryId!);
         if (existingCategoryById == null) {
           return Left(
             LocalDatabaseFailure(

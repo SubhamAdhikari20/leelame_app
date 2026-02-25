@@ -5,6 +5,7 @@ import 'package:leelame/core/constants/hive_table_constant.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
 import 'package:leelame/features/category/data/models/category_hive_model.dart';
+import 'package:leelame/features/product/data/models/product_hive_model.dart';
 import 'package:leelame/features/product_condition/data/models/product_condition_hive_model.dart';
 import 'package:leelame/features/seller/data/models/seller_hive_model.dart';
 import 'package:path_provider/path_provider.dart';
@@ -41,6 +42,9 @@ class HiveService {
     if (!Hive.isAdapterRegistered(HiveTableConstant.productConditionsTypeId)) {
       Hive.registerAdapter(ProductConditionHiveModelAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.productsTypeId)) {
+      Hive.registerAdapter(ProductHiveModelAdapter());
+    }
     // if (!Hive.isAdapterRegistered(HiveTableConstant.pendingEmailsTypeId)) {
     //   Hive.registerAdapter(BuyerHiveModelAdapter());
     // }
@@ -56,6 +60,7 @@ class HiveService {
     await Hive.openBox<ProductConditionHiveModel>(
       HiveTableConstant.productConditionsTable,
     );
+    await Hive.openBox<ProductHiveModel>(HiveTableConstant.productsTable);
   }
 
   // Close all boxes
@@ -387,6 +392,57 @@ class HiveService {
   // Delete all product conditions
   Future<bool> deleteAllProductConditions() async {
     await _productConditionBox.clear();
+    return true;
+  }
+
+  // ---------------------- Product CRUD Operations -------------------------
+  // Get product box
+  Box<ProductHiveModel> get _productBox =>
+      Hive.box(HiveTableConstant.productsTable);
+
+  // Create a new product
+  Future<ProductHiveModel?> createProduct(ProductHiveModel product) async {
+    await _productBox.put(product.productId, product);
+    return product;
+  }
+
+  // Update a existing product
+  Future<ProductHiveModel?> updateProduct(ProductHiveModel product) async {
+    await _productBox.put(product.productId, product);
+    return product;
+  }
+
+  // Get a existing product by ID
+  Future<ProductHiveModel?> getProductById(String productId) async {
+    return _productBox.get(productId);
+  }
+
+  // Get all products
+  Future<List<ProductHiveModel>> getAllProducts() async {
+    final products = _productBox.values.where(
+      (product) => product.isVerified == true,
+    );
+    return products.toList();
+  }
+
+  // Get all products by buyer ID
+  Future<List<ProductHiveModel>> getAllProductsByBuyerId(String buyerId) async {
+    final products = _productBox.values.where(
+      (product) =>
+          ((product.soldToBuyerId == buyerId) && (product.isVerified == true)),
+    );
+    return products.toList();
+  }
+
+  // Delete a product
+  Future<bool> deleteProduct(String productId) async {
+    await _productBox.delete(productId);
+    return true;
+  }
+
+  // Delete all products
+  Future<bool> deleteAllProducts() async {
+    await _productBox.clear();
     return true;
   }
 }

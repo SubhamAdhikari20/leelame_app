@@ -25,23 +25,29 @@ ProductApiModel _$ProductApiModelFromJson(Map<String, dynamic> json) =>
       isVerified: json['isVerified'] as bool,
       isSoldOut: json['isSoldOut'] as bool,
       soldToBuyerId: json['soldToBuyerId'] as String?,
+      removedExistingProductImageUrls:
+          (json['removedExistingProductImageUrls'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList(),
     );
 
-Map<String, dynamic> _$ProductApiModelToJson(ProductApiModel instance) =>
-    <String, dynamic>{
-      '_id': instance.id,
-      'sellerId': instance.sellerId,
-      'productName': instance.productName,
-      'description': instance.description,
-      'categoryId': instance.categoryId,
-      'conditionId': instance.conditionId,
-      'commission': instance.commission,
-      'startPrice': instance.startPrice,
-      'currentBidPrice': instance.currentBidPrice,
-      'bidIntervalPrice': instance.bidIntervalPrice,
-      'endDate': instance.endDate.toIso8601String(),
-      'productImageUrls': instance.productImageUrls,
-      'isVerified': instance.isVerified,
-      'isSoldOut': instance.isSoldOut,
-      'soldToBuyerId': instance.soldToBuyerId,
-    };
+Map<String, dynamic> _$ProductApiModelToJson(
+  ProductApiModel instance,
+) => <String, dynamic>{
+  '_id': instance.id,
+  'sellerId': instance.sellerId,
+  'productName': instance.productName,
+  'description': instance.description,
+  'categoryId': instance.categoryId,
+  'conditionId': instance.conditionId,
+  'commission': instance.commission,
+  'startPrice': instance.startPrice,
+  'currentBidPrice': instance.currentBidPrice,
+  'bidIntervalPrice': instance.bidIntervalPrice,
+  'endDate': instance.endDate.toIso8601String(),
+  'productImageUrls': instance.productImageUrls,
+  'isVerified': instance.isVerified,
+  'isSoldOut': instance.isSoldOut,
+  'soldToBuyerId': instance.soldToBuyerId,
+  'removedExistingProductImageUrls': instance.removedExistingProductImageUrls,
+};

@@ -1,4 +1,4 @@
-// lib/features/products/domain/entities/product_entity.dart
+// lib/features/product/domain/entities/product_entity.dart
 import 'package:equatable/equatable.dart';
 
 class ProductEntity extends Equatable {
@@ -17,6 +17,7 @@ class ProductEntity extends Equatable {
   final bool isVerified;
   final bool isSoldOut;
   final String? soldToBuyerId;
+  final List<String>? removedExistingProductImageUrls;
 
   const ProductEntity({
     this.productId,
@@ -34,6 +35,7 @@ class ProductEntity extends Equatable {
     required this.isVerified,
     required this.isSoldOut,
     this.soldToBuyerId,
+    this.removedExistingProductImageUrls,
   });
 
   @override
@@ -53,6 +55,7 @@ class ProductEntity extends Equatable {
     isVerified,
     isSoldOut,
     soldToBuyerId,
+    removedExistingProductImageUrls,
   ];
 
   ProductEntity copyWith({
@@ -71,6 +74,7 @@ class ProductEntity extends Equatable {
     bool? isVerified,
     bool? isSoldOut,
     String? soldToBuyerId,
+    List<String>? removedExistingProductImageUrls,
   }) {
     return ProductEntity(
       productId: productId ?? this.productId,
@@ -88,6 +92,9 @@ class ProductEntity extends Equatable {
       isVerified: isVerified ?? this.isVerified,
       isSoldOut: isSoldOut ?? this.isSoldOut,
       soldToBuyerId: soldToBuyerId ?? this.soldToBuyerId,
+      removedExistingProductImageUrls:
+          removedExistingProductImageUrls ??
+          this.removedExistingProductImageUrls,
     );
   }
 }

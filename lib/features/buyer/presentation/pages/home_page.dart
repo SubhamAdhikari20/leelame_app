@@ -5,7 +5,7 @@ import 'package:leelame/core/custom_icons/search_icon.dart';
 import 'package:leelame/core/widgets/category_toggle_item.dart';
 import 'package:leelame/core/widgets/custom_tab_item.dart';
 
-import 'package:leelame/features/products/presentation/widgets/product_card.dart';
+import 'package:leelame/features/product/presentation/widgets/product_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

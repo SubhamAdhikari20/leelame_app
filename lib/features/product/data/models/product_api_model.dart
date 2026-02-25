@@ -1,6 +1,6 @@
-// lib/features/products/data/models/product_api_model.dart
+// lib/features/product/data/models/product_api_model.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:leelame/features/products/domain/entities/product_entity.dart';
+import 'package:leelame/features/product/domain/entities/product_entity.dart';
 
 part "product_api_model.g.dart";
 
@@ -22,6 +22,7 @@ class ProductApiModel {
   final bool isVerified;
   final bool isSoldOut;
   final String? soldToBuyerId;
+  final List<String>? removedExistingProductImageUrls;
 
   ProductApiModel({
     this.id,
@@ -39,6 +40,7 @@ class ProductApiModel {
     required this.isVerified,
     required this.isSoldOut,
     this.soldToBuyerId,
+    this.removedExistingProductImageUrls,
   });
 
   // to Json
@@ -83,6 +85,7 @@ class ProductApiModel {
       isVerified: isVerified,
       isSoldOut: isSoldOut,
       soldToBuyerId: soldToBuyerId,
+      removedExistingProductImageUrls: removedExistingProductImageUrls,
     );
   }
 
@@ -104,6 +107,8 @@ class ProductApiModel {
       isVerified: productEntity.isVerified,
       isSoldOut: productEntity.isSoldOut,
       soldToBuyerId: productEntity.soldToBuyerId,
+      removedExistingProductImageUrls:
+          productEntity.removedExistingProductImageUrls,
     );
   }
 

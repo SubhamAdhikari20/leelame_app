@@ -7,8 +7,8 @@ import 'package:leelame/features/auth/data/models/user_hive_model.dart';
 import 'package:leelame/features/bid/data/models/bid_hive_model.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 import 'package:leelame/features/category/data/models/category_hive_model.dart';
+import 'package:leelame/features/product/data/models/product_hive_model.dart';
 import 'package:leelame/features/product_condition/data/models/product_condition_hive_model.dart';
-import 'package:leelame/features/products/data/models/product_hive_model.dart';
 import 'package:leelame/features/seller/data/models/seller_hive_model.dart';
 
 extension HiveRegistrar on HiveInterface {

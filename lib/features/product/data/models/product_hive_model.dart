@@ -1,7 +1,7 @@
-// lib/features/products/data/models/product_hive_model.dart
+// lib/features/product/data/models/product_hive_model.dart
 import 'package:hive_ce/hive.dart';
 import 'package:leelame/core/constants/hive_table_constant.dart';
-import 'package:leelame/features/products/domain/entities/product_entity.dart';
+import 'package:leelame/features/product/domain/entities/product_entity.dart';
 import 'package:uuid/uuid.dart';
 
 part "product_hive_model.g.dart";
@@ -53,6 +53,9 @@ class ProductHiveModel extends HiveObject {
   @HiveField(14)
   final String? soldToBuyerId;
 
+  @HiveField(15)
+  final List<String>? removedExistingProductImageUrls;
+
   ProductHiveModel({
     String? productId,
     this.sellerId,
@@ -69,6 +72,7 @@ class ProductHiveModel extends HiveObject {
     required this.isVerified,
     required this.isSoldOut,
     this.soldToBuyerId,
+    this.removedExistingProductImageUrls,
   }) : productId = productId ?? Uuid().v4();
 
   // Convert Model to Product Entity
@@ -89,6 +93,7 @@ class ProductHiveModel extends HiveObject {
       isVerified: isVerified,
       isSoldOut: isSoldOut,
       soldToBuyerId: soldToBuyerId,
+      removedExistingProductImageUrls: removedExistingProductImageUrls,
     );
   }
 
@@ -110,6 +115,8 @@ class ProductHiveModel extends HiveObject {
       isVerified: productEntity.isVerified,
       isSoldOut: productEntity.isSoldOut,
       soldToBuyerId: productEntity.soldToBuyerId,
+      removedExistingProductImageUrls:
+          productEntity.removedExistingProductImageUrls,
     );
   }
 
@@ -138,6 +145,7 @@ class ProductHiveModel extends HiveObject {
     bool? isVerified,
     bool? isSoldOut,
     String? soldToBuyerId,
+    List<String>? removedExistingProductImageUrls,
   }) {
     return ProductHiveModel(
       productId: productId ?? this.productId,
@@ -155,6 +163,9 @@ class ProductHiveModel extends HiveObject {
       isVerified: isVerified ?? this.isVerified,
       isSoldOut: isSoldOut ?? this.isSoldOut,
       soldToBuyerId: soldToBuyerId ?? this.soldToBuyerId,
+      removedExistingProductImageUrls:
+          removedExistingProductImageUrls ??
+          this.removedExistingProductImageUrls,
     );
   }
 }

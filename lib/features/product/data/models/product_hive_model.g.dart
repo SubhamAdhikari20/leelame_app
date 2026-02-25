@@ -32,13 +32,14 @@ class ProductHiveModelAdapter extends TypeAdapter<ProductHiveModel> {
       isVerified: fields[12] as bool,
       isSoldOut: fields[13] as bool,
       soldToBuyerId: fields[14] as String?,
+      removedExistingProductImageUrls: (fields[15] as List?)?.cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, ProductHiveModel obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.productId)
       ..writeByte(1)
@@ -68,7 +69,9 @@ class ProductHiveModelAdapter extends TypeAdapter<ProductHiveModel> {
       ..writeByte(13)
       ..write(obj.isSoldOut)
       ..writeByte(14)
-      ..write(obj.soldToBuyerId);
+      ..write(obj.soldToBuyerId)
+      ..writeByte(15)
+      ..write(obj.removedExistingProductImageUrls);
   }
 
   @override

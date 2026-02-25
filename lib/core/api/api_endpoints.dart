@@ -85,10 +85,23 @@ class ApiEndpoints {
   static const String getAllCategories = "/category/get-all-categories";
 
   // ======================= Product Condition Endpoints =======================
-  static const String createProductCondition = "/product-condition/create-product-condition";
+  static const String createProductCondition =
+      "/product-condition/create-product-condition";
   static String updateProductCondition(String id) =>
       "/product-condition/update-product-condition-details/$id";
-  static String deleteProductCondition(String id) => "/product-condition/delete-product-condition/$id";
+  static String deleteProductCondition(String id) =>
+      "/product-condition/delete-product-condition/$id";
   static String productConditionById(String id) => "/product-condition/$id";
-  static const String getAllProductConditions = "/product-condition/get-all-product-conditions";
+  static const String getAllProductConditions =
+      "/product-condition/get-all-product-conditions";
+
+  // ======================= Product Endpoints =======================
+  static const String createProduct = "/product/create-product";
+  static String updateProduct(String id) =>
+      "/product/update-product-details/$id";
+  static String deleteProduct(String id) => "/product/delete-product/$id";
+  static String productById(String id) => "/product/$id";
+  static const String getAllProducts = "/product/get-all-verified-products";
+  static String getAllProductsByBuyerId(String buyerId) =>
+      "/product/get-all-verified-products/$buyerId";
 }
