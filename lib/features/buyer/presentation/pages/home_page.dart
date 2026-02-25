@@ -1,87 +1,102 @@
 // lib/features/buyer/presentation/pages/home_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:leelame/app/theme/app_colors.dart';
 import 'package:leelame/core/custom_icons/notification_outlined_icon.dart';
 import 'package:leelame/core/custom_icons/search_icon.dart';
 import 'package:leelame/core/widgets/category_toggle_item.dart';
 import 'package:leelame/core/widgets/custom_tab_item.dart';
-
+import 'package:leelame/features/category/presentation/models/category_ui_model.dart';
+import 'package:leelame/features/category/presentation/states/category_state.dart';
+import 'package:leelame/features/category/presentation/view_models/category_view_model.dart';
+import 'package:leelame/features/product/presentation/models/product_ui_model.dart';
+import 'package:leelame/features/product/presentation/states/product_state.dart';
+import 'package:leelame/features/product/presentation/viewmodels/product_view_model.dart';
 import 'package:leelame/features/product/presentation/widgets/product_card.dart';
+import 'package:leelame/features/product_condition/presentation/models/product_condition_ui_model.dart';
+import 'package:leelame/features/product_condition/presentation/states/product_condition_state.dart';
+import 'package:leelame/features/product_condition/presentation/view_models/product_condition_view_model.dart';
+import 'package:leelame/features/seller/presentation/models/seller_ui_model.dart';
+import 'package:leelame/features/seller/presentation/states/seller_state.dart';
+import 'package:leelame/features/seller/presentation/view_models/seller_view_model.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin {
-  List<bool> selectedCategories = [
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ];
+  String? _selectedCategoryId;
+  String _searchQuery = "";
+  // List<bool> selectedCategories = [
+  //   true,
+  //   false,
+  //   false,
+  //   false,
+  //   false,
+  //   false,
+  //   false,
+  // ];
 
-  final List<Map<String, dynamic>> categories = [
-    {'label': 'All', 'icon': Icons.all_inclusive, 'color': Colors.grey},
-    {'label': 'Electronics', 'icon': Icons.phone_android, 'color': Colors.blue},
-    {'label': 'Fashion', 'icon': Icons.shopping_bag, 'color': Colors.pink},
-    {'label': 'House', 'icon': Icons.home, 'color': Colors.green},
-    {'label': 'Sports', 'icon': Icons.sports_soccer, 'color': Colors.orange},
-    {'label': 'Art', 'icon': Icons.palette, 'color': Colors.purple},
-    {'label': 'Books', 'icon': Icons.book, 'color': Colors.yellow},
-  ];
+  // final List<Map<String, dynamic>> categories = [
+  //   {'label': 'All', 'icon': Icons.all_inclusive, 'color': Colors.grey},
+  //   {'label': 'Electronics', 'icon': Icons.phone_android, 'color': Colors.blue},
+  //   {'label': 'Fashion', 'icon': Icons.shopping_bag, 'color': Colors.pink},
+  //   {'label': 'House', 'icon': Icons.home, 'color': Colors.green},
+  //   {'label': 'Sports', 'icon': Icons.sports_soccer, 'color': Colors.orange},
+  //   {'label': 'Art', 'icon': Icons.palette, 'color': Colors.purple},
+  //   {'label': 'Books', 'icon': Icons.book, 'color': Colors.yellow},
+  // ];
 
-  final List<Map<String, dynamic>> products = [
-    {
-      'tags': ['Electronics', 'Refurbished'],
-      // 'image': 'assets/images/iphone_mock.png',
-      'image': 'https://i.ytimg.com/vi/q2Ktw2yVeAQ/sddefault.jpg',
-      'title': 'iPhone 15 Pro Max 256GB',
-      'location': 'Kathmandu, Nepal',
-      'price': 'Rs. 220,000',
-      'isFavorite': false,
-      'ownerName': 'Rajesh Kumar',
-      'ownerAvatar':
-          'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80&auto=format&fit=crop',
-      'timeLeft': '2h 30m',
-      'bids': 24,
-    },
-    {
-      'tags': ['Fashion'],
-      // 'image': 'assets/images/shoes_mock.png',
-      'image':
-          'https://static.nike.com/a/images/f_auto,cs_srgb/w_1920,c_limit/187bd092-6b79-4576-872c-36c6fca5e536/the-best-nike-shoes-for-running-an-ultramarathon.jpg',
-      'title': 'Nike Running Shoes',
-      'location': 'Pokhara, Nepal',
-      'price': 'Rs. 9,500',
-      'isFavorite': true,
-      'ownerName': 'Rajesh Kumar',
-      'ownerAvatar':
-          'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80&auto=format&fit=crop',
-      'timeLeft': '2h 30m',
-      'bids': 24,
-    },
-    {
-      'tags': ['House'],
-      // 'image': 'assets/images/sofa_mock.png',
-      'image':
-          'https://pelicanessentials.com/cdn/shop/files/three_seater_grey_0002-Photoroom.jpg',
-      'title': '3-Seater Fabric Sofa',
-      'location': 'Lalitpur, Nepal',
-      'price': 'Rs. 45,000',
-      'isFavorite': false,
-      'ownerName': 'Rajesh Kumar',
-      'ownerAvatar':
-          'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80&auto=format&fit=crop',
-      'timeLeft': '2h 30m',
-      'bids': 24,
-    },
-  ];
+  // final List<Map<String, dynamic>> products = [
+  //   {
+  //     'tags': ['Electronics', 'Refurbished'],
+  //     // 'image': 'assets/images/iphone_mock.png',
+  //     'image': 'https://i.ytimg.com/vi/q2Ktw2yVeAQ/sddefault.jpg',
+  //     'title': 'iPhone 15 Pro Max 256GB',
+  //     'location': 'Kathmandu, Nepal',
+  //     'price': 'Rs. 220,000',
+  //     'isFavorite': false,
+  //     'ownerName': 'Rajesh Kumar',
+  //     'ownerAvatar':
+  //         'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80&auto=format&fit=crop',
+  //     'timeLeft': '2h 30m',
+  //     'bids': 24,
+  //   },
+  //   {
+  //     'tags': ['Fashion'],
+  //     // 'image': 'assets/images/shoes_mock.png',
+  //     'image':
+  //         'https://static.nike.com/a/images/f_auto,cs_srgb/w_1920,c_limit/187bd092-6b79-4576-872c-36c6fca5e536/the-best-nike-shoes-for-running-an-ultramarathon.jpg',
+  //     'title': 'Nike Running Shoes',
+  //     'location': 'Pokhara, Nepal',
+  //     'price': 'Rs. 9,500',
+  //     'isFavorite': true,
+  //     'ownerName': 'Rajesh Kumar',
+  //     'ownerAvatar':
+  //         'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80&auto=format&fit=crop',
+  //     'timeLeft': '2h 30m',
+  //     'bids': 24,
+  //   },
+  //   {
+  //     'tags': ['House'],
+  //     // 'image': 'assets/images/sofa_mock.png',
+  //     'image':
+  //         'https://pelicanessentials.com/cdn/shop/files/three_seater_grey_0002-Photoroom.jpg',
+  //     'title': '3-Seater Fabric Sofa',
+  //     'location': 'Lalitpur, Nepal',
+  //     'price': 'Rs. 45,000',
+  //     'isFavorite': false,
+  //     'ownerName': 'Rajesh Kumar',
+  //     'ownerAvatar':
+  //         'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80&auto=format&fit=crop',
+  //     'timeLeft': '2h 30m',
+  //     'bids': 24,
+  //   },
+  // ];
 
   late TabController _tabController;
 
@@ -89,6 +104,14 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(categoryViewModelProvider.notifier).getAllCategories();
+      ref
+          .read(productConditionViewModelProvider.notifier)
+          .getAllProductConditions();
+      ref.read(productViewModelProvider.notifier).getAllProducts();
+      ref.read(sellerViewModelProvider.notifier).getAllSellers();
+    });
   }
 
   @override
@@ -97,8 +120,161 @@ class _HomeScreenState extends State<HomeScreen>
     super.dispose();
   }
 
+  List<ProductUiModel> _getAllProducts(ProductState productState) {
+    List<ProductUiModel> products = ProductUiModel.fromEntityList(
+      productState.products,
+    );
+
+    // Filter by search query
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      products = products.where((product) {
+        final productNameMatch = product.productName.toLowerCase().contains(
+          query,
+        );
+        final descriptionMatch =
+            product.description?.toLowerCase().contains(query) ?? false;
+        // final locationMatch = product.location.toLowerCase().contains(query);
+        return productNameMatch || descriptionMatch;
+      }).toList();
+    }
+
+    // Filter by category
+    if (_selectedCategoryId != null) {
+      products = products
+          .where((product) => product.categoryId == _selectedCategoryId)
+          .toList();
+    }
+
+    return products;
+  }
+
+  CategoryUiModel _getCategoryById(
+    String? categoryId,
+    List<CategoryUiModel> categories,
+  ) {
+    final category = categories.firstWhere(
+      (c) => c.categoryId == categoryId,
+      orElse: () => categories.first,
+    );
+
+    return category;
+  }
+
+  ProductConditionUiModel _getProductConditionById(
+    String? productConditionId,
+    List<ProductConditionUiModel> productConditions,
+  ) {
+    final productCondition = productConditions.firstWhere(
+      (c) => c.productConditionId == productConditionId,
+      orElse: () => productConditions.first,
+    );
+    return productCondition;
+  }
+
+  SellerUiModel _getSellerById(String? sellerId, List<SellerUiModel> sellers) {
+    final seller = sellers.firstWhere(
+      (s) => s.sellerId == sellerId,
+      orElse: () => sellers.first,
+    );
+    return seller;
+  }
+
+  IconData _getCategoryIcon(String categoryName) {
+    final name = categoryName.toLowerCase();
+    if (name.contains('electronic')) {
+      return Icons.phone_android;
+    }
+    if (name.contains('jewelry')) {
+      return Icons.diamond;
+    }
+    if (name.contains('fashion') || name.contains('clothing')) {
+      return Icons.shopping_bag;
+    }
+    if (name.contains("bag") || name.contains("accessory")) {
+      return Icons.shopping_bag;
+    }
+    if (name.contains('house') ||
+        name.contains('home') ||
+        name.contains('furniture')) {
+      return Icons.home;
+    }
+    if (name.contains('sport')) {
+      return Icons.sports_soccer;
+    }
+    if (name.contains('art') || name.contains('paint')) {
+      return Icons.palette;
+    }
+    if (name.contains('book')) {
+      return Icons.book;
+    }
+    if (name.contains('vehicle') ||
+        name.contains('car') ||
+        name.contains('bike')) {
+      return Icons.directions_car;
+    }
+    return Icons.category; // default
+  }
+
+  Color _getCategoryColor(String categoryName) {
+    final name = categoryName.toLowerCase();
+    if (name.contains('electronic')) {
+      return Colors.blue;
+    }
+    if (name.contains('fashion')) {
+      return Colors.pink;
+    }
+    if (name.contains('house') || name.contains('home')) {
+      return Colors.green;
+    }
+    if (name.contains('sport')) {
+      return Colors.orange;
+    }
+    if (name.contains('art')) {
+      return Colors.purple;
+    }
+    if (name.contains('book')) {
+      return Colors.brown;
+    }
+    if (name.contains('bag')) {
+      return Colors.yellow;
+    }
+    return Colors.grey;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final categoryState = ref.watch(categoryViewModelProvider);
+    final productConditionState = ref.watch(productConditionViewModelProvider);
+    final productState = ref.watch(productViewModelProvider);
+    final sellerState = ref.watch(sellerViewModelProvider);
+    final allProducts = _getAllProducts(productState);
+
+    final isLoading =
+        productState.productStatus == ProductStatus.loading ||
+        categoryState.categoryStatus == CategoryStatus.loading ||
+        productConditionState.productConditionStatus ==
+            ProductConditionStatus.loading ||
+        sellerState.sellerStatus == SellerStatus.loading;
+
+    // UI Categories with icons and colors
+    final List<Map<String, dynamic>> uiCategories = [
+      {
+        'id': null,
+        'name': 'All',
+        'icon': Icons.all_inclusive,
+        'color': Colors.grey,
+      },
+      ...categoryState.categories.map((category) {
+        return {
+          'id': category.categoryId,
+          'name': category.categoryName,
+          'icon': _getCategoryIcon(category.categoryName),
+          'color': _getCategoryColor(category.categoryName),
+        };
+      }),
+    ];
+
     return Scaffold(
       // appBar: AppBar(
       //   backgroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -158,38 +334,47 @@ class _HomeScreenState extends State<HomeScreen>
                         horizontal: 15,
                         vertical: 8,
                       ),
-                      child: Row(
-                        children: List.generate(categories.length, (index) {
-                          final category = categories[index];
-                          return Padding(
-                            padding: EdgeInsets.only(right: 8),
-                            child: FilterChip(
-                              label: CategoryToggleItem(
-                                label: category['label'],
-                              ),
-                              selected: selectedCategories[index],
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  for (
-                                    int i = 0;
-                                    i < selectedCategories.length;
-                                    i++
-                                  ) {
-                                    selectedCategories[i] = i == index;
-                                  }
-                                });
-                              },
-                              backgroundColor: Colors.transparent,
-                              selectedColor: Colors.blue.withValues(alpha: 0.2),
-                              showCheckmark: false,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                side: BorderSide.none,
-                              ),
+                      child:
+                          categoryState.categoryStatus == CategoryStatus.loading
+                          ? const Center(child: CircularProgressIndicator())
+                          : Row(
+                              children: List.generate(uiCategories.length, (
+                                index,
+                              ) {
+                                final category = uiCategories[index];
+                                final isSelected =
+                                    _selectedCategoryId == category["id"];
+                                return Padding(
+                                  padding: EdgeInsets.only(right: 8),
+                                  child: FilterChip(
+                                    avatar: Icon(
+                                      category['icon'] as IconData,
+                                      size: 18,
+                                    ),
+                                    label: CategoryToggleItem(
+                                      label: category["name"],
+                                    ),
+                                    selected: isSelected,
+                                    onSelected: (bool selected) {
+                                      setState(() {
+                                        _selectedCategoryId = selected
+                                            ? category["id"]
+                                            : null;
+                                      });
+                                    },
+                                    backgroundColor: Colors.transparent,
+                                    selectedColor: Colors.blue.withValues(
+                                      alpha: 0.2,
+                                    ),
+                                    showCheckmark: false,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      side: BorderSide.none,
+                                    ),
+                                  ),
+                                );
+                              }),
                             ),
-                          );
-                        }),
-                      ),
                     ),
                   ),
                 ),
@@ -266,36 +451,89 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
 
-            SliverPadding(
-              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final product = products[index % products.length];
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 20),
-                    child: ProductCard(
-                      tags: List<String>.from(product['tags'] as List),
-                      imageAsset: product['image'] as String,
-                      title: product['title'] as String,
-                      location: product['location'] as String,
-                      price: product['price'] as String,
-                      isFavorite: product['isFavorite'] as bool,
-                      timeLeft: product['timeLeft'] as String? ?? '',
-                      bidCount: product['bids'] as int? ?? 0,
-                      ownerName: product['ownerName'] as String? ?? '',
-                      ownerAvatar: product['ownerAvatar'] as String? ?? '',
-                      onFavoriteToggle: (val) {
-                        setState(() {
-                          products[index]['isFavorite'] = val;
-                        });
-                      },
-                      onTap: () {},
-                      onPlaceBid: () {},
+            // Product List
+            isLoading
+                ? const SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(80),
+                        child: CircularProgressIndicator(),
+                      ),
                     ),
-                  );
-                }, childCount: products.length),
-              ),
-            ),
+                  )
+                : allProducts.isEmpty
+                ? SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(40.0),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.inbox_rounded,
+                              size: 64,
+                              color: AppColors.textTertiaryColor.withAlpha(128),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              "No items found",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                : SliverPadding(
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        // final product = productState.products[index];
+                        final product = allProducts[index];
+
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 20),
+                          child:
+                              productState.productStatus ==
+                                  ProductStatus.loading
+                              ? const Center(child: CircularProgressIndicator())
+                              : ProductCard(
+                                  category: _getCategoryById(
+                                    product.categoryId,
+                                    CategoryUiModel.fromEntityList(
+                                      categoryState.categories,
+                                    ),
+                                  ),
+                                  productCondition: _getProductConditionById(
+                                    product.conditionId,
+                                    ProductConditionUiModel.fromEntityList(
+                                      productConditionState.productConditions,
+                                    ),
+                                  ),
+                                  // product: ProductUiModel.fromEntity(product),
+                                  product: product,
+                                  seller: _getSellerById(
+                                    product.sellerId,
+                                    SellerUiModel.fromEntityList(
+                                      sellerState.sellers,
+                                    ),
+                                  ),
+                                  isFavorite: false,
+                                  onFavoriteToggle: (val) {},
+                                  // onFavoriteToggle: (val) {
+                                  //   setState(() {
+                                  //     products[index]['isFavorite'] = val;
+                                  //   });
+                                  // },
+                                  onTap: () {},
+                                  onPlaceBid: () {},
+                                ),
+                        );
+                      }, childCount: allProducts.length),
+                    ),
+                  ),
 
             // SliverToBoxAdapter(
             //   child: SizedBox(

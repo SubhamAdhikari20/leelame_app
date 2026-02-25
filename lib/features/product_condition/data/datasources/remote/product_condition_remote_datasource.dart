@@ -106,7 +106,8 @@ class ProductConditionRemoteDatasource
   Future<List<ProductConditionApiModel>> getAllProductConditions() async {
     final response = await _apiClient.get(ApiEndpoints.getAllProductConditions);
     final success = response.data["success"] as bool;
-    final data = response.data["data"] as List<Map<String, dynamic>>?;
+    final data = response.data["data"] as List<dynamic>?;
+    // final data = response.data["data"] as List<Map<String, dynamic>>?;
 
     if (!success || data == null) {
       return [];

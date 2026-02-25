@@ -2,7 +2,16 @@
 import 'package:equatable/equatable.dart';
 import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
 
-enum BuyerStatus { initial, loading, created, updated, deleted, loaded, error, imageLoaded }
+enum BuyerStatus {
+  initial,
+  loading,
+  created,
+  updated,
+  deleted,
+  loaded,
+  error,
+  imageLoaded,
+}
 
 class BuyerState extends Equatable {
   final BuyerStatus buyerStatus;

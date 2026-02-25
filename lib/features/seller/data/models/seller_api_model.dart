@@ -75,7 +75,7 @@ class SellerApiModel {
   // From JSON
   factory SellerApiModel.fromJson(Map<String, dynamic> json) {
     return SellerApiModel(
-      id: json["_id"] as String,
+      id: json["_id"] as String?,
       fullName: json["fullName"] as String,
       phoneNumber: json["contact"] as String?,
       profilePictureUrl: json["profilePictureUrl"] as String?,
@@ -190,5 +190,48 @@ class SellerApiModel {
     return sellerEntities
         .map((sellerEntity) => SellerApiModel.fromEntity(sellerEntity))
         .toList();
+  }
+
+  SellerApiModel copyWith({
+    String? id,
+    String? fullName,
+    String? phoneNumber,
+    String? password,
+    String? profilePictureUrl,
+    String? bio,
+    String? baseUserId,
+    UserApiModel? baseUser,
+    String? sellerNotes,
+    String? sellerStatus,
+    DateTime? sellerVerificationDate,
+    int? sellerAttemptCount,
+    int? sellerRuleViolationCount,
+    bool? isSellerPermanentlyBanned,
+    DateTime? sellerBannedAt,
+    DateTime? sellerBannedDateFrom,
+    DateTime? sellerBannedDateTo,
+  }) {
+    return SellerApiModel(
+      id: id ?? this.id,
+      fullName: fullName ?? this.fullName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      password: password ?? this.password,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      bio: bio ?? this.bio,
+      baseUserId: baseUserId ?? this.baseUserId,
+      baseUser: baseUser ?? this.baseUser,
+      sellerNotes: sellerNotes ?? this.sellerNotes,
+      sellerStatus: sellerStatus ?? this.sellerStatus,
+      sellerVerificationDate:
+          sellerVerificationDate ?? this.sellerVerificationDate,
+      sellerAttemptCount: sellerAttemptCount ?? this.sellerAttemptCount,
+      sellerRuleViolationCount:
+          sellerRuleViolationCount ?? this.sellerRuleViolationCount,
+      isSellerPermanentlyBanned:
+          isSellerPermanentlyBanned ?? this.isSellerPermanentlyBanned,
+      sellerBannedAt: sellerBannedAt ?? this.sellerBannedAt,
+      sellerBannedDateFrom: sellerBannedDateFrom ?? this.sellerBannedDateFrom,
+      sellerBannedDateTo: sellerBannedDateTo ?? this.sellerBannedDateTo,
+    );
   }
 }

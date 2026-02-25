@@ -164,4 +164,44 @@ class BuyerRepository implements IBuyerRepository {
       return const Left(NetworkFailure(message: "No internet connection"));
     }
   }
+
+  @override
+  Future<Either<Failures, List<BuyerEntity>>> getAllBuyers() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final result = await _buyerRemoteDatasource.getAllBuyers();
+        if (result.isEmpty) {
+          return const Left(ApiFailure(message: "Failed to fetch buyers!"));
+        }
+
+        final buyers = BuyerApiModel.toEntityList(result);
+
+        return Right(buyers);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data["message"] ?? "Failed to fetch buyers!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      try {
+        final result = await _buyerLocalDatasource.getAllBuyers();
+        if (result.isEmpty) {
+          return const Left(
+            LocalDatabaseFailure(message: "Failed to fetch buyers!"),
+          );
+        }
+
+        final buyers = BuyerHiveModel.toEntityList(result);
+
+        return Right(buyers);
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
+    }
+  }
 }

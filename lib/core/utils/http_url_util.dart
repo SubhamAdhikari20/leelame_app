@@ -25,4 +25,14 @@ class HttpUrlUtil {
 
     return "$cleanBase$cleanUrl";
   }
+
+  static List<String> normalizeHttpUrls(List<String?>? urls) {
+    if (urls == null || urls.isEmpty) {
+      return <String>[];
+    }
+    return urls
+        .map((url) => normalizeHttpUrl(url))
+        .whereType<String>() // keep only non-null normalized strings
+        .toList();
+  }
 }

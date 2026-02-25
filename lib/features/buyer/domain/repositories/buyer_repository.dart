@@ -11,4 +11,5 @@ abstract interface class IBuyerRepository {
     String buyerId,
     File profilePicture,
   );
+  Future<Either<Failures, List<BuyerEntity>>> getAllBuyers();
 }

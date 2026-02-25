@@ -1,35 +1,35 @@
-// lib/features/buyer/data/datasources/remote/buyer_remote_datasource.dart
+// lib/features/seller/data/datasources/remote/seller_remote_datasource.dart
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/core/api/api_client.dart';
 import 'package:leelame/core/api/api_endpoints.dart';
 import 'package:leelame/core/services/storage/token_service.dart';
-import 'package:leelame/features/buyer/data/datasources/buyer_datasource.dart';
-import 'package:leelame/features/buyer/data/models/buyer_api_model.dart';
+import 'package:leelame/features/seller/data/datasources/seller_datasource.dart';
+import 'package:leelame/features/seller/data/models/seller_api_model.dart';
 
-final buyerRemoteDatasourceProvider = Provider<IBuyerRemoteDatasource>((ref) {
-  return BuyerRemoteDatasource(
+final sellerRemoteDatasourceProvider = Provider<ISellerRemoteDatasource>((ref) {
+  return SellerRemoteDatasource(
     apiClient: ref.read(apiClientProvider),
     tokenService: ref.read(tokenServiceProvider),
   );
 });
 
-class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
+class SellerRemoteDatasource implements ISellerRemoteDatasource {
   final ApiClient _apiClient;
   final TokenService _tokenService;
 
-  BuyerRemoteDatasource({
+  SellerRemoteDatasource({
     required ApiClient apiClient,
     required TokenService tokenService,
   }) : _apiClient = apiClient,
        _tokenService = tokenService;
 
   @override
-  Future<BuyerApiModel?> getCurrentBuyer(String buyerId) async {
+  Future<SellerApiModel?> getCurrentSeller(String sellerId) async {
     final token = _tokenService.getToken();
     final response = await _apiClient.get(
-      ApiEndpoints.buyerById(buyerId),
+      ApiEndpoints.currentSeller(sellerId),
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
 
@@ -40,16 +40,16 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
       return null;
     }
 
-    final buyer = BuyerApiModel.fromJson(data);
-    return buyer;
+    final seller = SellerApiModel.fromJson(data);
+    return seller;
   }
 
   @override
-  Future<BuyerApiModel?> updateBuyer(BuyerApiModel buyerApiModel) async {
+  Future<SellerApiModel?> updateSeller(SellerApiModel sellerApiModel) async {
     final token = _tokenService.getToken();
-    final body = buyerApiModel.toJson(userApiModel: buyerApiModel.baseUser);
+    final body = sellerApiModel.toJson(userApiModel: sellerApiModel.baseUser);
     final response = await _apiClient.put(
-      ApiEndpoints.buyerUpdateById(buyerApiModel.id!),
+      ApiEndpoints.sellerUpdateById(sellerApiModel.id!),
       data: body,
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
@@ -61,33 +61,33 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
       return null;
     }
 
-    final updatedBuyer = BuyerApiModel.fromJson(data);
-    return updatedBuyer;
+    final updatedSeller = SellerApiModel.fromJson(data);
+    return updatedSeller;
   }
 
   @override
-  Future<String?> uploadBuyerProfilePicture(
-    String buyerId,
+  Future<String?> uploadSellerProfilePicture(
+    String sellerId,
     File profilePicture,
   ) async {
     final fileName = profilePicture.path.split("/").last;
     final formData = FormData.fromMap({
-      "profilePicture": await MultipartFile.fromFile(
+      "profile-picture-seller": await MultipartFile.fromFile(
         profilePicture.path,
         filename: fileName,
       ),
-      "folder": "profile-pictures/buyers",
+      "folder": "profile-pictures/sellers",
     });
 
     final token = _tokenService.getToken();
     final response = await _apiClient.uploadFile(
-      ApiEndpoints.buyerUploadProfilePicture(buyerId),
+      ApiEndpoints.sellerUploadProfilePicture(sellerId),
       formData: formData,
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
 
     final success = response.data["success"] as bool;
-    final data = response.data["data"] as Map<String, dynamic>?;
+    final data = response.data["user"] as Map<String, dynamic>?;
     final image = data?["imageUrl"] as String?;
 
     if (!success || data == null || image == null) {
@@ -100,16 +100,17 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
   }
 
   @override
-  Future<List<BuyerApiModel>> getAllBuyers() async {
-    final response = await _apiClient.get(ApiEndpoints.getAllBuyers);
+  Future<List<SellerApiModel>> getAllSellers() async {
+    final response = await _apiClient.get(ApiEndpoints.getAllSellers);
     final success = response.data["success"] as bool;
-    final data = response.data["users"] as List<Map<String, dynamic>>?;
+    final data = response.data["users"] as List<dynamic>?;
+    // final data = response.data["users"] as List<Map<String, dynamic>>?;
 
     if (!success || data == null) {
       return [];
     }
 
-    final buyers = BuyerApiModel.fromJsonList(data);
-    return buyers;
+    final sellers = SellerApiModel.fromJsonList(data);
+    return sellers;
   }
 }

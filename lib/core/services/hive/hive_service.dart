@@ -167,8 +167,17 @@ class HiveService {
 
   // Get all buyers
   Future<List<BuyerHiveModel>> getAllBuyers() async {
-    return _buyersBox.values.toList();
+    final users = _usersBox.values.where((user) => user.isVerified == true);
+    final buyers = _buyersBox.values.where(
+      (buyer) =>
+          buyer.buyerId != null &&
+          users.any((user) => user.userId == buyer.buyerId),
+    );
+    return buyers.toList();
   }
+  // Future<List<BuyerHiveModel>> getAllBuyers() async {
+  //   return _buyersBox.values.toList();
+  // }
 
   // Delete a buyer
   Future<void> deleteBuyer(String buyerId) async {
@@ -271,7 +280,13 @@ class HiveService {
 
   // Get all sellers
   Future<List<SellerHiveModel>> getAllSellers() async {
-    return _sellersBox.values.toList();
+    final users = _usersBox.values.where((user) => user.isVerified == true);
+    final sellers = _sellersBox.values.where(
+      (seller) =>
+          seller.sellerId != null &&
+          users.any((user) => user.userId == seller.sellerId),
+    );
+    return sellers.toList();
   }
 
   // Delete a seller

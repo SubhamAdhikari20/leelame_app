@@ -212,7 +212,8 @@ class ProductRemoteDatasource implements IProductRemoteDatasource {
   Future<List<ProductApiModel>> getAllProducts() async {
     final response = await _apiClient.get(ApiEndpoints.getAllProducts);
     final success = response.data["success"] as bool;
-    final data = response.data["data"] as List<Map<String, dynamic>>?;
+    final data = response.data["data"] as List<dynamic>?;
+    // final data = response.data["data"] as List<Map<String, dynamic>>?;
 
     if (!success || data == null) {
       return [];

@@ -1,13 +1,8 @@
-// lib/features/product/data/models/product_api_model.dart
-import 'package:freezed_annotation/freezed_annotation.dart';
+// lib/features/product/presentation/models/product_ui_model.dart
 import 'package:leelame/features/product/domain/entities/product_entity.dart';
 
-part "product_api_model.g.dart";
-
-@JsonSerializable()
-class ProductApiModel {
-  @JsonKey(name: "_id")
-  final String? id;
+class ProductUiModel {
+  final String? productId;
   final String? sellerId;
   final String productName;
   final String? description;
@@ -24,8 +19,8 @@ class ProductApiModel {
   final String? soldToBuyerId;
   final List<String>? removedExistingProductImageUrls;
 
-  ProductApiModel({
-    this.id,
+  ProductUiModel({
+    this.productId,
     this.sellerId,
     required this.productName,
     this.description,
@@ -43,34 +38,10 @@ class ProductApiModel {
     this.removedExistingProductImageUrls,
   });
 
-  // to Json
-  Map<String, dynamic> toJson() {
-    return _$ProductApiModelToJson(this);
-  }
-
-  // From JSON
-  factory ProductApiModel.fromJson(Map<String, dynamic> json) {
-    return _$ProductApiModelFromJson(json);
-  }
-
-  // to JSON List
-  static List<Map<String, dynamic>> toJsonList(
-    List<ProductApiModel> productModels,
-  ) {
-    return productModels.map((productModel) => productModel.toJson()).toList();
-  }
-
-  // from JSON List
-  static List<ProductApiModel> fromJsonList(List<dynamic> jsonList) {
-    return jsonList
-        .map((json) => ProductApiModel.fromJson(json as Map<String, dynamic>))
-        .toList();
-  }
-
   // to Entity
   ProductEntity toEntity() {
     return ProductEntity(
-      productId: id,
+      productId: productId,
       productName: productName,
       description: description,
       sellerId: sellerId,
@@ -90,9 +61,9 @@ class ProductApiModel {
   }
 
   // from Entity
-  factory ProductApiModel.fromEntity(ProductEntity productEntity) {
-    return ProductApiModel(
-      id: productEntity.productId,
+  factory ProductUiModel.fromEntity(ProductEntity productEntity) {
+    return ProductUiModel(
+      productId: productEntity.productId,
       productName: productEntity.productName,
       description: productEntity.description,
       sellerId: productEntity.sellerId,
@@ -113,23 +84,23 @@ class ProductApiModel {
   }
 
   // to Entity List
-  static List<ProductEntity> toEntityList(List<ProductApiModel> productModels) {
+  static List<ProductEntity> toEntityList(List<ProductUiModel> productModels) {
     return productModels
         .map((productModel) => productModel.toEntity())
         .toList();
   }
 
   // from Entity List
-  static List<ProductApiModel> fromEntityList(
+  static List<ProductUiModel> fromEntityList(
     List<ProductEntity> productEntities,
   ) {
     return productEntities
-        .map((productEntity) => ProductApiModel.fromEntity(productEntity))
+        .map((productEntity) => ProductUiModel.fromEntity(productEntity))
         .toList();
   }
 
-  ProductApiModel copyWith({
-    String? id,
+  ProductUiModel copyWith({
+    String? productId,
     String? sellerId,
     String? productName,
     String? description,
@@ -146,8 +117,8 @@ class ProductApiModel {
     String? soldToBuyerId,
     List<String>? removedExistingProductImageUrls,
   }) {
-    return ProductApiModel(
-      id: id ?? this.id,
+    return ProductUiModel(
+      productId: productId ?? this.productId,
       sellerId: sellerId ?? this.sellerId,
       productName: productName ?? this.productName,
       description: description ?? this.description,

@@ -42,7 +42,6 @@ class ApiEndpoints {
   static String userByEmail(String email) => "/user/$email";
 
   // ======================= Buyer Auth Endpoints =======================
-  static const String buyers = "/users/buyer";
   static const String buyerSignUp = "/users/buyer/sign-up";
   static const String buyerLogin = "/users/buyer/login";
   static const String buyerVerifyAccountRegistration =
@@ -50,19 +49,20 @@ class ApiEndpoints {
   static const String buyerSendVerificationEmailRegistration =
       "/users/buyer/send-verification-email-registration";
   static const String buyerLogout = "/users/buyer/logout";
+  static String buyerById(String id) => "/users/buyer/$id";
+  static String currentBuyer(String id) => "/users/buyer/get-current-buyer/$id";
+  static String buyerByBaseUserId(String baseUserId) =>
+      "/users/buyer/$baseUserId";
   static String buyerUploadProfilePicture(String id) =>
       "/users/buyer/upload-profile-picture/$id";
   static String buyerUpdateById(String id) =>
       "/users/buyer/update-profile-details/$id";
-  static String buyerById(String id) => "/users/buyer/$id";
-  static String buyerByBaseUserId(String baseUserId) =>
-      "/users/buyer/$baseUserId";
+  static const String getAllBuyers = "/users/buyer/get-all-buyers";
   static String buyerByUsername(String username) => "/users/buyer/$username";
   static String buyerByPhoneNumber(String phoneNumber) =>
       "/users/buyer/$phoneNumber";
 
   // ======================= Seller Auth Endpoints =======================
-  static const String sellers = "/users/seller";
   static const String sellerSignUp = "/users/seller/sign-up";
   static const String sellerLogin = "/users/seller/login";
   static const String sellerVerifyAccountRegistration =
@@ -71,8 +71,15 @@ class ApiEndpoints {
       "/users/seller/send-verification-email-registration";
   static const String sellerLogout = "/users/seller/logout";
   static String sellerById(String id) => "/users/seller/$id";
+  static String currentSeller(String id) =>
+      "/users/seller/get-current-seller/$id";
   static String sellerByBaseUserId(String baseUserId) =>
       "/users/seller/$baseUserId";
+  static String sellerUploadProfilePicture(String id) =>
+      "/users/seller/upload-profile-picture/$id";
+  static String sellerUpdateById(String id) =>
+      "/users/seller/update-profile-details/$id";
+  static const String getAllSellers = "/users/seller/get-all-sellers";
   static String sellerByPhoneNumber(String phoneNumber) =>
       "/users/seller/$phoneNumber";
 

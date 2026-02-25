@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/features/buyer/domain/usecases/buyer_get_current_user_usecase.dart';
+import 'package:leelame/features/buyer/domain/usecases/get_all_buyers_usecase.dart';
 import 'package:leelame/features/buyer/domain/usecases/update_buyer_profile_details_usecase.dart';
 import 'package:leelame/features/buyer/domain/usecases/upload_buyer_profile_picture_usecase.dart';
 import 'package:leelame/features/buyer/presentation/states/buyer_state.dart';
@@ -14,6 +15,7 @@ class BuyerViewModel extends Notifier<BuyerState> {
   late final BuyerGetCurrentUserUsecase _buyerGetCurrentUserUsecase;
   late final UpdateBuyerProfileDetailsUsecase _updateBuyerProfileDetailsUsecase;
   late final UploadBuyerProfilePictureUsecase _uploadBuyerProfilePictureUsecase;
+  late final GetAllBuyersUsecase _getAllBuyersUsecase;
 
   @override
   BuyerState build() {
@@ -24,6 +26,7 @@ class BuyerViewModel extends Notifier<BuyerState> {
     _uploadBuyerProfilePictureUsecase = ref.read(
       uploadBuyerProfilePictureUsecaseProvider,
     );
+    _getAllBuyersUsecase = ref.read(getAllBuyersUsecaseProvider);
     return BuyerState();
   }
 
@@ -112,5 +115,33 @@ class BuyerViewModel extends Notifier<BuyerState> {
         );
       },
     );
+  }
+
+  Future<void> getAllBuyers() async {
+    state = state.copyWith(buyerStatus: BuyerStatus.loading);
+    final result = await _getAllBuyersUsecase();
+
+    result.fold(
+      (failure) => state = state.copyWith(
+        buyerStatus: BuyerStatus.error,
+        errorMessage: failure.message,
+      ),
+      (buyers) => state = state.copyWith(
+        buyerStatus: BuyerStatus.loaded,
+        buyers: buyers,
+      ),
+    );
+  }
+
+  void clearError() {
+    state = state.copyWith(errorMessage: null);
+  }
+
+  void clearBuyerList() {
+    state = state.copyWith(buyers: []);
+  }
+
+  void clearBuyerStatus() {
+    state = state.copyWith(buyerStatus: BuyerStatus.initial);
   }
 }

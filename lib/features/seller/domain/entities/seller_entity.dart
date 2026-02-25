@@ -63,4 +63,47 @@ class SellerEntity extends Equatable {
     sellerBannedDateFrom,
     sellerBannedDateTo,
   ];
+
+  SellerEntity copyWith({
+    String? sellerId,
+    String? fullName,
+    String? phoneNumber,
+    String? password,
+    String? profilePictureUrl,
+    String? bio,
+    String? baseUserId,
+    UserEntity? userEntity,
+    String? sellerNotes,
+    String? sellerStatus,
+    DateTime? sellerVerificationDate,
+    int? sellerAttemptCount,
+    int? sellerRuleViolationCount,
+    bool? isSellerPermanentlyBanned,
+    DateTime? sellerBannedAt,
+    DateTime? sellerBannedDateFrom,
+    DateTime? sellerBannedDateTo,
+  }) {
+    return SellerEntity(
+      sellerId: sellerId ?? this.sellerId,
+      fullName: fullName ?? this.fullName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      password: password ?? this.password,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      bio: bio ?? this.bio,
+      baseUserId: baseUserId ?? this.baseUserId,
+      userEntity: userEntity ?? this.userEntity,
+      sellerNotes: sellerNotes ?? this.sellerNotes,
+      sellerStatus: sellerStatus ?? this.sellerStatus,
+      sellerVerificationDate:
+          sellerVerificationDate ?? this.sellerVerificationDate,
+      sellerAttemptCount: sellerAttemptCount ?? this.sellerAttemptCount,
+      sellerRuleViolationCount:
+          sellerRuleViolationCount ?? this.sellerRuleViolationCount,
+      isSellerPermanentlyBanned:
+          isSellerPermanentlyBanned ?? this.isSellerPermanentlyBanned,
+      sellerBannedAt: sellerBannedAt ?? this.sellerBannedAt,
+      sellerBannedDateFrom: sellerBannedDateFrom ?? this.sellerBannedDateFrom,
+      sellerBannedDateTo: sellerBannedDateTo ?? this.sellerBannedDateTo,
+    );
+  }
 }

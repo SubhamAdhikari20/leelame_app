@@ -33,4 +33,10 @@ class BuyerLocalDatasource implements IBuyerLocalDatasource {
     final result = await _hiveService.updateBuyer(buyerHiveModel);
     return Future.value(result);
   }
+
+  @override
+  Future<List<BuyerHiveModel>> getAllBuyers() async {
+    final result = await _hiveService.getAllBuyers();
+    return Future.value(result);
+  }
 }

@@ -8,6 +8,7 @@ abstract interface class IBuyerLocalDatasource {
   Future<BuyerHiveModel?> updateBuyer(BuyerHiveModel buyerHiveModel);
   Future<BuyerHiveModel?> getBuyerById(String buyerId);
   Future<UserHiveModel?> getBaseUserById(String userId);
+  Future<List<BuyerHiveModel>> getAllBuyers();
 }
 
 abstract interface class IBuyerRemoteDatasource {
@@ -17,4 +18,6 @@ abstract interface class IBuyerRemoteDatasource {
     String buyerId,
     File profilePicture,
   );
+
+  Future<List<BuyerApiModel>> getAllBuyers();
 }

@@ -2,9 +2,11 @@
 import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/core/error/failures.dart';
 import 'package:leelame/core/services/connectivity/network_info.dart';
+import 'package:leelame/core/utils/http_url_util.dart';
 import 'package:leelame/features/product/data/datasources/local/product_local_datasource.dart';
 import 'package:leelame/features/product/data/datasources/product_datasource.dart';
 import 'package:leelame/features/product/data/datasources/remote/product_remote_datasource.dart';
@@ -232,7 +234,16 @@ class ProductRepository implements IProductRepository {
           );
         }
 
-        final products = ProductApiModel.toEntityList(result);
+        final normalizedProducts = result.map((product) {
+          final normalizedImageUrls = HttpUrlUtil.normalizeHttpUrls(
+            product.productImageUrls,
+          );
+          return product.copyWith(productImageUrls: normalizedImageUrls);
+        }).toList();
+
+        final products = ProductApiModel.toEntityList(normalizedProducts);
+
+        debugPrint("products from repository: $products");
 
         return Right(products);
       } on DioException catch (e) {
