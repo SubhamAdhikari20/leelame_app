@@ -192,10 +192,10 @@ class ProductRemoteDatasource implements IProductRemoteDatasource {
 
   @override
   Future<ProductApiModel?> getProductById(String productId) async {
-    final token = _tokenService.getToken();
-    final response = await _apiClient.post(
+    // final token = _tokenService.getToken();
+    final response = await _apiClient.get(
       ApiEndpoints.productById(productId),
-      options: Options(headers: {"Authorization": "Bearer $token"}),
+      // options: Options(headers: {"Authorization": "Bearer $token"}),
     );
     final success = response.data["success"] as bool;
     final data = response.data["data"] as Map<String, dynamic>?;
@@ -227,6 +227,24 @@ class ProductRemoteDatasource implements IProductRemoteDatasource {
   Future<List<ProductApiModel>> getAllProductsByBuyerId(String buyerId) async {
     final response = await _apiClient.get(
       ApiEndpoints.getAllProductsByBuyerId(buyerId),
+    );
+    final success = response.data["success"] as bool;
+    final data = response.data["data"] as List<Map<String, dynamic>>?;
+
+    if (!success || data == null) {
+      return [];
+    }
+
+    final products = ProductApiModel.fromJsonList(data);
+    return products;
+  }
+
+  @override
+  Future<List<ProductApiModel>> getAllProductsBySellerId(
+    String sellerId,
+  ) async {
+    final response = await _apiClient.get(
+      ApiEndpoints.getAllProductsBySellerId(sellerId),
     );
     final success = response.data["success"] as bool;
     final data = response.data["data"] as List<Map<String, dynamic>>?;

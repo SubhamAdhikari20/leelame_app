@@ -16,9 +16,10 @@ import 'package:leelame/features/buyer/presentation/view_models/buyer_view_model
 import 'package:permission_handler/permission_handler.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
-  final BuyerUiModel? buyerUiModel;
+  // final BuyerUiModel? buyerUiModel;
+  final String buyerId;
 
-  const EditProfilePage({super.key, this.buyerUiModel});
+  const EditProfilePage({super.key, required this.buyerId});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -42,14 +43,28 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    final buyer = widget.buyerUiModel;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(buyerViewModelProvider.notifier)
+          .getCurrentUser(buyerId: widget.buyerId);
+    });
 
-    _fullNameController.text = buyer?.fullName ?? "";
-    _usernameController.text = buyer?.username ?? "";
-    _emailController.text = buyer?.userUiModel?.email ?? "";
-    _phoneNumberController.text = buyer?.phoneNumber ?? "";
-    _bioController.text = buyer?.bio ?? "";
-    _profilePictureUrl = buyer?.profilePictureUrl;
+    // final buyer = widget.buyerUiModel;
+    // _fullNameController.text = buyer?.fullName ?? "";
+    // _usernameController.text = buyer?.username ?? "";
+    // _emailController.text = buyer?.userUiModel?.email ?? "";
+    // _phoneNumberController.text = buyer?.phoneNumber ?? "";
+    // _bioController.text = buyer?.bio ?? "";
+    // _profilePictureUrl = buyer?.profilePictureUrl;
+  }
+
+  void _loadBuyerDetails(BuyerUiModel buyer) {
+    _fullNameController.text = buyer.fullName;
+    _usernameController.text = buyer.username ?? "";
+    _emailController.text = buyer.userUiModel?.email ?? "";
+    _phoneNumberController.text = buyer.phoneNumber ?? "";
+    _bioController.text = buyer.bio ?? "";
+    _profilePictureUrl = buyer.profilePictureUrl;
   }
 
   @override
@@ -64,26 +79,43 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   }
 
   Future<void> _handleUpdateDetails() async {
-    if (_editProfileFormKey.currentState!.validate()) {
-      final buyerId = widget.buyerUiModel?.buyerId;
-      if (buyerId != null) {
-        await ref
-            .read(buyerViewModelProvider.notifier)
-            .updateBuyer(buyerId: buyerId);
-      }
-    }
+    // if (_editProfileFormKey.currentState!.validate()) {
+    final buyerId = widget.buyerId;
+    await ref
+        .read(buyerViewModelProvider.notifier)
+        .updateBuyer(
+          buyerId: buyerId,
+          fullName: _fullNameController.text.trim(),
+          username: _usernameController.text.trim(),
+          email: _emailController.text.trim(),
+          phoneNumber: _phoneNumberController.text.trim(),
+          bio: _bioController.text.trim(),
+        );
+
+    // final buyerId = widget.buyerUiModel?.buyerId;
+    // if (buyerId != null) {
+    //   await ref
+    //       .read(buyerViewModelProvider.notifier)
+    //       .updateBuyer(buyerId: buyerId);
+    // }
+    // }
   }
 
   Future<void> _handleUploadProfilePicture(File profilePicture) async {
-    final buyerId = widget.buyerUiModel?.buyerId;
-    if (buyerId != null) {
-      await ref
-          .read(buyerViewModelProvider.notifier)
-          .uploadProfilePicture(
-            buyerId: buyerId,
-            profilePicture: profilePicture,
-          );
-    }
+    final buyerId = widget.buyerId;
+    await ref
+        .read(buyerViewModelProvider.notifier)
+        .uploadProfilePicture(buyerId: buyerId, profilePicture: profilePicture);
+
+    // final buyerId = widget.buyerUiModel?.buyerId;
+    // if (buyerId != null) {
+    //   await ref
+    //       .read(buyerViewModelProvider.notifier)
+    //       .uploadProfilePicture(
+    //         buyerId: buyerId,
+    //         profilePicture: profilePicture,
+    //       );
+    // }
   }
 
   Future<bool> _requestPermissionFromUser(Permission permission) async {
@@ -372,7 +404,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         elevation: 2,
                       ),
                       onPressed: () {
-                        AppRoutes.pop(context);
                         if (_profileImage != null) {
                           setState(() {
                             _selectedMediaType = "photo";
@@ -381,6 +412,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                             File(_profileImage!.path),
                           );
                         }
+                        AppRoutes.pop(context);
                       },
                       child: const Text(
                         "Save",
@@ -504,12 +536,17 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         if (_profileImage != null) {
           _profileImage = null;
         }
+        // ref
+        //     .read(buyerViewModelProvider.notifier)
+        //     .getCurrentUser(buyerId: widget.buyerId);
         SnackbarUtil.showSuccess(
           context,
           "User profile picture uploaded successfully!",
         );
       }
     });
+
+    _loadBuyerDetails(BuyerUiModel.fromEntity(buyerState.buyer!));
 
     return Scaffold(
       body: SafeArea(
@@ -573,270 +610,285 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               ),
             ),
 
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Center(
+            buyerState.buyerStatus == BuyerStatus.loading
+                ? const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : buyerState.buyer == null
+                ? const Expanded(child: Center(child: Text("Buyer not found!")))
+                : Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         children: [
-                          Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              CircleAvatar(
-                                radius: 50,
-                                backgroundColor: Colors.grey.shade200,
-                                backgroundImage: _profileImage != null
-                                    ? (_selectedMediaType == "photo"
-                                          ? FileImage(File(_profileImage!.path))
-                                                as ImageProvider
-                                          : null)
-                                    : (_profilePictureUrl != null &&
-                                              _profilePictureUrl!.isNotEmpty
-                                          ? NetworkImage(_profilePictureUrl!)
-                                                as ImageProvider
-                                          : null),
-                                child:
-                                    (_profileImage == null &&
-                                        (_profilePictureUrl == null ||
-                                            _profilePictureUrl!.isEmpty))
-                                    ? const Icon(
-                                        Icons.person,
-                                        size: 60,
-                                        color: Colors.grey,
-                                      )
-                                    : null,
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
+                          Center(
+                            child: Column(
+                              children: [
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 50,
+                                      backgroundColor: Colors.grey.shade200,
+                                      backgroundImage: _profileImage != null
+                                          ? (_selectedMediaType == "photo"
+                                                ? FileImage(
+                                                        File(
+                                                          _profileImage!.path,
+                                                        ),
+                                                      )
+                                                      as ImageProvider
+                                                : null)
+                                          : (_profilePictureUrl != null &&
+                                                    _profilePictureUrl!
+                                                        .isNotEmpty
+                                                ? NetworkImage(
+                                                        _profilePictureUrl!,
+                                                      )
+                                                      as ImageProvider
+                                                : null),
+                                      child:
+                                          (_profileImage == null &&
+                                              (_profilePictureUrl == null ||
+                                                  _profilePictureUrl!.isEmpty))
+                                          ? const Icon(
+                                              Icons.person,
+                                              size: 60,
+                                              color: Colors.grey,
+                                            )
+                                          : null,
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
 
-                          // Edit profile pic button
-                          GestureDetector(
-                            onTap: _pickMedia,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Color(0xFFD7CACA),
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: AppColors.softShadow,
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Text(
-                                    'Edit profile',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
+                                // Edit profile pic button
+                                GestureDetector(
+                                  onTap: _pickMedia,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFD7CACA),
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: AppColors.softShadow,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Text(
+                                          'Edit profile',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        SizedBox(width: 6),
+                                        Icon(Icons.edit, size: 16),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(width: 6),
-                                  Icon(Icons.edit, size: 16),
-                                ],
-                              ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 25),
+
+                          // Sign up Form
+                          Form(
+                            key: _editProfileFormKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // FullName Text Field
+                                const Text(
+                                  "Full Name",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+
+                                CustomTextField(
+                                  controller: _fullNameController,
+                                  hintText: "Full Name",
+                                  labelText: "Full Name",
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your name';
+                                    }
+                                    if (value.length < 3) {
+                                      return 'Name must be at least 3 characters';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                SizedBox(height: 20),
+
+                                // Username Text Field
+                                const Text(
+                                  "Username",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+
+                                CustomTextField(
+                                  controller: _usernameController,
+                                  hintText: "Username",
+                                  labelText: "Username",
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your username';
+                                    }
+                                    if (value.length < 3) {
+                                      return 'Username must be at least 3 characters';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                SizedBox(height: 20),
+
+                                // Email Text Field
+                                const Text(
+                                  "Email",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+
+                                CustomTextField(
+                                  controller: _emailController,
+                                  hintText: "Email",
+                                  labelText: "Email",
+                                  keyboardType: TextInputType.emailAddress,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your email';
+                                    }
+                                    if (!RegExp(
+                                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                    ).hasMatch(value)) {
+                                      return 'Please enter a valid email';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                SizedBox(height: 20),
+
+                                // Phone Number Text Field
+                                const Text(
+                                  "Phone Number",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+
+                                CustomTextField(
+                                  controller: _phoneNumberController,
+                                  hintText: "Phone Number",
+                                  labelText: "Phone Number",
+                                  keyboardType: TextInputType.phone,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter phone number';
+                                    }
+                                    if (value.length != 10) {
+                                      return 'Phone must be 10 digits';
+                                    }
+                                    if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                                      return 'Only numbers allowed';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                SizedBox(height: 20),
+
+                                // Bio Text Area Field
+                                const Text(
+                                  "Bio",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+
+                                CustomTextAreaField(
+                                  controller: _bioController,
+                                  hintText: "Bio",
+                                  // validator: (value) {
+                                  //   if (value == null || value.isEmpty) {
+                                  //     return 'Please enter bio';
+                                  //   }
+                                  //   return null;
+                                  // },
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 25),
+                  ),
 
-                    // Sign up Form
-                    Form(
-                      key: _editProfileFormKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // FullName Text Field
-                          const Text(
-                            "Full Name",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-
-                          CustomTextField(
-                            controller: _fullNameController,
-                            hintText: "Full Name",
-                            labelText: "Full Name",
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your name';
-                              }
-                              if (value.length < 3) {
-                                return 'Name must be at least 3 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 20),
-
-                          // Username Text Field
-                          const Text(
-                            "Username",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-
-                          CustomTextField(
-                            controller: _usernameController,
-                            hintText: "Username",
-                            labelText: "Username",
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your username';
-                              }
-                              if (value.length < 3) {
-                                return 'Username must be at least 3 characters';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 20),
-
-                          // Email Text Field
-                          const Text(
-                            "Email",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-
-                          CustomTextField(
-                            controller: _emailController,
-                            hintText: "Email",
-                            labelText: "Email",
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              if (!RegExp(
-                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                              ).hasMatch(value)) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 20),
-
-                          // Phone Number Text Field
-                          const Text(
-                            "Phone Number",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-
-                          CustomTextField(
-                            controller: _phoneNumberController,
-                            hintText: "Phone Number",
-                            labelText: "Phone Number",
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter phone number';
-                              }
-                              if (value.length != 10) {
-                                return 'Phone must be 10 digits';
-                              }
-                              if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-                                return 'Only numbers allowed';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 20),
-
-                          // Bio Text Area Field
-                          const Text(
-                            "Bio",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-
-                          CustomTextAreaField(
-                            controller: _bioController,
-                            hintText: "Bio",
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter bio';
-                              }
-                              return null;
-                            },
-                          ),
-                        ],
-                      ),
+            // Bottom Fixed Confirm Button
+            if (buyerState.buyerStatus != BuyerStatus.loading &&
+                buyerState.buyer != null)
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(color: const Color(0xFFDDDDDD), width: 1.0),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 5,
+                      offset: const Offset(0, -4),
                     ),
                   ],
                 ),
-              ),
-            ),
-
-            // Bottom Fixed Confirm Button
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: const Color(0xFFDDDDDD), width: 1.0),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
-                    blurRadius: 5,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                child: GradientElevatedButton(
-                  style: GradientElevatedButton.styleFrom(
-                    backgroundGradient: AppColors.auctionPrimaryGradient,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: GradientElevatedButton(
+                    style: GradientElevatedButton.styleFrom(
+                      backgroundGradient: AppColors.auctionPrimaryGradient,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.all(20),
+                      elevation: 2,
                     ),
-                    padding: const EdgeInsets.all(20),
-                    elevation: 2,
-                  ),
-                  onPressed: _handleUpdateDetails,
-                  child: buyerState.buyerStatus == BuyerStatus.loading
-                      ? const Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.blueGrey,
+                    onPressed: _handleUpdateDetails,
+                    child: buyerState.buyerStatus == BuyerStatus.loading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.blueGrey,
+                              ),
+                              strokeWidth: 2,
                             ),
-                            strokeWidth: 2,
+                          )
+                        : Text(
+                            "Confirm changes",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                        )
-                      : Text(
-                          "Confirm changes",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),

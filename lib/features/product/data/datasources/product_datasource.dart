@@ -10,6 +10,7 @@ abstract interface class IProductLocalDatasource {
   Future<bool> deleteProduct(String productId);
   Future<List<ProductHiveModel>> getAllProducts();
   Future<List<ProductHiveModel>> getAllProductsByBuyerId(String buyerId);
+  Future<List<ProductHiveModel>> getAllProductsBySellerId(String sellerId);
 }
 
 abstract interface class IProductRemoteDatasource {
@@ -27,4 +28,5 @@ abstract interface class IProductRemoteDatasource {
   Future<bool> deleteProduct(String productId);
   Future<List<ProductApiModel>> getAllProducts();
   Future<List<ProductApiModel>> getAllProductsByBuyerId(String buyerId);
+  Future<List<ProductApiModel>> getAllProductsBySellerId(String sellerId);
 }

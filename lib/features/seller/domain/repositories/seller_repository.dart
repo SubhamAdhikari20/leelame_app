@@ -6,6 +6,7 @@ import 'package:leelame/features/seller/domain/entities/seller_entity.dart';
 
 abstract interface class ISellerRepository {
   Future<Either<Failures, SellerEntity>> getCurrentSeller(String sellerId);
+  Future<Either<Failures, SellerEntity>> getSellerById(String sellerId);
   Future<Either<Failures, SellerEntity>> updateSeller(
     SellerEntity sellerEntity,
   );

@@ -113,4 +113,19 @@ class SellerRemoteDatasource implements ISellerRemoteDatasource {
     final sellers = SellerApiModel.fromJsonList(data);
     return sellers;
   }
+
+  @override
+  Future<SellerApiModel?> getSellerById(String sellerId) async {
+    final response = await _apiClient.get(ApiEndpoints.sellerById(sellerId));
+
+    final success = response.data["success"] as bool;
+    final data = response.data["user"] as Map<String, dynamic>?;
+
+    if (!success || data == null) {
+      return null;
+    }
+
+    final seller = SellerApiModel.fromJson(data);
+    return seller;
+  }
 }

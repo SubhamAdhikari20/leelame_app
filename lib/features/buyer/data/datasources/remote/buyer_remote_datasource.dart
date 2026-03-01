@@ -29,7 +29,7 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
   Future<BuyerApiModel?> getCurrentBuyer(String buyerId) async {
     final token = _tokenService.getToken();
     final response = await _apiClient.get(
-      ApiEndpoints.buyerById(buyerId),
+      ApiEndpoints.currentBuyer(buyerId),
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
 
@@ -48,6 +48,7 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
   Future<BuyerApiModel?> updateBuyer(BuyerApiModel buyerApiModel) async {
     final token = _tokenService.getToken();
     final body = buyerApiModel.toJson(userApiModel: buyerApiModel.baseUser);
+
     final response = await _apiClient.put(
       ApiEndpoints.buyerUpdateById(buyerApiModel.id!),
       data: body,
@@ -72,7 +73,7 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
   ) async {
     final fileName = profilePicture.path.split("/").last;
     final formData = FormData.fromMap({
-      "profilePicture": await MultipartFile.fromFile(
+      "profile-picture-buyer": await MultipartFile.fromFile(
         profilePicture.path,
         filename: fileName,
       ),
@@ -80,30 +81,33 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
     });
 
     final token = _tokenService.getToken();
-    final response = await _apiClient.uploadFile(
+    final response = await _apiClient.put(
       ApiEndpoints.buyerUploadProfilePicture(buyerId),
-      formData: formData,
+      data: formData,
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
+    // final response = await _apiClient.uploadFile(
+    //   ApiEndpoints.buyerUploadProfilePicture(buyerId),
+    //   formData: formData,
+    //   options: Options(headers: {"Authorization": "Bearer $token"}),
+    // );
 
     final success = response.data["success"] as bool;
     final data = response.data["data"] as Map<String, dynamic>?;
-    final image = data?["imageUrl"] as String?;
 
-    if (!success || data == null || image == null) {
+    if (!success || data == null) {
       return null;
     }
 
-    final imageUrl = "${ApiEndpoints.mediaServerUrl}$image";
+    final imageUrl = data["imageUrl"] as String;
     return imageUrl;
-    // return image;
   }
 
   @override
   Future<List<BuyerApiModel>> getAllBuyers() async {
     final response = await _apiClient.get(ApiEndpoints.getAllBuyers);
     final success = response.data["success"] as bool;
-    final data = response.data["users"] as List<Map<String, dynamic>>?;
+    final data = response.data["users"] as List<dynamic>?;
 
     if (!success || data == null) {
       return [];
@@ -111,5 +115,20 @@ class BuyerRemoteDatasource implements IBuyerRemoteDatasource {
 
     final buyers = BuyerApiModel.fromJsonList(data);
     return buyers;
+  }
+
+  @override
+  Future<BuyerApiModel?> getBuyerById(String buyerId) async {
+    final response = await _apiClient.get(ApiEndpoints.buyerById(buyerId));
+
+    final success = response.data["success"] as bool;
+    final data = response.data["user"] as Map<String, dynamic>?;
+
+    if (!success || data == null) {
+      return null;
+    }
+
+    final buyer = BuyerApiModel.fromJson(data);
+    return buyer;
   }
 }

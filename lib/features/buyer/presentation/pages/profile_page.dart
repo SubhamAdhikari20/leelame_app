@@ -8,7 +8,6 @@ import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/buyer/buyer_login_page.dart';
 import 'package:leelame/features/auth/presentation/states/buyer_auth_state.dart';
 import 'package:leelame/features/auth/presentation/view_models/buyer_auth_view_model.dart';
-import 'package:leelame/features/buyer/presentation/models/buyer_ui_model.dart';
 import 'package:leelame/features/buyer/presentation/pages/edit_profile_page.dart';
 import 'package:leelame/features/buyer/presentation/states/buyer_state.dart';
 import 'package:leelame/features/buyer/presentation/view_models/buyer_view_model.dart';
@@ -24,6 +23,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {}
     Future.microtask(() => _loadCurrentUser());
   }
 
@@ -108,14 +108,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                 ),
                               ],
                             ),
-                            child: const CircleAvatar(
+                            child: CircleAvatar(
                               radius: 60,
                               backgroundColor: Colors.white,
-                              child: Icon(
-                                Icons.person_rounded,
-                                size: 60,
-                                color: Colors.black54,
-                              ),
+                              backgroundImage:
+                                  buyerState.buyer?.profilePictureUrl != null
+                                  ? NetworkImage(
+                                      buyerState.buyer!.profilePictureUrl!,
+                                    )
+                                  : null,
+                              child: buyerState.buyer?.profilePictureUrl == null
+                                  ? Icon(
+                                      Icons.person_rounded,
+                                      size: 60,
+                                      color: Colors.black54,
+                                    )
+                                  : null,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -189,21 +197,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             onTap: () {
                               AppRoutes.push(
                                 context,
-                                EditProfilePage(
-                                  buyerUiModel: userData != null
-                                      ? BuyerUiModel.fromEntity(userData)
-                                      : null,
-                                ),
+                                EditProfilePage(buyerId: userData!.buyerId!),
+                                // EditProfilePage(
+                                //   buyerUiModel: userData != null
+                                //       ? BuyerUiModel.fromEntity(userData)
+                                //       : null,
+                                // ),
                               );
                             },
                           ),
                           const SizedBox(height: 12),
-                          _MenuItem(
-                            icon: Icons.history_rounded,
-                            title: 'My Items',
-                            onTap: () {},
-                          ),
-                          const SizedBox(height: 12),
+
                           _MenuItem(
                             icon: Icons.notifications_outlined,
                             title: 'Notifications',
@@ -227,25 +231,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             ),
                             onTap: () {},
                           ),
-                          const SizedBox(height: 12),
-                          _MenuItem(
-                            icon: Icons.security_rounded,
-                            title: 'Privacy & Security',
-                            onTap: () {},
-                          ),
-                          const SizedBox(height: 12),
-                          _MenuItem(
-                            icon: Icons.help_outline_rounded,
-                            title: 'Help & Support',
-                            onTap: () {},
-                          ),
-                          const SizedBox(height: 12),
-                          _MenuItem(
-                            icon: Icons.info_outline_rounded,
-                            title: 'About',
-                            onTap: () {},
-                          ),
                           const SizedBox(height: 24),
+
                           _MenuItem(
                             icon: Icons.logout_rounded,
                             title: 'Logout',
@@ -284,9 +271,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               AppRoutes.pop(context);
-              _handleLogout();
+              await _handleLogout();
             },
             child: Text(
               'Logout',

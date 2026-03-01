@@ -1,5 +1,4 @@
 // lib/features/buyer/data/models/buyer_api_model.dart
-import 'package:leelame/core/api/api_endpoints.dart';
 import 'package:leelame/features/auth/data/models/user_api_model.dart';
 import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
 
@@ -104,7 +103,7 @@ class BuyerApiModel {
       fullName: fullName,
       username: username,
       phoneNumber: phoneNumber,
-      profilePictureUrl: "${ApiEndpoints.mediaServerUrl}$profilePictureUrl",
+      profilePictureUrl: profilePictureUrl,
       bio: bio,
       termsAccepted: termsAccepted,
       baseUserId: baseUserId,
@@ -140,5 +139,31 @@ class BuyerApiModel {
     return buyerEntities
         .map((buyerEntity) => BuyerApiModel.fromEntity(buyerEntity))
         .toList();
+  }
+
+  BuyerApiModel copyWith({
+    String? id,
+    String? fullName,
+    String? username,
+    String? phoneNumber,
+    String? password,
+    String? profilePictureUrl,
+    String? bio,
+    bool? termsAccepted,
+    String? baseUserId,
+    UserApiModel? baseUser,
+  }) {
+    return BuyerApiModel(
+      id: id ?? this.id,
+      fullName: fullName ?? this.fullName,
+      username: username ?? this.username,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      password: password ?? this.password,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
+      bio: bio ?? this.bio,
+      termsAccepted: termsAccepted ?? this.termsAccepted,
+      baseUserId: baseUserId ?? this.baseUserId,
+      baseUser: baseUser ?? this.baseUser,
+    );
   }
 }

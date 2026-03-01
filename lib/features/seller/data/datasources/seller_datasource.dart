@@ -6,6 +6,7 @@ import 'package:leelame/features/seller/data/models/seller_hive_model.dart';
 
 abstract interface class ISellerLocalDatasource {
   Future<SellerHiveModel?> updateSeller(SellerHiveModel sellerHiveModel);
+  Future<SellerHiveModel?> getCurrentSeller(String sellerId);
   Future<SellerHiveModel?> getSellerById(String sellerId);
   Future<UserHiveModel?> getBaseUserById(String userId);
   Future<List<SellerHiveModel>> getAllSellers();
@@ -13,6 +14,7 @@ abstract interface class ISellerLocalDatasource {
 
 abstract interface class ISellerRemoteDatasource {
   Future<SellerApiModel?> getCurrentSeller(String sellerId);
+  Future<SellerApiModel?> getSellerById(String sellerId);
   Future<SellerApiModel?> updateSeller(SellerApiModel sellerApiModel);
   Future<String?> uploadSellerProfilePicture(
     String sellerId,

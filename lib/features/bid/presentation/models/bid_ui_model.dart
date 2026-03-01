@@ -1,11 +1,9 @@
-// lib/features/bid/data/models/bid_api_model.dart
+// lib/features/bid/presentation/models/bid_ui_model.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:leelame/features/bid/domain/entities/bid_entity.dart';
 
-part "bid_api_model.g.dart";
-
 @JsonSerializable()
-class BidApiModel {
+class BidUiModel {
   @JsonKey(name: "_id")
   final String? id;
   final String? productId;
@@ -14,7 +12,7 @@ class BidApiModel {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  BidApiModel({
+  BidUiModel({
     this.id,
     this.productId,
     this.buyerId,
@@ -22,28 +20,6 @@ class BidApiModel {
     this.createdAt,
     this.updatedAt,
   });
-
-  // to Json
-  Map<String, dynamic> toJson() {
-    return _$BidApiModelToJson(this);
-  }
-
-  // From JSON
-  factory BidApiModel.fromJson(Map<String, dynamic> json) {
-    return _$BidApiModelFromJson(json);
-  }
-
-  // to JSON List
-  static List<Map<String, dynamic>> toJsonList(List<BidApiModel> bidModels) {
-    return bidModels.map((bidModel) => bidModel.toJson()).toList();
-  }
-
-  // from JSON List
-  static List<BidApiModel> fromJsonList(List<dynamic> jsonList) {
-    return jsonList
-        .map((json) => BidApiModel.fromJson(json as Map<String, dynamic>))
-        .toList();
-  }
 
   // to Entity
   BidEntity toEntity() {
@@ -58,8 +34,8 @@ class BidApiModel {
   }
 
   // from Entity
-  factory BidApiModel.fromEntity(BidEntity bidEntity) {
-    return BidApiModel(
+  factory BidUiModel.fromEntity(BidEntity bidEntity) {
+    return BidUiModel(
       id: bidEntity.bidId,
       productId: bidEntity.productId,
       buyerId: bidEntity.buyerId,
@@ -70,18 +46,18 @@ class BidApiModel {
   }
 
   // to Entity List
-  static List<BidEntity> toEntityList(List<BidApiModel> bidModels) {
+  static List<BidEntity> toEntityList(List<BidUiModel> bidModels) {
     return bidModels.map((bidModel) => bidModel.toEntity()).toList();
   }
 
   // from Entity List
-  static List<BidApiModel> fromEntityList(List<BidEntity> bidEntities) {
+  static List<BidUiModel> fromEntityList(List<BidEntity> bidEntities) {
     return bidEntities
-        .map((bidEntity) => BidApiModel.fromEntity(bidEntity))
+        .map((bidEntity) => BidUiModel.fromEntity(bidEntity))
         .toList();
   }
 
-  BidApiModel copyWith({
+  BidUiModel copyWith({
     String? id,
     String? productId,
     String? buyerId,
@@ -89,7 +65,7 @@ class BidApiModel {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return BidApiModel(
+    return BidUiModel(
       id: id ?? this.id,
       productId: productId ?? this.productId,
       buyerId: buyerId ?? this.buyerId,

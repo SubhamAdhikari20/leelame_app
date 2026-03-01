@@ -9,4 +9,11 @@ abstract interface class IBidRepository {
   Future<Either<Failures, BidEntity>> getBidById(String bidId);
   Future<Either<Failures, bool>> deleteBid(String bidId);
   Future<Either<Failures, List<BidEntity>>> getAllBids();
+  Future<Either<Failures, List<BidEntity>>> getAllBidsByProductId(
+    String productId,
+  );
+  Future<Either<Failures, List<BidEntity>>> getAllBidsByBuyerId(String buyerId);
+  Future<Either<Failures, List<BidEntity>>> getAllBidsBySellerId(
+    String sellerId,
+  );
 }

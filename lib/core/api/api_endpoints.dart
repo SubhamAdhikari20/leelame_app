@@ -11,8 +11,9 @@ class ApiEndpoints {
   // For iOS Simulator use: "http://localhost:5000/api"
   // For Physical Device use your computer's IP: "http://192.168.x.x:5000/api"
 
-  static const bool isPhysicalDevice = false;
-  static const String _ipAddress = "192.168.1.1";
+  static const bool isPhysicalDevice = true;
+  static const String _ipAddress = "192.168.1.205";
+  // static const String _ipAddress = "192.168.1.67";
   static const int _port = 5050;
 
   // Base URLs
@@ -111,4 +112,19 @@ class ApiEndpoints {
   static const String getAllProducts = "/product/get-all-verified-products";
   static String getAllProductsByBuyerId(String buyerId) =>
       "/product/get-all-verified-products/$buyerId";
+  static String getAllProductsBySellerId(String sellerId) =>
+      "/product/get-all-verified-products/$sellerId";
+
+  // ======================= Bid Endpoints =======================
+  static const String createBid = "/bid/create-bid";
+  static String updateBid(String id) => "/bid/update-bid-details/$id";
+  static String deleteBid(String id) => "/bid/delete-bid/$id";
+  static String bidById(String id) => "/bid/$id";
+  static const String getAllBids = "/bid/get-all-bids";
+  static String getAllBidsByProductId(String productId) =>
+      "/bid/get-all-bids/$productId";
+  static String getAllBidsByBuyerId(String buyerId) =>
+      "/bid/get-all-bids/$buyerId";
+  static String getAllBidsBySellerId(String sellerId) =>
+      "/bid/get-all-bids/$sellerId";
 }

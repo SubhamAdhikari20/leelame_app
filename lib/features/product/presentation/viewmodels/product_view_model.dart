@@ -1,6 +1,7 @@
 // lib/features/product/presentation/view_models/product_view_model.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/features/product/domain/usecases/get_all_products_by_buyer_id_usecase.dart';
+import 'package:leelame/features/product/domain/usecases/get_all_products_by_seller_id_usecase.dart';
 import 'package:leelame/features/product/domain/usecases/get_all_products_usecase.dart';
 import 'package:leelame/features/product/domain/usecases/get_product_by_id_usecase.dart';
 import 'package:leelame/features/product/presentation/states/product_state.dart';
@@ -13,6 +14,7 @@ final productViewModelProvider =
 class ProductViewModel extends Notifier<ProductState> {
   late final GetAllProductsUsecase _getAllProductsUsecase;
   late final GetAllProductsByBuyerIdUsecase _getAllProductsByBuyerIdUsecase;
+  late final GetAllProductsBySellerIdUsecase _getAllProductsBySellerIdUsecase;
   late final GetProductByIdUsecase _getProductByIdUsecase;
 
   @override
@@ -20,6 +22,9 @@ class ProductViewModel extends Notifier<ProductState> {
     _getAllProductsUsecase = ref.read(getAllProductsUsecaseProvider);
     _getAllProductsByBuyerIdUsecase = ref.read(
       getAllProductsByBuyerIdUsecaseProvider,
+    );
+    _getAllProductsBySellerIdUsecase = ref.read(
+      getAllProductsBySellerIdUsecaseProvider,
     );
     _getProductByIdUsecase = ref.read(getProductByIdUsecaseProvider);
     return const ProductState();
@@ -45,6 +50,24 @@ class ProductViewModel extends Notifier<ProductState> {
     state = state.copyWith(productStatus: ProductStatus.loading);
     final result = await _getAllProductsByBuyerIdUsecase(
       GetAllProductsByBuyerIdUsecaseParams(buyerId: buyerId),
+    );
+
+    result.fold(
+      (failure) => state = state.copyWith(
+        productStatus: ProductStatus.error,
+        errorMessage: failure.message,
+      ),
+      (products) => state = state.copyWith(
+        productStatus: ProductStatus.loaded,
+        products: products,
+      ),
+    );
+  }
+
+  Future<void> getAllProductsBySellerId(String sellerId) async {
+    state = state.copyWith(productStatus: ProductStatus.loading);
+    final result = await _getAllProductsBySellerIdUsecase(
+      GetAllProductsBySellerIdUsecaseParams(sellerId: sellerId),
     );
 
     result.fold(

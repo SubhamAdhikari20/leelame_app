@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/core/error/failures.dart';
 import 'package:leelame/core/services/connectivity/network_info.dart';
+import 'package:leelame/core/utils/http_url_util.dart';
 import 'package:leelame/features/buyer/data/datasources/buyer_datasource.dart';
 import 'package:leelame/features/buyer/data/datasources/local/buyer_local_datasource.dart';
 import 'package:leelame/features/buyer/data/datasources/remote/buyer_remote_datasource.dart';
@@ -42,12 +43,19 @@ class BuyerRepository implements IBuyerRepository {
   Future<Either<Failures, BuyerEntity>> getCurrentBuyer(String buyerId) async {
     if (await _networkInfo.isConnected) {
       try {
-        final buyer = await _buyerRemoteDatasource.getCurrentBuyer(buyerId);
-        if (buyer == null) {
+        final result = await _buyerRemoteDatasource.getCurrentBuyer(buyerId);
+        if (result == null) {
           return const Left(
             ApiFailure(message: "Failed to get current buyer!"),
           );
         }
+
+        final normalizedProfilePictureUrl = HttpUrlUtil.normalizeHttpUrl(
+          result.profilePictureUrl,
+        );
+        final buyer = result.copyWith(
+          profilePictureUrl: normalizedProfilePictureUrl,
+        );
 
         return Right(buyer.toEntity());
       } on DioException catch (e) {
@@ -63,7 +71,7 @@ class BuyerRepository implements IBuyerRepository {
       }
     } else {
       try {
-        final buyer = await _buyerLocalDatasource.getBuyerById(buyerId);
+        final buyer = await _buyerLocalDatasource.getCurrentBuyer(buyerId);
         if (buyer == null) {
           return const Left(
             LocalDatabaseFailure(message: "Failed to get current buyer!"),
@@ -101,7 +109,14 @@ class BuyerRepository implements IBuyerRepository {
           );
         }
 
-        return Right(result.toEntity());
+        final normalizedProfilePictureUrl = HttpUrlUtil.normalizeHttpUrl(
+          result.profilePictureUrl,
+        );
+        final buyer = result.copyWith(
+          profilePictureUrl: normalizedProfilePictureUrl,
+        );
+
+        return Right(buyer.toEntity());
       } on DioException catch (e) {
         return Left(
           ApiFailure(
@@ -116,6 +131,7 @@ class BuyerRepository implements IBuyerRepository {
       try {
         final buyerModel = BuyerHiveModel.fromEntity(buyerEntity);
         final result = await _buyerLocalDatasource.updateBuyer(buyerModel);
+
         if (result == null) {
           return const Left(
             LocalDatabaseFailure(message: "Failed to update buyer"),
@@ -139,7 +155,11 @@ class BuyerRepository implements IBuyerRepository {
           buyerId,
           profilePicture,
         );
-        if (imageUrl == null) {
+
+        final normalizedProfilePictureUrl = HttpUrlUtil.normalizeHttpUrl(
+          imageUrl,
+        );
+        if (normalizedProfilePictureUrl == null) {
           return const Left(
             ApiFailure(
               message: "Null image url! The image url is not fetched.",
@@ -147,7 +167,7 @@ class BuyerRepository implements IBuyerRepository {
           );
         }
 
-        return Right(imageUrl);
+        return Right(normalizedProfilePictureUrl);
       } on DioException catch (e) {
         return Left(
           ApiFailure(
@@ -174,7 +194,14 @@ class BuyerRepository implements IBuyerRepository {
           return const Left(ApiFailure(message: "Failed to fetch buyers!"));
         }
 
-        final buyers = BuyerApiModel.toEntityList(result);
+        final normalizedBuyers = result.map((buyer) {
+          final normalizedProfilePictureUrl = HttpUrlUtil.normalizeHttpUrl(
+            buyer.profilePictureUrl,
+          );
+          return buyer.copyWith(profilePictureUrl: normalizedProfilePictureUrl);
+        }).toList();
+
+        final buyers = BuyerApiModel.toEntityList(normalizedBuyers);
 
         return Right(buyers);
       } on DioException catch (e) {
@@ -199,6 +226,62 @@ class BuyerRepository implements IBuyerRepository {
         final buyers = BuyerHiveModel.toEntityList(result);
 
         return Right(buyers);
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
+    }
+  }
+
+  @override
+  Future<Either<Failures, BuyerEntity>> getBuyerById(String buyerId) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final result = await _buyerRemoteDatasource.getBuyerById(buyerId);
+        if (result == null) {
+          return const Left(
+            ApiFailure(message: "Failed to get buyer with this is!"),
+          );
+        }
+
+        final normalizedProfilePictureUrl = HttpUrlUtil.normalizeHttpUrl(
+          result.profilePictureUrl,
+        );
+        final buyer = result.copyWith(
+          profilePictureUrl: normalizedProfilePictureUrl,
+        );
+
+        return Right(buyer.toEntity());
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data["message"] ??
+                "Failed to get buyer with this is!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      try {
+        final buyer = await _buyerLocalDatasource.getBuyerById(buyerId);
+        if (buyer == null) {
+          return const Left(
+            LocalDatabaseFailure(message: "Failed to get buyer with this id!"),
+          );
+        }
+
+        final user = await _buyerLocalDatasource.getBaseUserById(
+          buyer.baseUserId!,
+        );
+        if (user == null) {
+          return const Left(
+            LocalDatabaseFailure(message: "Failed to get buyer with this id!"),
+          );
+        }
+
+        return Right(buyer.toEntity(userEntity: user.toEntity()));
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }

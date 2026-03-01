@@ -20,11 +20,19 @@ class BidHiveModel extends HiveObject {
   @HiveField(3)
   final double bidAmount;
 
+  @HiveField(4)
+  final DateTime? createdAt;
+
+  @HiveField(5)
+  final DateTime? updatedAt;
+
   BidHiveModel({
     String? bidId,
     required this.productId,
     required this.buyerId,
     required this.bidAmount,
+    this.createdAt,
+    this.updatedAt,
   }) : bidId = bidId ?? Uuid().v4();
 
   // Convert Model to Bid Entity
@@ -34,6 +42,8 @@ class BidHiveModel extends HiveObject {
       productId: productId,
       buyerId: buyerId,
       bidAmount: bidAmount,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
@@ -44,6 +54,8 @@ class BidHiveModel extends HiveObject {
       productId: bidEntity.productId,
       buyerId: bidEntity.buyerId,
       bidAmount: bidEntity.bidAmount,
+      createdAt: bidEntity.createdAt,
+      updatedAt: bidEntity.updatedAt,
     );
   }
 
@@ -57,12 +69,16 @@ class BidHiveModel extends HiveObject {
     String? productId,
     String? buyerId,
     double? bidAmount,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return BidHiveModel(
       bidId: bidId ?? this.bidId,
       productId: productId ?? this.productId,
       buyerId: buyerId ?? this.buyerId,
       bidAmount: bidAmount ?? this.bidAmount,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }

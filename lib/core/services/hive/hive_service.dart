@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:leelame/core/constants/hive_table_constant.dart';
+import 'package:leelame/features/bid/data/models/bid_hive_model.dart';
 import 'package:leelame/features/buyer/data/models/buyer_hive_model.dart';
 import 'package:leelame/features/auth/data/models/user_hive_model.dart';
 import 'package:leelame/features/category/data/models/category_hive_model.dart';
@@ -45,6 +46,9 @@ class HiveService {
     if (!Hive.isAdapterRegistered(HiveTableConstant.productsTypeId)) {
       Hive.registerAdapter(ProductHiveModelAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.bidsTypeId)) {
+      Hive.registerAdapter(BidHiveModelAdapter());
+    }
     // if (!Hive.isAdapterRegistered(HiveTableConstant.pendingEmailsTypeId)) {
     //   Hive.registerAdapter(BuyerHiveModelAdapter());
     // }
@@ -61,6 +65,7 @@ class HiveService {
       HiveTableConstant.productConditionsTable,
     );
     await Hive.openBox<ProductHiveModel>(HiveTableConstant.productsTable);
+    await Hive.openBox<BidHiveModel>(HiveTableConstant.bidsTable);
   }
 
   // Close all boxes
@@ -449,6 +454,16 @@ class HiveService {
     return products.toList();
   }
 
+  // Get all products by seller ID
+  Future<List<ProductHiveModel>> getAllProductsBySellerId(
+    String sellerId,
+  ) async {
+    final products = _productBox.values.where(
+      (product) => (product.sellerId == sellerId),
+    );
+    return products.toList();
+  }
+
   // Delete a product
   Future<bool> deleteProduct(String productId) async {
     await _productBox.delete(productId);
@@ -458,6 +473,69 @@ class HiveService {
   // Delete all products
   Future<bool> deleteAllProducts() async {
     await _productBox.clear();
+    return true;
+  }
+
+  // ---------------------- Bid CRUD Operations -------------------------
+  // Get Bid box
+  Box<BidHiveModel> get _bidBox => Hive.box(HiveTableConstant.bidsTable);
+
+  // Create a new bid
+  Future<BidHiveModel?> createBid(BidHiveModel bid) async {
+    await _bidBox.put(bid.bidId, bid);
+    return bid;
+  }
+
+  // Update a existing bid
+  Future<BidHiveModel?> updateBid(BidHiveModel bid) async {
+    await _bidBox.put(bid.bidId, bid);
+    return bid;
+  }
+
+  // Get a existing bid by ID
+  Future<BidHiveModel?> getBidById(String bidId) async {
+    return _bidBox.get(bidId);
+  }
+
+  // Get all bids
+  Future<List<BidHiveModel>> getAllBids() async {
+    return _bidBox.values.toList();
+  }
+
+  // Get all bids by product ID
+  Future<List<BidHiveModel>> getAllBidsByProductId(String productId) async {
+    final bids = _bidBox.values.where((bid) => (bid.productId == productId));
+    return bids.toList();
+  }
+
+  // Get all bids by buyer ID
+  Future<List<BidHiveModel>> getAllBidsByBuyerId(String buyerId) async {
+    final bids = _bidBox.values.where((bid) => (bid.buyerId == buyerId));
+    return bids.toList();
+  }
+
+  // Get all bids by seller ID
+  Future<List<BidHiveModel>> getAllBidsBySellerId(String sellerId) async {
+    final products = _productBox.values.where(
+      (product) =>
+          ((product.sellerId == sellerId) && (product.isVerified == true)),
+    );
+
+    final bids = _bidBox.values.where(
+      (bid) => products.any((product) => product.productId == bid.productId),
+    );
+    return bids.toList();
+  }
+
+  // Delete a bid
+  Future<bool> deleteBid(String bidId) async {
+    await _bidBox.delete(bidId);
+    return true;
+  }
+
+  // Delete all bids
+  Future<bool> deleteAllBids() async {
+    await _bidBox.clear();
     return true;
   }
 }

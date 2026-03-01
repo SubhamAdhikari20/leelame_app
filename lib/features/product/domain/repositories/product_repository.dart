@@ -21,4 +21,7 @@ abstract interface class IProductRepository {
   Future<Either<Failures, List<ProductEntity>>> getAllProductsByBuyerId(
     String buyerId,
   );
+  Future<Either<Failures, List<ProductEntity>>> getAllProductsBySellerId(
+    String sellerId,
+  );
 }

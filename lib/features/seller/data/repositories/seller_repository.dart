@@ -66,7 +66,7 @@ class SellerRepository implements ISellerRepository {
       }
     } else {
       try {
-        final seller = await _sellerLocalDatasource.getSellerById(sellerId);
+        final seller = await _sellerLocalDatasource.getCurrentSeller(sellerId);
         if (seller == null) {
           return const Left(
             LocalDatabaseFailure(message: "Failed to get current seller!"),
@@ -211,6 +211,51 @@ class SellerRepository implements ISellerRepository {
         final sellers = SellerHiveModel.toEntityList(result);
 
         return Right(sellers);
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
+    }
+  }
+
+  @override
+  Future<Either<Failures, SellerEntity>> getSellerById(String sellerId) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final result = await _sellerRemoteDatasource.getSellerById(sellerId);
+        if (result == null) {
+          return const Left(
+            ApiFailure(message: "Failed to fetch seller by id!"),
+          );
+        }
+
+        final normalizedProfilePictureUrl = HttpUrlUtil.normalizeHttpUrl(
+          result.profilePictureUrl,
+        );
+        final seller = result.copyWith(
+          profilePictureUrl: normalizedProfilePictureUrl,
+        );
+
+        return Right(seller.toEntity());
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data["message"] ?? "Failed to fetch seller!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      try {
+        final result = await _sellerLocalDatasource.getSellerById(sellerId);
+        if (result == null) {
+          return const Left(
+            LocalDatabaseFailure(message: "Failed to fetch seller by id!"),
+          );
+        }
+
+        return Right(result.toEntity());
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }

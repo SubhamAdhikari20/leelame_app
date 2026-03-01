@@ -2,7 +2,6 @@
 import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/core/error/failures.dart';
 import 'package:leelame/core/services/connectivity/network_info.dart';
@@ -55,11 +54,20 @@ class ProductRepository implements IProductRepository {
           productImages,
           imageSubFolder,
         );
+
         if (result == null) {
           return const Left(ApiFailure(message: "Failed to create product!"));
         }
 
-        return Right(result.toEntity());
+        final normalizedImageUrls = HttpUrlUtil.normalizeHttpUrls(
+          result.productImageUrls,
+        );
+
+        final newProduct = result.copyWith(
+          productImageUrls: normalizedImageUrls,
+        );
+
+        return Right(newProduct.toEntity());
       } on DioException catch (e) {
         return Left(
           ApiFailure(
@@ -103,11 +111,20 @@ class ProductRepository implements IProductRepository {
           productImages,
           imageSubFolder,
         );
+
         if (result == null) {
           return const Left(ApiFailure(message: "Failed to update product!"));
         }
 
-        return Right(result.toEntity());
+        final normalizedImageUrls = HttpUrlUtil.normalizeHttpUrls(
+          result.productImageUrls,
+        );
+
+        final updatedProduct = result.copyWith(
+          productImageUrls: normalizedImageUrls,
+        );
+
+        return Right(updatedProduct.toEntity());
       } on DioException catch (e) {
         return Left(
           ApiFailure(
@@ -195,7 +212,13 @@ class ProductRepository implements IProductRepository {
           );
         }
 
-        return Right(result.toEntity());
+        final normalizedImageUrls = HttpUrlUtil.normalizeHttpUrls(
+          result.productImageUrls,
+        );
+
+        final product = result.copyWith(productImageUrls: normalizedImageUrls);
+
+        return Right(product.toEntity());
       } on DioException catch (e) {
         return Left(
           ApiFailure(
@@ -243,8 +266,6 @@ class ProductRepository implements IProductRepository {
 
         final products = ProductApiModel.toEntityList(normalizedProducts);
 
-        debugPrint("products from repository: $products");
-
         return Right(products);
       } on DioException catch (e) {
         return Left(
@@ -284,6 +305,7 @@ class ProductRepository implements IProductRepository {
         final result = await _productRemoteDatasource.getAllProductsByBuyerId(
           buyerId,
         );
+
         if (result.isEmpty) {
           return const Left(
             ApiFailure(
@@ -292,7 +314,14 @@ class ProductRepository implements IProductRepository {
           );
         }
 
-        final products = ProductApiModel.toEntityList(result);
+        final normalizedProducts = result.map((product) {
+          final normalizedImageUrls = HttpUrlUtil.normalizeHttpUrls(
+            product.productImageUrls,
+          );
+          return product.copyWith(productImageUrls: normalizedImageUrls);
+        }).toList();
+
+        final products = ProductApiModel.toEntityList(normalizedProducts);
 
         return Right(products);
       } on DioException catch (e) {
@@ -316,6 +345,70 @@ class ProductRepository implements IProductRepository {
           return const Left(
             LocalDatabaseFailure(
               message: "Failed to fetch all products for buyer with buyer id!",
+            ),
+          );
+        }
+
+        final products = ProductHiveModel.toEntityList(result);
+
+        return Right(products);
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
+    }
+  }
+
+  @override
+  Future<Either<Failures, List<ProductEntity>>> getAllProductsBySellerId(
+    String sellerId,
+  ) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final result = await _productRemoteDatasource.getAllProductsBySellerId(
+          sellerId,
+        );
+
+        if (result.isEmpty) {
+          return const Left(
+            ApiFailure(
+              message:
+                  "Failed to fetch all products for seller with seller id!",
+            ),
+          );
+        }
+
+        final normalizedProducts = result.map((product) {
+          final normalizedImageUrls = HttpUrlUtil.normalizeHttpUrls(
+            product.productImageUrls,
+          );
+          return product.copyWith(productImageUrls: normalizedImageUrls);
+        }).toList();
+
+        final products = ProductApiModel.toEntityList(normalizedProducts);
+
+        return Right(products);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data["message"] ??
+                "Failed to fetch all products for seller with seller id!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      try {
+        final result = await _productLocalDatasource.getAllProductsBySellerId(
+          sellerId,
+        );
+        if (result.isEmpty) {
+          return const Left(
+            LocalDatabaseFailure(
+              message:
+                  "Failed to fetch all products for seller with seller id!",
             ),
           );
         }

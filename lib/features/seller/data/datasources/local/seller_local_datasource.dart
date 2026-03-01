@@ -39,4 +39,10 @@ class SellerLocalDatasource implements ISellerLocalDatasource {
     final result = await _hiveService.getAllSellers();
     return Future.value(result);
   }
+
+  @override
+  Future<SellerHiveModel?> getCurrentSeller(String sellerId) async {
+    final result = await _hiveService.getSellerById(sellerId);
+    return Future.value(result);
+  }
 }

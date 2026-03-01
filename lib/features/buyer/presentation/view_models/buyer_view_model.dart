@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/features/buyer/domain/usecases/buyer_get_current_user_usecase.dart';
 import 'package:leelame/features/buyer/domain/usecases/get_all_buyers_usecase.dart';
+import 'package:leelame/features/buyer/domain/usecases/get_buyer_by_id_usecase.dart';
 import 'package:leelame/features/buyer/domain/usecases/update_buyer_profile_details_usecase.dart';
 import 'package:leelame/features/buyer/domain/usecases/upload_buyer_profile_picture_usecase.dart';
 import 'package:leelame/features/buyer/presentation/states/buyer_state.dart';
@@ -13,6 +14,7 @@ final buyerViewModelProvider = NotifierProvider<BuyerViewModel, BuyerState>(() {
 
 class BuyerViewModel extends Notifier<BuyerState> {
   late final BuyerGetCurrentUserUsecase _buyerGetCurrentUserUsecase;
+  late final GetBuyerByIdUsecase _getBuyerByIdUsecase;
   late final UpdateBuyerProfileDetailsUsecase _updateBuyerProfileDetailsUsecase;
   late final UploadBuyerProfilePictureUsecase _uploadBuyerProfilePictureUsecase;
   late final GetAllBuyersUsecase _getAllBuyersUsecase;
@@ -20,6 +22,7 @@ class BuyerViewModel extends Notifier<BuyerState> {
   @override
   BuyerState build() {
     _buyerGetCurrentUserUsecase = ref.read(buyerGetCurrentUserUsecaseProvider);
+    _getBuyerByIdUsecase = ref.read(getBuyerByIdUsecaseProvider);
     _updateBuyerProfileDetailsUsecase = ref.read(
       updateBuyerProfileDetailsUsecaseProvider,
     );
@@ -35,6 +38,26 @@ class BuyerViewModel extends Notifier<BuyerState> {
 
     final result = await _buyerGetCurrentUserUsecase(
       BuyerGetCurrentUserUsecaseParams(buyerId: buyerId),
+    );
+
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          buyerStatus: BuyerStatus.error,
+          errorMessage: failure.message,
+        );
+      },
+      (buyer) {
+        state = state.copyWith(buyerStatus: BuyerStatus.loaded, buyer: buyer);
+      },
+    );
+  }
+
+  Future<void> getBuyerById(String buyerId) async {
+    state = state.copyWith(buyerStatus: BuyerStatus.loading);
+
+    final result = await _getBuyerByIdUsecase(
+      GetBuyerByIdUsecaseParams(buyerId: buyerId),
     );
 
     result.fold(

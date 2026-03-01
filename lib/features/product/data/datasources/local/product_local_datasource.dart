@@ -50,4 +50,12 @@ class ProductLocalDatasource implements IProductLocalDatasource {
     final result = await _hiveService.getAllProductsByBuyerId(buyerId);
     return Future.value(result);
   }
+
+  @override
+  Future<List<ProductHiveModel>> getAllProductsBySellerId(
+    String sellerId,
+  ) async {
+    final result = await _hiveService.getAllProductsBySellerId(sellerId);
+    return Future.value(result);
+  }
 }

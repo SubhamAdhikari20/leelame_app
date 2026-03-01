@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/features/seller/domain/usecases/get_current_seller_usecase.dart';
 import 'package:leelame/features/seller/domain/usecases/get_all_sellers_usecase.dart';
+import 'package:leelame/features/seller/domain/usecases/get_seller_by_id_usecase.dart';
 import 'package:leelame/features/seller/domain/usecases/update_seller_profile_details_usecase.dart';
 import 'package:leelame/features/seller/domain/usecases/upload_seller_profile_picture_usecase.dart';
 import 'package:leelame/features/seller/presentation/states/seller_state.dart';
@@ -15,6 +16,7 @@ final sellerViewModelProvider = NotifierProvider<SellerViewModel, SellerState>(
 
 class SellerViewModel extends Notifier<SellerState> {
   late final GetCurrentSellerUsecase _getCurrentSellerUsecase;
+  late final GetSellerByIdUsecase _getSellerByIdUsecase;
   late final UpdateSellerProfileDetailsUsecase
   _updateSellerProfileDetailsUsecase;
   late final UploadSellerProfilePictureUsecase
@@ -24,6 +26,7 @@ class SellerViewModel extends Notifier<SellerState> {
   @override
   SellerState build() {
     _getCurrentSellerUsecase = ref.read(getCurrentSellerUsecaseProvider);
+    _getSellerByIdUsecase = ref.read(getSellerByIdUsecaseProvider);
     _updateSellerProfileDetailsUsecase = ref.read(
       updateSellerProfileDetailsUsecaseProvider,
     );
@@ -39,6 +42,29 @@ class SellerViewModel extends Notifier<SellerState> {
 
     final result = await _getCurrentSellerUsecase(
       GetCurrentSellerUsecaseParams(sellerId: sellerId),
+    );
+
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          sellerStatus: SellerStatus.error,
+          errorMessage: failure.message,
+        );
+      },
+      (seller) {
+        state = state.copyWith(
+          sellerStatus: SellerStatus.loaded,
+          seller: seller,
+        );
+      },
+    );
+  }
+
+  Future<void> getSellerIdById(String sellerId) async {
+    state = state.copyWith(sellerStatus: SellerStatus.loading);
+
+    final result = await _getSellerByIdUsecase(
+      GetSellerByIdUsecaseParams(sellerId: sellerId),
     );
 
     result.fold(

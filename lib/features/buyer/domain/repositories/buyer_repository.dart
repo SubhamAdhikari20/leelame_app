@@ -6,6 +6,7 @@ import 'package:leelame/features/buyer/domain/entities/buyer_entity.dart';
 
 abstract interface class IBuyerRepository {
   Future<Either<Failures, BuyerEntity>> getCurrentBuyer(String buyerId);
+  Future<Either<Failures, BuyerEntity>> getBuyerById(String buyerId);
   Future<Either<Failures, BuyerEntity>> updateBuyer(BuyerEntity buyerEntity);
   Future<Either<Failures, String>> uploadBuyerProfilePicture(
     String buyerId,

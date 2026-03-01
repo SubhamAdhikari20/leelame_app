@@ -86,10 +86,10 @@ class ProductConditionRemoteDatasource
   Future<ProductConditionApiModel?> getProductConditionById(
     String productConditionId,
   ) async {
-    final token = _tokenService.getToken();
-    final response = await _apiClient.post(
+    // final token = _tokenService.getToken();
+    final response = await _apiClient.get(
       ApiEndpoints.productConditionById(productConditionId),
-      options: Options(headers: {"Authorization": "Bearer $token"}),
+      // options: Options(headers: {"Authorization": "Bearer $token"}),
     );
     final success = response.data["success"] as bool;
     final data = response.data["data"] as Map<String, dynamic>?;
