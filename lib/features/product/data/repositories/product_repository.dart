@@ -40,11 +40,11 @@ class ProductRepository implements IProductRepository {
        _networkInfo = networkInfo;
 
   @override
-  Future<Either<Failures, ProductEntity>> createProduct(
-    ProductEntity productEntity,
+  Future<Either<Failures, ProductEntity>> createProduct({
+    required ProductEntity productEntity,
     List<File>? productImages,
     String? imageSubFolder,
-  ) async {
+  }) async {
     if (await _networkInfo.isConnected) {
       try {
         final productApiModel = ProductApiModel.fromEntity(productEntity);
@@ -97,11 +97,11 @@ class ProductRepository implements IProductRepository {
   }
 
   @override
-  Future<Either<Failures, ProductEntity>> updateProduct(
-    ProductEntity productEntity,
+  Future<Either<Failures, ProductEntity>> updateProduct({
+    required ProductEntity productEntity,
     List<File>? productImages,
     String? imageSubFolder,
-  ) async {
+  }) async {
     if (await _networkInfo.isConnected) {
       try {
         final productApiModel = ProductApiModel.fromEntity(productEntity);

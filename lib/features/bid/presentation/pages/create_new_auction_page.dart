@@ -1,4 +1,4 @@
-// lib/features/auction/presentation/pages/create_new_auction.dart
+// lib/features/bid/presentation/pages/create_new_auction.dart
 import 'package:flutter/material.dart';
 import 'package:gradient_elevated_button/gradient_elevated_button.dart';
 import 'package:leelame/app/routes/app_routes.dart';

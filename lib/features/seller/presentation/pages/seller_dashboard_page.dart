@@ -7,11 +7,15 @@ import 'package:leelame/core/custom_icons/home_filled_icon.dart';
 import 'package:leelame/core/custom_icons/home_outlined_icon.dart';
 import 'package:leelame/core/custom_icons/person_filled_icon.dart';
 import 'package:leelame/core/custom_icons/person_outlined_icon.dart';
-import 'package:leelame/features/bid/presentation/pages/create_new_auction_page.dart';
+import 'package:leelame/core/services/storage/user_session_service.dart';
+import 'package:leelame/core/utils/snackbar_util.dart';
+import 'package:leelame/features/product/presentation/pages/add_new_product_page.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_analytics_screen.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_home_screen.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_orders_screen.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_profile_screen.dart';
+import 'package:leelame/features/seller/presentation/states/seller_state.dart';
+import 'package:leelame/features/seller/presentation/view_models/seller_view_model.dart';
 
 class SellerDashboardPage extends ConsumerStatefulWidget {
   const SellerDashboardPage({super.key});
@@ -31,12 +35,41 @@ class _SellerDashboardPageState extends ConsumerState<SellerDashboardPage> {
     SellerProfileScreen(),
   ];
 
-  void _onCreateNewAuctionPressed() {
-    AppRoutes.push(context, const CreateNewAuctionPage());
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCurrentUser();
+    });
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final userSessionService = ref.read(userSessionServiceProvider);
+    final sellerId = userSessionService.getUserId();
+    if (sellerId != null) {
+      await ref
+          .read(sellerViewModelProvider.notifier)
+          .getCurrentUser(sellerId: sellerId);
+    }
+  }
+
+  void _onCreateNewAuctionPressed({required String sellerId}) {
+    AppRoutes.push(context, AddNewProductPage(sellerId: sellerId));
   }
 
   @override
   Widget build(BuildContext context) {
+    final sellerState = ref.watch(sellerViewModelProvider);
+
+    ref.listen<SellerState>(sellerViewModelProvider, (previous, next) {
+      if (next.sellerStatus == SellerStatus.error) {
+        SnackbarUtil.showError(
+          context,
+          next.errorMessage ?? "Error loading current user!",
+        );
+      }
+    });
+
     return Scaffold(
       body: lstBottomScreen[_selectedIndex],
       floatingActionButton: Container(
@@ -46,7 +79,9 @@ class _SellerDashboardPageState extends ConsumerState<SellerDashboardPage> {
           boxShadow: AppColors.buttonShadow,
         ),
         child: FloatingActionButton(
-          onPressed: _onCreateNewAuctionPressed,
+          onPressed: () {
+            _onCreateNewAuctionPressed(sellerId: sellerState.seller!.sellerId!);
+          },
           backgroundColor: Colors.transparent,
           elevation: 0,
           child: Icon(Icons.add_rounded, color: Colors.white, size: 32),

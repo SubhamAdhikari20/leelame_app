@@ -50,8 +50,39 @@ class ProductApiModel {
 
   // From JSON
   factory ProductApiModel.fromJson(Map<String, dynamic> json) {
-    return _$ProductApiModelFromJson(json);
+    return ProductApiModel(
+      id: json['_id'] as String?,
+      sellerId: json['sellerId'] as String?,
+      productName: json['productName'] as String,
+      description: json['description'] as String?,
+      categoryId: json['categoryId'] as String?,
+      conditionId: json['conditionId'] as String?,
+      commission: (json['commission'] as num? ?? 0.0).toDouble(),
+      startPrice: (json['startPrice'] as num? ?? 0.0).toDouble(),
+      currentBidPrice: (json['currentBidPrice'] as num? ?? 0.0).toDouble(),
+      bidIntervalPrice: (json['bidIntervalPrice'] as num? ?? 0.0).toDouble(),
+      endDate: json['endDate'] == null
+          ? DateTime.now()
+          : DateTime.parse(json['endDate'] as String),
+      productImageUrls:
+          (json['productImageUrls'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      isVerified: json['isVerified'] as bool? ?? false,
+      isSoldOut: json['isSoldOut'] as bool? ?? false,
+      soldToBuyerId: json['soldToBuyerId'] as String?,
+      removedExistingProductImageUrls:
+          (json['removedExistingProductImageUrls'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList(),
+    );
   }
+
+  // // From JSON
+  // factory ProductApiModel.fromJson(Map<String, dynamic> json) {
+  //   return _$ProductApiModelFromJson(json);
+  // }
 
   // to JSON List
   static List<Map<String, dynamic>> toJsonList(

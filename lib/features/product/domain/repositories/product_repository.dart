@@ -5,16 +5,16 @@ import 'package:leelame/core/error/failures.dart';
 import 'package:leelame/features/product/domain/entities/product_entity.dart';
 
 abstract interface class IProductRepository {
-  Future<Either<Failures, ProductEntity>> createProduct(
-    ProductEntity productEntity,
+  Future<Either<Failures, ProductEntity>> createProduct({
+    required ProductEntity productEntity,
     List<File>? productImages,
     String? imageSubFolder,
-  );
-  Future<Either<Failures, ProductEntity>> updateProduct(
-    ProductEntity productEntity,
+  });
+  Future<Either<Failures, ProductEntity>> updateProduct({
+    required ProductEntity productEntity,
     List<File>? productImages,
     String? imageSubFolder,
-  );
+  });
   Future<Either<Failures, ProductEntity>> getProductById(String productId);
   Future<Either<Failures, bool>> deleteProduct(String productId);
   Future<Either<Failures, List<ProductEntity>>> getAllProducts();
