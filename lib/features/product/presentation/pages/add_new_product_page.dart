@@ -1,4 +1,4 @@
-// lib/features/bid/presentation/pages/create_new_auction.dart
+// lib/features/product/presentation/pages/add_new_product_page.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

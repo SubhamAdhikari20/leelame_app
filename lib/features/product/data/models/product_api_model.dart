@@ -19,6 +19,7 @@ class ProductApiModel {
   final double bidIntervalPrice;
   final DateTime endDate;
   final List<String> productImageUrls;
+  final double? buyNowPrice;
   final bool isVerified;
   final bool isSoldOut;
   final String? soldToBuyerId;
@@ -37,6 +38,7 @@ class ProductApiModel {
     required this.bidIntervalPrice,
     required this.endDate,
     required this.productImageUrls,
+    this.buyNowPrice,
     required this.isVerified,
     required this.isSoldOut,
     this.soldToBuyerId,
@@ -69,6 +71,7 @@ class ProductApiModel {
               ?.map((e) => e as String)
               .toList() ??
           [],
+      buyNowPrice: (json['buyNowPrice'] as num? ?? 0.0).toDouble(),
       isVerified: json['isVerified'] as bool? ?? false,
       isSoldOut: json['isSoldOut'] as bool? ?? false,
       soldToBuyerId: json['soldToBuyerId'] as String?,
@@ -113,6 +116,7 @@ class ProductApiModel {
       bidIntervalPrice: bidIntervalPrice,
       endDate: endDate,
       productImageUrls: productImageUrls,
+      buyNowPrice: buyNowPrice,
       isVerified: isVerified,
       isSoldOut: isSoldOut,
       soldToBuyerId: soldToBuyerId,
@@ -135,6 +139,7 @@ class ProductApiModel {
       bidIntervalPrice: productEntity.bidIntervalPrice,
       endDate: productEntity.endDate,
       productImageUrls: productEntity.productImageUrls,
+      buyNowPrice: productEntity.buyNowPrice,
       isVerified: productEntity.isVerified,
       isSoldOut: productEntity.isSoldOut,
       soldToBuyerId: productEntity.soldToBuyerId,
@@ -172,6 +177,7 @@ class ProductApiModel {
     double? bidIntervalPrice,
     DateTime? endDate,
     List<String>? productImageUrls,
+    double? buyNowPrice,
     bool? isVerified,
     bool? isSoldOut,
     String? soldToBuyerId,
@@ -190,6 +196,7 @@ class ProductApiModel {
       bidIntervalPrice: bidIntervalPrice ?? this.bidIntervalPrice,
       endDate: endDate ?? this.endDate,
       productImageUrls: productImageUrls ?? this.productImageUrls,
+      buyNowPrice: buyNowPrice ?? this.buyNowPrice,
       isVerified: isVerified ?? this.isVerified,
       isSoldOut: isSoldOut ?? this.isSoldOut,
       soldToBuyerId: soldToBuyerId ?? this.soldToBuyerId,

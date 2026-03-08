@@ -229,7 +229,7 @@ class ProductRemoteDatasource implements IProductRemoteDatasource {
       ApiEndpoints.getAllProductsByBuyerId(buyerId),
     );
     final success = response.data["success"] as bool;
-    final data = response.data["data"] as List<Map<String, dynamic>>?;
+    final data = response.data["data"] as List<dynamic>?;
 
     if (!success || data == null) {
       return [];
@@ -247,7 +247,7 @@ class ProductRemoteDatasource implements IProductRemoteDatasource {
       ApiEndpoints.getAllProductsBySellerId(sellerId),
     );
     final success = response.data["success"] as bool;
-    final data = response.data["data"] as List<Map<String, dynamic>>?;
+    final data = response.data["data"] as List<dynamic>?;
 
     if (!success || data == null) {
       return [];

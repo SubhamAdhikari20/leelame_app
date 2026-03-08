@@ -45,12 +45,19 @@ class SellerRepository implements ISellerRepository {
   ) async {
     if (await _networkInfo.isConnected) {
       try {
-        final seller = await _sellerRemoteDatasource.getCurrentSeller(sellerId);
-        if (seller == null) {
+        final result = await _sellerRemoteDatasource.getCurrentSeller(sellerId);
+        if (result == null) {
           return const Left(
             ApiFailure(message: "Failed to get current seller!"),
           );
         }
+
+        final normalizedProfilePictureUrl = HttpUrlUtil.normalizeHttpUrl(
+          result.profilePictureUrl,
+        );
+        final seller = result.copyWith(
+          profilePictureUrl: normalizedProfilePictureUrl,
+        );
 
         return Right(seller.toEntity());
       } on DioException catch (e) {
@@ -106,7 +113,14 @@ class SellerRepository implements ISellerRepository {
           );
         }
 
-        return Right(result.toEntity());
+        final normalizedProfilePictureUrl = HttpUrlUtil.normalizeHttpUrl(
+          result.profilePictureUrl,
+        );
+        final seller = result.copyWith(
+          profilePictureUrl: normalizedProfilePictureUrl,
+        );
+
+        return Right(seller.toEntity());
       } on DioException catch (e) {
         return Left(
           ApiFailure(
@@ -150,7 +164,18 @@ class SellerRepository implements ISellerRepository {
           );
         }
 
-        return Right(imageUrl);
+        final normalizedProfilePictureUrl = HttpUrlUtil.normalizeHttpUrl(
+          imageUrl,
+        );
+        if (normalizedProfilePictureUrl == null) {
+          return const Left(
+            ApiFailure(
+              message: "Null image url! The image url is not fetched.",
+            ),
+          );
+        }
+
+        return Right(normalizedProfilePictureUrl);
       } on DioException catch (e) {
         return Left(
           ApiFailure(

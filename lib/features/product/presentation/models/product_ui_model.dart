@@ -14,6 +14,7 @@ class ProductUiModel {
   final double bidIntervalPrice;
   final DateTime endDate;
   final List<String> productImageUrls;
+  final double? buyNowPrice;
   final bool isVerified;
   final bool isSoldOut;
   final String? soldToBuyerId;
@@ -32,6 +33,7 @@ class ProductUiModel {
     required this.bidIntervalPrice,
     required this.endDate,
     required this.productImageUrls,
+    this.buyNowPrice,
     required this.isVerified,
     required this.isSoldOut,
     this.soldToBuyerId,
@@ -53,6 +55,7 @@ class ProductUiModel {
       bidIntervalPrice: bidIntervalPrice,
       endDate: endDate,
       productImageUrls: productImageUrls,
+      buyNowPrice: buyNowPrice,
       isVerified: isVerified,
       isSoldOut: isSoldOut,
       soldToBuyerId: soldToBuyerId,
@@ -75,6 +78,7 @@ class ProductUiModel {
       bidIntervalPrice: productEntity.bidIntervalPrice,
       endDate: productEntity.endDate,
       productImageUrls: productEntity.productImageUrls,
+      buyNowPrice: productEntity.buyNowPrice,
       isVerified: productEntity.isVerified,
       isSoldOut: productEntity.isSoldOut,
       soldToBuyerId: productEntity.soldToBuyerId,
@@ -112,6 +116,7 @@ class ProductUiModel {
     double? bidIntervalPrice,
     DateTime? endDate,
     List<String>? productImageUrls,
+    double? buyNowPrice,
     bool? isVerified,
     bool? isSoldOut,
     String? soldToBuyerId,
@@ -130,6 +135,7 @@ class ProductUiModel {
       bidIntervalPrice: bidIntervalPrice ?? this.bidIntervalPrice,
       endDate: endDate ?? this.endDate,
       productImageUrls: productImageUrls ?? this.productImageUrls,
+      buyNowPrice: buyNowPrice ?? this.buyNowPrice,
       isVerified: isVerified ?? this.isVerified,
       isSoldOut: isSoldOut ?? this.isSoldOut,
       soldToBuyerId: soldToBuyerId ?? this.soldToBuyerId,

@@ -22,6 +22,7 @@ ProductApiModel _$ProductApiModelFromJson(Map<String, dynamic> json) =>
       productImageUrls: (json['productImageUrls'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
+      buyNowPrice: (json['buyNowPrice'] as num?)?.toDouble(),
       isVerified: json['isVerified'] as bool,
       isSoldOut: json['isSoldOut'] as bool,
       soldToBuyerId: json['soldToBuyerId'] as String?,
@@ -46,6 +47,7 @@ Map<String, dynamic> _$ProductApiModelToJson(
   'bidIntervalPrice': instance.bidIntervalPrice,
   'endDate': instance.endDate.toIso8601String(),
   'productImageUrls': instance.productImageUrls,
+  'buyNowPrice': instance.buyNowPrice,
   'isVerified': instance.isVerified,
   'isSoldOut': instance.isSoldOut,
   'soldToBuyerId': instance.soldToBuyerId,

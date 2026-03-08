@@ -14,6 +14,7 @@ class ProductEntity extends Equatable {
   final double bidIntervalPrice;
   final DateTime endDate;
   final List<String> productImageUrls;
+  final double? buyNowPrice;
   final bool isVerified;
   final bool isSoldOut;
   final String? soldToBuyerId;
@@ -32,6 +33,7 @@ class ProductEntity extends Equatable {
     required this.bidIntervalPrice,
     required this.endDate,
     required this.productImageUrls,
+    this.buyNowPrice,
     required this.isVerified,
     required this.isSoldOut,
     this.soldToBuyerId,
@@ -52,6 +54,7 @@ class ProductEntity extends Equatable {
     bidIntervalPrice,
     endDate,
     productImageUrls,
+    buyNowPrice,
     isVerified,
     isSoldOut,
     soldToBuyerId,
@@ -71,6 +74,7 @@ class ProductEntity extends Equatable {
     double? bidIntervalPrice,
     DateTime? endDate,
     List<String>? productImageUrls,
+    double? buyNowPrice,
     bool? isVerified,
     bool? isSoldOut,
     String? soldToBuyerId,
@@ -89,6 +93,7 @@ class ProductEntity extends Equatable {
       bidIntervalPrice: bidIntervalPrice ?? this.bidIntervalPrice,
       endDate: endDate ?? this.endDate,
       productImageUrls: productImageUrls ?? this.productImageUrls,
+      buyNowPrice: buyNowPrice ?? this.buyNowPrice,
       isVerified: isVerified ?? this.isVerified,
       isSoldOut: isSoldOut ?? this.isSoldOut,
       soldToBuyerId: soldToBuyerId ?? this.soldToBuyerId,

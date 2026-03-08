@@ -18,6 +18,7 @@ class AddProductUsecaseParams extends Equatable {
   final double startPrice;
   final double bidIntervalPrice;
   final DateTime endDate;
+  final double? buyNowPrice;
   final List<File>? productImages;
   final String? imageSubFolder;
 
@@ -30,6 +31,7 @@ class AddProductUsecaseParams extends Equatable {
     required this.startPrice,
     required this.bidIntervalPrice,
     required this.endDate,
+    this.buyNowPrice,
     this.productImages,
     this.imageSubFolder,
   });
@@ -44,6 +46,7 @@ class AddProductUsecaseParams extends Equatable {
     startPrice,
     bidIntervalPrice,
     endDate,
+    buyNowPrice,
     productImages,
     imageSubFolder,
   ];
@@ -77,6 +80,7 @@ class AddProductUsecase
       bidIntervalPrice: params.bidIntervalPrice,
       endDate: params.endDate,
       productImageUrls: [],
+      buyNowPrice: params.buyNowPrice,
       isVerified: false,
       isSoldOut: false,
     );

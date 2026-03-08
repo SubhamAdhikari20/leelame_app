@@ -49,6 +49,7 @@ class ProductViewModel extends Notifier<ProductState> {
     required double startPrice,
     required double bidIntervalPrice,
     required DateTime endDate,
+    double? buyNowPrice,
     List<File>? productImages,
     String? imageSubFolder,
   }) async {
@@ -63,6 +64,7 @@ class ProductViewModel extends Notifier<ProductState> {
         startPrice: startPrice,
         bidIntervalPrice: bidIntervalPrice,
         endDate: endDate,
+        buyNowPrice: buyNowPrice,
         productImages: productImages,
         imageSubFolder: imageSubFolder,
       ),
@@ -91,6 +93,7 @@ class ProductViewModel extends Notifier<ProductState> {
     double? currentBidPrice,
     double? bidIntervalPrice,
     DateTime? endDate,
+    double? buyNowPrice,
     List<File>? productImages,
     String? imageSubFolder,
   }) async {
@@ -107,6 +110,7 @@ class ProductViewModel extends Notifier<ProductState> {
         currentBidPrice: currentBidPrice,
         bidIntervalPrice: bidIntervalPrice,
         endDate: endDate,
+        buyNowPrice: buyNowPrice,
         productImages: productImages,
         imageSubFolder: imageSubFolder,
       ),

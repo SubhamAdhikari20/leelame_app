@@ -12,7 +12,6 @@ class UpdateSellerProfileDetailsUsecaseParams extends Equatable {
   final String sellerId;
   final String? fullName;
   final String? email;
-  final String? username;
   final String? phoneNumber;
   final String? bio;
 
@@ -20,13 +19,12 @@ class UpdateSellerProfileDetailsUsecaseParams extends Equatable {
     required this.sellerId,
     this.fullName,
     this.email,
-    this.username,
     this.phoneNumber,
     this.bio,
   });
 
   @override
-  List<Object?> get props => [fullName, username, email, phoneNumber, bio];
+  List<Object?> get props => [fullName, email, phoneNumber, bio];
 }
 
 final updateSellerProfileDetailsUsecaseProvider =

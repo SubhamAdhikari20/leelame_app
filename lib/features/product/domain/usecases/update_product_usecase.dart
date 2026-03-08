@@ -20,6 +20,7 @@ class UpdateProductUsecaseParams extends Equatable {
   final double? currentBidPrice;
   final double? bidIntervalPrice;
   final DateTime? endDate;
+  final double? buyNowPrice;
   final List<File>? productImages;
   final String? imageSubFolder;
 
@@ -34,6 +35,7 @@ class UpdateProductUsecaseParams extends Equatable {
     this.currentBidPrice,
     this.bidIntervalPrice,
     this.endDate,
+    this.buyNowPrice,
     this.productImages,
     this.imageSubFolder,
   });
@@ -50,6 +52,7 @@ class UpdateProductUsecaseParams extends Equatable {
     currentBidPrice,
     bidIntervalPrice,
     endDate,
+    buyNowPrice,
     productImages,
     imageSubFolder,
   ];
@@ -90,6 +93,7 @@ class UpdateProductUsecase
           currentBidPrice: params.currentBidPrice,
           bidIntervalPrice: params.bidIntervalPrice,
           endDate: params.endDate,
+          buyNowPrice: params.buyNowPrice,
         );
 
         return await _productRepository.updateProduct(

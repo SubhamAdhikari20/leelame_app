@@ -45,15 +45,18 @@ class ProductHiveModel extends HiveObject {
   final List<String> productImageUrls;
 
   @HiveField(12)
-  final bool isVerified;
+  final double? buyNowPrice;
 
   @HiveField(13)
-  final bool isSoldOut;
+  final bool isVerified;
 
   @HiveField(14)
-  final String? soldToBuyerId;
+  final bool isSoldOut;
 
   @HiveField(15)
+  final String? soldToBuyerId;
+
+  @HiveField(16)
   final List<String>? removedExistingProductImageUrls;
 
   ProductHiveModel({
@@ -69,6 +72,7 @@ class ProductHiveModel extends HiveObject {
     required this.bidIntervalPrice,
     required this.endDate,
     required this.productImageUrls,
+    this.buyNowPrice,
     required this.isVerified,
     required this.isSoldOut,
     this.soldToBuyerId,
@@ -90,6 +94,7 @@ class ProductHiveModel extends HiveObject {
       bidIntervalPrice: bidIntervalPrice,
       endDate: endDate,
       productImageUrls: productImageUrls,
+      buyNowPrice: buyNowPrice,
       isVerified: isVerified,
       isSoldOut: isSoldOut,
       soldToBuyerId: soldToBuyerId,
@@ -112,6 +117,7 @@ class ProductHiveModel extends HiveObject {
       bidIntervalPrice: productEntity.bidIntervalPrice,
       endDate: productEntity.endDate,
       productImageUrls: productEntity.productImageUrls,
+      buyNowPrice: productEntity.buyNowPrice,
       isVerified: productEntity.isVerified,
       isSoldOut: productEntity.isSoldOut,
       soldToBuyerId: productEntity.soldToBuyerId,
@@ -142,6 +148,7 @@ class ProductHiveModel extends HiveObject {
     double? bidIntervalPrice,
     DateTime? endDate,
     List<String>? productImageUrls,
+    double? buyNowPrice,
     bool? isVerified,
     bool? isSoldOut,
     String? soldToBuyerId,
@@ -160,6 +167,7 @@ class ProductHiveModel extends HiveObject {
       bidIntervalPrice: bidIntervalPrice ?? this.bidIntervalPrice,
       endDate: endDate ?? this.endDate,
       productImageUrls: productImageUrls ?? this.productImageUrls,
+      buyNowPrice: buyNowPrice ?? this.buyNowPrice,
       isVerified: isVerified ?? this.isVerified,
       isSoldOut: isSoldOut ?? this.isSoldOut,
       soldToBuyerId: soldToBuyerId ?? this.soldToBuyerId,

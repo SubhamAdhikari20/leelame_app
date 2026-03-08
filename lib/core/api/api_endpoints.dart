@@ -111,9 +111,9 @@ class ApiEndpoints {
   static String productById(String id) => "/product/$id";
   static const String getAllProducts = "/product/get-all-verified-products";
   static String getAllProductsByBuyerId(String buyerId) =>
-      "/product/get-all-verified-products/$buyerId";
+      "/product/get-all-verified-products-by-buyerId/$buyerId";
   static String getAllProductsBySellerId(String sellerId) =>
-      "/product/get-all-verified-products/$sellerId";
+      "/product/get-all-verified-products-by-sellerId/$sellerId";
 
   // ======================= Bid Endpoints =======================
   static const String createBid = "/bid/create-bid";

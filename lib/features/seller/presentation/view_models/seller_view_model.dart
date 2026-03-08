@@ -87,7 +87,6 @@ class SellerViewModel extends Notifier<SellerState> {
     required String sellerId,
     String? fullName,
     String? email,
-    String? username,
     String? phoneNumber,
     String? bio,
   }) async {
@@ -100,7 +99,6 @@ class SellerViewModel extends Notifier<SellerState> {
       UpdateSellerProfileDetailsUsecaseParams(
         sellerId: sellerId,
         fullName: fullName,
-        username: username,
         phoneNumber: phoneNumber,
         bio: bio,
       ),

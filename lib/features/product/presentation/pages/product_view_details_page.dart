@@ -19,8 +19,9 @@ import 'package:leelame/features/category/presentation/view_models/category_view
 import 'package:leelame/features/product/presentation/models/product_ui_model.dart';
 import 'package:leelame/features/product/presentation/states/product_state.dart';
 import 'package:leelame/features/product/presentation/viewmodels/product_view_model.dart';
+import 'package:leelame/features/product/presentation/widgets/bid_history_tile_widget.dart';
 import 'package:leelame/features/product/presentation/widgets/favorite_button_widget.dart';
-import 'package:leelame/features/product/presentation/widgets/time_ago_widget.dart';
+import 'package:leelame/features/product/presentation/widgets/product_image_carousel_widget.dart';
 import 'package:leelame/features/product_condition/presentation/states/product_condition_state.dart';
 import 'package:leelame/features/product_condition/presentation/view_models/product_condition_view_model.dart';
 import 'package:leelame/features/seller/presentation/states/seller_state.dart';
@@ -262,6 +263,40 @@ class _ProductViewDetailsPageState
           buyerId: buyerId,
           bidAmount: bidAmount,
         );
+  }
+
+  Future<void> _handleBuyNow(ProductUiModel product) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Confirm Purchase'),
+        content: Text(
+          'Buy "${product.productName}" now for ${_formatAmount(product.buyNowPrice ?? 0)}?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryButtonColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Buy Now', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+    // if (confirmed == true && mounted) {
+    //   await ref
+    //       .read(productViewModelProvider.notifier)
+    //       .buyNow(productId: product.productId, buyerId: widget.currentUserId);
+    // }
   }
 
   void _showBidBottomSheet(ProductUiModel product) {
@@ -561,6 +596,8 @@ class _ProductViewDetailsPageState
       }
     });
 
+    final hasBuyNow = productState.selectedProduct?.buyNowPrice != null;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -640,7 +677,7 @@ class _ProductViewDetailsPageState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Product Images
-                          _ProductImageCarousel(
+                          ProductImageCarousel(
                             imageUrls:
                                 productState.selectedProduct!.productImageUrls,
                             height: isTablet ? 400 : 300,
@@ -897,12 +934,17 @@ class _ProductViewDetailsPageState
                                 return buyerState.buyers
                                     .map(
                                       (buyer) => buyer.buyerId == bid.buyerId
-                                          ? _BidHistoryTile(
+                                          ? BidHistoryTile(
                                               buyer: BuyerUiModel.fromEntity(
                                                 buyer,
                                               ),
                                               bid: BidUiModel.fromEntity(bid),
                                               isHighest: isHighest,
+                                              product:
+                                                  ProductUiModel.fromEntity(
+                                                    productState
+                                                        .selectedProduct!,
+                                                  ),
 
                                               // name: buyer.fullName,
                                               // amount: _formatAmount(
@@ -948,7 +990,48 @@ class _ProductViewDetailsPageState
 
             // Fixed bottom Place Bid button
             if (productState.productStatus != ProductStatus.loading &&
-                productState.selectedProduct != null)
+                productState.selectedProduct != null) ...[
+              if (hasBuyNow)
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber.shade600,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: isTablet ? 20 : 16,
+                      ),
+                      elevation: 2,
+                    ),
+                    onPressed: () => _handleBuyNow(
+                      ProductUiModel.fromEntity(productState.selectedProduct!),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Buy Now',
+                          style: TextStyle(
+                            fontSize: isTablet ? 15 : 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          _formatAmount(
+                            productState.selectedProduct!.buyNowPrice!),
+                          style: TextStyle(
+                            fontSize: isTablet ? 13 : 11,
+                            color: Colors.white.withValues(alpha: 0.9),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              const SizedBox(width: 12),
+
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
                 decoration: BoxDecoration(
@@ -989,201 +1072,9 @@ class _ProductViewDetailsPageState
                   ),
                 ),
               ),
+            ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-// Custom Image Carousel
-class _ProductImageCarousel extends StatelessWidget {
-  const _ProductImageCarousel({
-    required this.imageUrls,
-    required this.height,
-    required this.pageController,
-    required this.currentIndex,
-    required this.onPageChanged,
-    required this.favoriteWidget,
-  });
-
-  final List<String> imageUrls;
-  final double height;
-  final PageController pageController;
-  final int currentIndex;
-  final ValueChanged<int> onPageChanged;
-  final Widget favoriteWidget;
-
-  @override
-  Widget build(BuildContext context) {
-    final images = imageUrls.isNotEmpty ? imageUrls : <String>[];
-    final total = images.length;
-
-    return SizedBox(
-      height: height,
-      child: Stack(
-        children: [
-          // PageView
-          PageView.builder(
-            controller: pageController,
-            itemCount: total == 0 ? 1 : total,
-            onPageChanged: onPageChanged,
-            itemBuilder: (_, index) {
-              if (total == 0) {
-                return _imagePlaceholder();
-              }
-              return Image.network(
-                images[index],
-                width: double.infinity,
-                height: height,
-                fit: BoxFit.cover,
-                loadingBuilder: (_, child, progress) => progress == null
-                    ? child
-                    : Container(
-                        color: Colors.grey.shade100,
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                errorBuilder: (_, _, _) => _imagePlaceholder(),
-              );
-            },
-          ),
-
-          // Counter badge
-          if (total > 1)
-            Positioned(
-              top: 12,
-              right: 12,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.55),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '${currentIndex + 1} / $total',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-
-          // Favourite button
-          Positioned(
-            top: 12,
-            left: 12,
-            child: Material(color: Colors.transparent, child: favoriteWidget),
-          ),
-
-          // Dot indicators
-          if (total > 1)
-            Positioned(
-              bottom: 12,
-              left: 0,
-              right: 0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(total, (i) {
-                  final active = i == currentIndex;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
-                    width: active ? 20 : 7,
-                    height: 7,
-                    decoration: BoxDecoration(
-                      color: active
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  );
-                }),
-              ),
-            ),
-
-          // Left arrow
-          if (total > 1 && currentIndex > 0)
-            Positioned(
-              left: 8,
-              top: 0,
-              bottom: 0,
-              child: Center(
-                child: _CarouselArrow(
-                  icon: Icons.chevron_left,
-                  onTap: () => pageController.previousPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  ),
-                ),
-              ),
-            ),
-
-          // Right arrow
-          if (total > 1 && currentIndex < total - 1)
-            Positioned(
-              right: 8,
-              top: 0,
-              bottom: 0,
-              child: Center(
-                child: _CarouselArrow(
-                  icon: Icons.chevron_right,
-                  onTap: () => pageController.nextPage(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _imagePlaceholder() {
-    return Container(
-      color: Colors.grey.shade100,
-      child: Center(
-        child: Icon(
-          Icons.image_outlined,
-          size: 64,
-          color: Colors.grey.shade300,
-        ),
-      ),
-    );
-  }
-}
-
-class _CarouselArrow extends StatelessWidget {
-  const _CarouselArrow({required this.icon, required this.onTap});
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 34,
-        height: 34,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.85),
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Icon(icon, size: 22, color: Colors.black87),
       ),
     );
   }
@@ -1300,125 +1191,53 @@ class _TagChip extends StatelessWidget {
   }
 }
 
-// Bid History Tile
-class _BidHistoryTile extends StatelessWidget {
-  const _BidHistoryTile({
-    required this.buyer,
-    required this.bid,
-    this.isHighest = false,
-    // required this.time,
-    // required this.amount,
-    // required this.name,
-    // required this.timeAgo,
-  });
+class _BuyNowBanner extends StatelessWidget {
+  const _BuyNowBanner({required this.price, required this.isTablet});
 
-  final BuyerUiModel buyer;
-  final BidUiModel bid;
-  final bool isHighest;
-  // final DateTime time;
-  // final String amount;
-  // final String name;
-  // final String timeAgo;
+  final String price;
+  final bool isTablet;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: isTablet ? 14 : 12,
+      ),
       decoration: BoxDecoration(
-        color: isHighest ? Colors.purple.shade50 : Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: isHighest ? Border.all(color: Colors.purple.shade100) : null,
+        color: Colors.amber.shade50,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.amber.shade300),
       ),
       child: Row(
         children: [
-          // Avatar
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: Colors.grey.shade200,
-            backgroundImage: buyer.profilePictureUrl != null
-                ? NetworkImage(buyer.profilePictureUrl!)
-                : null,
-            child: buyer.profilePictureUrl == null
-                ? Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.purple.shade100,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.person_outline,
-                      color: Colors.purple.shade400,
-                      size: 20,
-                    ),
-                  )
-                : null,
+          Icon(
+            Icons.flash_on_rounded,
+            color: Colors.amber.shade700,
+            size: isTablet ? 24 : 20,
           ),
-          const SizedBox(width: 12),
-
-          // Name & time
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      buyer.fullName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                    if (isHighest) ...[
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.purple.shade100,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          'Highest',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.purple.shade700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Buy Now Available',
+                style: TextStyle(
+                  fontSize: isTablet ? 14 : 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.amber.shade800,
                 ),
-                const SizedBox(height: 2),
-                TimeAgoWidget(
-                  dateTime: bid.createdAt != null
-                      ? DateTime.parse(bid.createdAt!.toString()).toLocal()
-                      : DateTime.now(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textTertiaryColor,
-                  ),
+              ),
+              Text(
+                'Skip the auction and buy at $price',
+                style: TextStyle(
+                  fontSize: isTablet ? 15 : 13,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.amber.shade900,
                 ),
-                // Text(
-                //   timeAgo,
-                //   style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                // ),
-              ],
-            ),
-          ),
-
-          // Amount
-          Text(
-            "Rs. ${bid.bidAmount.toStringAsFixed(2)}",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.purple.shade700,
-            ),
+              ),
+            ],
           ),
         ],
       ),

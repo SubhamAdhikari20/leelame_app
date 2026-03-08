@@ -6,7 +6,9 @@
 Using **Clean Architecture**, the app ensures scalability, maintainability, and a robust separation of concerns—perfect for production-grade applications.
 
 <div align="center">
-  <img src="https://i.ibb.co/7nL4Z6G/leelame-logo.png" alt="Leelame Logo" width="200">
+  <!-- <img src="/assets/images/leelame_logo_cropped_png.png" alt="Leelame Logo" width="200"> -->
+
+  ![Alt text](/assets/images/leelame_logo_cropped_png.png)
 
   <br/>
 

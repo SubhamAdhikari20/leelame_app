@@ -12,7 +12,7 @@ import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/product/presentation/pages/add_new_product_page.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_analytics_screen.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_home_screen.dart';
-import 'package:leelame/features/seller/presentation/pages/screens/seller_orders_screen.dart';
+import 'package:leelame/features/seller/presentation/pages/screens/seller_my_products_screen.dart';
 import 'package:leelame/features/seller/presentation/pages/screens/seller_profile_screen.dart';
 import 'package:leelame/features/seller/presentation/states/seller_state.dart';
 import 'package:leelame/features/seller/presentation/view_models/seller_view_model.dart';
@@ -30,7 +30,7 @@ class _SellerDashboardPageState extends ConsumerState<SellerDashboardPage> {
 
   List<Widget> lstBottomScreen = [
     SellerHomeScreen(),
-    SellerOrdersScreen(),
+    SellerMyProductsScreen(),
     SellerAnalyticsScreen(),
     SellerProfileScreen(),
   ];
@@ -110,7 +110,7 @@ class _SellerDashboardPageState extends ConsumerState<SellerDashboardPage> {
             BottomNavigationBarItem(
               activeIcon: Icon(Icons.shopping_bag),
               icon: Icon(Icons.shopping_bag_outlined),
-              label: "Oders",
+              label: "My Products",
             ),
             BottomNavigationBarItem(
               activeIcon: Icon(Icons.analytics),
