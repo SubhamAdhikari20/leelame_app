@@ -1,6 +1,7 @@
 // lib/core/services/proximity_service.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:proximity_sensor/proximity_sensor.dart';
 
 class ProximitySensorService {
@@ -14,9 +15,18 @@ class ProximitySensorService {
   }
 
   void stop() {
-    _subscription?.cancel();
+    final subscription = _subscription;
     _subscription = null;
     isPrivacyMode.value = false;
+
+    // Some platform/plugin versions throw when cancel is called after the
+    // native stream is already inactive. Swallow that specific cleanup error.
+    subscription?.cancel().catchError((error) {
+      if (error is! PlatformException) {
+        throw error;
+      }
+      debugPrint('Proximity stream already inactive during cancel: $error');
+    });
   }
 
   void dispose() {

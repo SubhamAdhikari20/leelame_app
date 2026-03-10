@@ -47,7 +47,17 @@ class SellerRemoteDatasource implements ISellerRemoteDatasource {
   @override
   Future<SellerApiModel?> updateSeller(SellerApiModel sellerApiModel) async {
     final token = _tokenService.getToken();
-    final body = sellerApiModel.toJson(userApiModel: sellerApiModel.baseUser);
+    final rawBody = sellerApiModel.toJson(
+      userApiModel: sellerApiModel.baseUser,
+    );
+    final body = <String, dynamic>{};
+    rawBody.forEach((key, value) {
+      if (value != null) {
+        body[key] = value;
+      }
+    });
+    // final token = _tokenService.getToken();
+    // final body = sellerApiModel.toJson(userApiModel: sellerApiModel.baseUser);
     final response = await _apiClient.put(
       ApiEndpoints.sellerUpdateById(sellerApiModel.id!),
       data: body,
@@ -80,9 +90,9 @@ class SellerRemoteDatasource implements ISellerRemoteDatasource {
     });
 
     final token = _tokenService.getToken();
-    final response = await _apiClient.uploadFile(
+    final response = await _apiClient.put(
       ApiEndpoints.sellerUploadProfilePicture(sellerId),
-      formData: formData,
+      data: formData,
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );
 

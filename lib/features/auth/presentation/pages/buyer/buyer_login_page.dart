@@ -12,7 +12,6 @@ import 'package:leelame/features/buyer/presentation/pages/dashboard_page.dart';
 import 'package:leelame/core/widgets/custom_outlined_button.dart';
 import 'package:leelame/core/widgets/custom_primary_button.dart';
 import 'package:leelame/features/auth/presentation/widgets/custom_auth_text_field.dart';
-import 'package:leelame/features/auth/presentation/widgets/or_divider.dart';
 
 class BuyerLoginPage extends ConsumerStatefulWidget {
   const BuyerLoginPage({super.key});
@@ -176,24 +175,6 @@ class _BuyerLoginPageState extends ConsumerState<BuyerLoginPage> {
                           ],
                         ),
                       ),
-
-                      // OR Divider
-                      const OrDivider(),
-                      const SizedBox(height: 20),
-
-                      // Google Sign in
-                      CustomOutlinedButton(
-                        onPressed: () {},
-                        text: "Sign in with Google",
-                        prefixIcon: Image.asset(
-                          "assets/icons/google_icon.png",
-                          height: 25,
-                          width: 25,
-                        ),
-                        // If you don't have the asset yet, temporarily use:
-                        // prefixIcon: const Text("G ", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue)),
-                      ),
-                      const SizedBox(height: 50),
 
                       // Don't have an account?
                       const Text(

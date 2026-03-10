@@ -7,6 +7,7 @@ import 'package:leelame/core/services/storage/user_session_service.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/product/presentation/models/product_ui_model.dart';
 import 'package:leelame/features/product/presentation/pages/add_new_product_page.dart';
+import 'package:leelame/features/product/presentation/pages/seller_product_view_details_page.dart';
 import 'package:leelame/features/product/presentation/pages/update_product_details_page.dart';
 import 'package:leelame/features/product/presentation/states/product_state.dart';
 import 'package:leelame/features/product/presentation/viewmodels/product_view_model.dart';
@@ -136,14 +137,22 @@ class _SellerMyProductsScreenState extends ConsumerState<SellerMyProductsScreen>
   }
 
   void _goToDetail(ProductUiModel product) {
+    if (product.productId == null ||
+        product.categoryId == null ||
+        product.conditionId == null ||
+        _sellerId == null) {
+      SnackbarUtil.showError(context, 'Unable to open product details.');
+      return;
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => UpdateProductPage(
-          productId: product.productId ?? "",
-          categoryId: product.categoryId ?? '',
-          productConditionId: product.conditionId ?? '',
-          sellerId: _sellerId ?? '',
+        builder: (_) => SellerProductViewDetailsPage(
+          productId: product.productId!,
+          categoryId: product.categoryId!,
+          productConditionId: product.conditionId!,
+          currentUserId: _sellerId!,
         ),
       ),
     ).then((_) => _loadProducts());
@@ -508,7 +517,7 @@ class _ProductGridCard extends StatelessWidget {
                           fit: BoxFit.cover,
                           loadingBuilder: (_, child, p) =>
                               p == null ? child : _imgLoading(),
-                          errorBuilder: (_, _,_) => _imgPlaceholder(),
+                          errorBuilder: (_, _, _) => _imgPlaceholder(),
                         )
                       : _imgPlaceholder(),
                 ),

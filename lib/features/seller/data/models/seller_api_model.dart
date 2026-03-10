@@ -166,6 +166,9 @@ class SellerApiModel {
       profilePictureUrl: sellerEntity.profilePictureUrl,
       bio: sellerEntity.bio,
       baseUserId: sellerEntity.baseUserId,
+      baseUser: sellerEntity.userEntity != null
+          ? UserApiModel.fromEntity(sellerEntity.userEntity!)
+          : null,
       sellerNotes: sellerEntity.sellerNotes,
       sellerStatus: sellerEntity.sellerStatus,
       sellerVerificationDate: sellerEntity.sellerVerificationDate,

@@ -12,28 +12,38 @@ class CustomTabItem extends StatelessWidget {
     return Tab(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            title,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontFamily: "OpenSans Medium"),
+          Flexible(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+              style: const TextStyle(fontFamily: 'OpenSans Medium'),
+            ),
           ),
-          count > 0
-              ? Container(
-                  margin: EdgeInsetsDirectional.only(start: 5),
-                  padding: EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      count > 9 ? "9+" : count.toString(),
-                      style: TextStyle(color: Colors.black54, fontSize: 10),
-                    ),
-                  ),
-                )
-              : SizedBox(width: 0, height: 0),
+          if (count > 0) ...[
+            const SizedBox(width: 4),
+            Container(
+              width: 20,
+              height: 20,
+              constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Text(
+                  count > 99 ? '99+' : count.toString(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.black54, fontSize: 9),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

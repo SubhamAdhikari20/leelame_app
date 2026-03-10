@@ -76,14 +76,6 @@ class _SellerEditProfilePageState extends ConsumerState<SellerEditProfilePage> {
           phoneNumber: _phoneNumberController.text.trim(),
           bio: _bioController.text.trim(),
         );
-
-    // final sellerId = widget.sellerUiModel?.sellerId;
-    // if (sellerId != null) {
-    //   await ref
-    //       .read(sellerViewModelProvider.notifier)
-    //       .updateSeller(sellerId: sellerId);
-    // }
-    // }
   }
 
   Future<void> _handleUploadProfilePicture(File profilePicture) async {
@@ -514,6 +506,10 @@ class _SellerEditProfilePageState extends ConsumerState<SellerEditProfilePage> {
         if (_profileImage != null) {
           _profileImage = null;
         }
+        ref
+            .read(sellerViewModelProvider.notifier)
+            .getCurrentUser(sellerId: widget.sellerId);
+
         SnackbarUtil.showSuccess(
           context,
           "User profile picture uploaded successfully!",
@@ -703,16 +699,6 @@ class _SellerEditProfilePageState extends ConsumerState<SellerEditProfilePage> {
                                   },
                                 ),
                                 SizedBox(height: 20),
-
-                                // Username Text Field
-                                const Text(
-                                  "Username",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
 
                                 // Email Text Field
                                 const Text(

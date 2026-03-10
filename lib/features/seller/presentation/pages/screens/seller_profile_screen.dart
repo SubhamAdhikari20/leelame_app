@@ -11,7 +11,6 @@ import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/auth/presentation/pages/seller/seller_login_sign_up_page.dart';
 import 'package:leelame/features/auth/presentation/states/seller_auth_state.dart';
 import 'package:leelame/features/auth/presentation/view_models/seller_auth_view_model.dart';
-import 'package:leelame/features/product/presentation/models/product_ui_model.dart';
 import 'package:leelame/features/product/presentation/states/product_state.dart';
 import 'package:leelame/features/product/presentation/viewmodels/product_view_model.dart';
 import 'package:leelame/features/seller/presentation/models/seller_ui_model.dart';
@@ -41,7 +40,6 @@ class _SellerProfileScreenState extends ConsumerState<SellerProfileScreen> {
     _proximitySvc.isPrivacyMode.addListener(() => setState(() {}));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
-
       _startShake();
     });
   }
@@ -327,8 +325,10 @@ class _SellerProfileScreenState extends ConsumerState<SellerProfileScreen> {
                 _StatBadge(
                   label: 'Sold',
                   value: productState.products
-                      .map((product) => product.isSoldOut ? 1 : 0)
-                      .reduce((a, b) => a + b)
+                      .fold<int>(
+                        0,
+                        (sum, product) => sum + (product.isSoldOut ? 1 : 0),
+                      )
                       .toString(),
                   // value: seller?.totalSold?.toString() ?? '0',
                   isPrivate: isPrivate,
@@ -393,27 +393,7 @@ class _SellerProfileScreenState extends ConsumerState<SellerProfileScreen> {
           },
         ),
         const SizedBox(height: 12),
-        _MenuItem(
-          icon: Icons.inventory_2_outlined,
-          title: 'My Products',
-          isTablet: isTablet,
-          onTap: () => _loadData(),
-        ),
-        const SizedBox(height: 12),
-        _MenuItem(
-          icon: Icons.bar_chart_rounded,
-          title: 'Sales Analytics',
-          isTablet: isTablet,
-          onTap: () {},
-        ),
-        const SizedBox(height: 12),
-        // _MenuItem(
-        //   icon: Icons.notifications_outlined,
-        //   title: 'Notifications',
-        //   isTablet: isTablet,
-        //   onTap: () {},
-        // ),
-        // const SizedBox(height: 24),
+
         _MenuItem(
           icon: Icons.logout_rounded,
           title: 'Logout',
@@ -529,88 +509,3 @@ class _MenuItem extends StatelessWidget {
     );
   }
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:leelame/app/routes/app_routes.dart';
-// import 'package:leelame/app/theme/app_colors.dart';
-// import 'package:leelame/core/utils/snackbar_util.dart';
-// import 'package:leelame/core/widgets/custom_primary_button.dart';
-// import 'package:leelame/features/auth/presentation/pages/seller/seller_login_sign_up_page.dart';
-// import 'package:leelame/features/auth/presentation/states/seller_auth_state.dart';
-// import 'package:leelame/features/auth/presentation/view_models/seller_auth_view_model.dart';
-
-// class SellerProfileScreen extends ConsumerStatefulWidget {
-//   const SellerProfileScreen({super.key});
-
-//   @override
-//   ConsumerState<ConsumerStatefulWidget> createState() =>
-//       _SellerProfileScreenState();
-// }
-
-// class _SellerProfileScreenState extends ConsumerState<SellerProfileScreen> {
-//   Future<void> _handleLogout() async {
-//     await ref.read(sellerAuthViewModelProvider.notifier).logout();
-//   }
-
-//   void _showLogoutDialog(BuildContext context) {
-//     showDialog(
-//       context: context,
-//       builder: (context) => AlertDialog(
-//         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-//         title: Text('Logout', style: TextStyle(fontWeight: FontWeight.bold)),
-//         content: Text('Are you sure you want to logout?'),
-//         actions: [
-//           TextButton(
-//             onPressed: () => AppRoutes.pop(context),
-//             child: Text(
-//               'Cancel',
-//               style: TextStyle(color: AppColors.textPrimaryColor),
-//             ),
-//           ),
-//           TextButton(
-//             onPressed: _handleLogout,
-//             child: Text(
-//               'Logout',
-//               style: TextStyle(
-//                 color: AppColors.error,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final sellerAuthState = ref.watch(sellerAuthViewModelProvider);
-
-//     ref.listen<SellerAuthState>(sellerAuthViewModelProvider, (previous, next) {
-//       if (next.sellerAuthStatus == SellerAuthStatus.error &&
-//           next.errorMessage != null) {
-//         SnackbarUtil.showError(context, next.errorMessage ?? "Logout Failed!");
-//       } else if (next.sellerAuthStatus == SellerAuthStatus.unauthenticated) {
-//         SnackbarUtil.showSuccess(context, "Logged out successfully.");
-
-//         // Navigate to seller login and sign up page
-//         AppRoutes.pop(context);
-//         AppRoutes.pushAndRemoveUntil(context, const SellerLoginSignUpPage());
-//       }
-//     });
-
-//     return Scaffold(
-//       body: Center(
-//         child: CustomPrimaryButton(
-//           onPressed: () {
-//             _showLogoutDialog(context);
-//           },
-//           text: "Logout",
-//           isLoading:
-//               sellerAuthState.sellerAuthStatus == SellerAuthStatus.loading,
-//         ),
-//       ),
-//     );
-//   }
-// }

@@ -29,6 +29,19 @@ class ProductRemoteDatasource implements IProductRemoteDatasource {
   }) : _apiClient = apiClient,
        _tokenService = tokenService;
 
+  Map<String, dynamic> _buildUpdatePayload(ProductApiModel productModel) {
+    final payload = Map<String, dynamic>.from(productModel.toJson());
+
+    // Backend DTO currently expects this typoed key and requires an array.
+    payload['removedExisitingProductImageUrls'] =
+        productModel.removedExistingProductImageUrls ?? <String>[];
+
+    // Avoid sending similarly named key that backend does not validate against.
+    payload.remove('removedExistingProductImageUrls');
+
+    return payload;
+  }
+
   @override
   Future<ProductApiModel?> createProduct(
     ProductApiModel productModel,
@@ -111,11 +124,12 @@ class ProductRemoteDatasource implements IProductRemoteDatasource {
     final hasExisitingImagesRemovals =
         productModel.removedExistingProductImageUrls != null &&
         productModel.removedExistingProductImageUrls!.isNotEmpty;
+    final updatePayload = _buildUpdatePayload(productModel);
 
     if (hasNewImages || hasExisitingImagesRemovals) {
       final formMap = <String, dynamic>{
         "folder": imageSubFolder ?? "product-images",
-        "productData": jsonEncode(productModel.toJson()),
+        "productData": jsonEncode(updatePayload),
       };
 
       // final productFormData = FormData();
@@ -165,7 +179,7 @@ class ProductRemoteDatasource implements IProductRemoteDatasource {
 
     final response = await _apiClient.put(
       ApiEndpoints.updateProduct(productModel.id!),
-      data: productModel.toJson(),
+      data: updatePayload,
       options: Options(headers: authHeader),
     );
     final success = response.data["success"] as bool;
@@ -182,7 +196,7 @@ class ProductRemoteDatasource implements IProductRemoteDatasource {
   @override
   Future<bool> deleteProduct(String productId) async {
     final token = _tokenService.getToken();
-    final response = await _apiClient.post(
+    final response = await _apiClient.delete(
       ApiEndpoints.deleteProduct(productId),
       options: Options(headers: {"Authorization": "Bearer $token"}),
     );

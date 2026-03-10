@@ -49,6 +49,8 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
   final ImagePicker _imagePicker = ImagePicker();
   final List<XFile> _newImages = [];
   List<String> _existingImageUrls = [];
+  final List<String> _removedExistingImageUrls = [];
+  bool _didInitializeForm = false;
 
   String? _selectedCategoryId;
   String? _selectedConditionId;
@@ -76,6 +78,8 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
   }
 
   void _loadUpdateDetails(ProductUiModel product) {
+    if (_didInitializeForm) return;
+
     _productNameController.text = product.productName;
     _descriptionController.text = product.description ?? '';
     _startPriceController.text = product.startPrice.toString();
@@ -85,6 +89,8 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
         : '';
     _selectedCategoryId = product.categoryId;
     _selectedConditionId = product.conditionId;
+    _existingImageUrls = List<String>.from(product.productImageUrls);
+    _removedExistingImageUrls.clear();
 
     _selectedEndDate = product.endDate;
     _endDateController.text = _formatDate(_selectedEndDate!);
@@ -92,6 +98,19 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
     _selectedEndTime = tod;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _endTimeController.text = tod.format(context);
+    });
+
+    _didInitializeForm = true;
+  }
+
+  void _removeExistingImageAt(int index) {
+    if (index < 0 || index >= _existingImageUrls.length) return;
+    final imageUrl = _existingImageUrls[index];
+    setState(() {
+      _existingImageUrls.removeAt(index);
+      if (!_removedExistingImageUrls.contains(imageUrl)) {
+        _removedExistingImageUrls.add(imageUrl);
+      }
     });
   }
 
@@ -244,6 +263,9 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
           productImages: _newImages.isNotEmpty
               ? _newImages.map((x) => File(x.path)).toList()
               : null,
+          removedExistingProductImageUrls: _removedExistingImageUrls.isNotEmpty
+              ? List<String>.from(_removedExistingImageUrls)
+              : null,
           imageSubFolder: 'product-images',
         );
   }
@@ -253,7 +275,6 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
     final categoryState = ref.watch(categoryViewModelProvider);
     final productConditionState = ref.watch(productConditionViewModelProvider);
     final productState = ref.watch(productViewModelProvider);
-    final sellerState = ref.watch(sellerViewModelProvider);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
@@ -306,9 +327,11 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
       }
     });
 
-    _loadUpdateDetails(
-      ProductUiModel.fromEntity(productState.selectedProduct!),
-    );
+    if (productState.selectedProduct == null) {
+      return const Scaffold(
+        body: SafeArea(child: Center(child: CircularProgressIndicator())),
+      );
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -329,10 +352,7 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
                   ),
                   child: isTablet
                       ? _TabletLayout(
-                          leftColumn: _buildImageSection(
-                            labelSize,
-                            inputFontSize,
-                          ),
+                          leftColumn: _buildImageSection(labelSize: labelSize),
                           rightColumn: _buildFormFields(
                             categoryState: categoryState,
                             productConditionState: productConditionState,
@@ -343,7 +363,7 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildImageSection(labelSize, inputFontSize),
+                            _buildImageSection(labelSize: labelSize),
                             const SizedBox(height: 20),
                             _buildFormFields(
                               categoryState: categoryState,
@@ -372,32 +392,77 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
     );
   }
 
-  Widget _buildImageSection(double labelSize, double inputFontSize) {
+  Widget _buildImageSection({required double labelSize}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _SectionLabel(text: 'Product Images', fontSize: labelSize),
         const SizedBox(height: 12),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            _AddImageButton(onTap: _showImagePicker),
-            ..._existingImageUrls.asMap().entries.map((entry) {
-              return _ExistingImageTile(
-                imageUrl: entry.value,
-                onRemove: () =>
-                    setState(() => _existingImageUrls.removeAt(entry.key)),
-              );
-            }),
-            ..._newImages.asMap().entries.map((entry) {
-              return _NewImageTile(
-                file: File(entry.value.path),
-                onRemove: () => setState(() => _newImages.removeAt(entry.key)),
-              );
-            }),
-          ],
+        SizedBox(
+          height: 100,
+          child: Row(
+            children: [
+              _AddImageButton(onTap: _showImagePicker),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _existingImageUrls.isEmpty
+                    ? Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: AppColors.softShadow,
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'No current images',
+                          style: TextStyle(
+                            color: AppColors.textTertiaryColor,
+                            fontSize: 12,
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _existingImageUrls.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 10),
+                        itemBuilder: (context, index) {
+                          return _ExistingImageTile(
+                            imageUrl: _existingImageUrls[index],
+                            onRemove: () => _removeExistingImageAt(index),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
         ),
+        const SizedBox(height: 14),
+        if (_newImages.isNotEmpty) ...[
+          const Text(
+            'New Images',
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondaryColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 94,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _newImages.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 10),
+              itemBuilder: (context, index) {
+                final image = _newImages[index];
+                return _NewImageTile(
+                  file: File(image.path),
+                  onRemove: () => setState(() => _newImages.removeAt(index)),
+                );
+              },
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -517,59 +582,88 @@ class _UpdateProductPageState extends ConsumerState<UpdateProductPage> {
         const SizedBox(height: 20),
         _SectionLabel(text: 'End Date & Time', fontSize: labelSize),
         const SizedBox(height: 10),
+
         Row(
           children: [
             Expanded(
-              child: _StyledTextFormField(
-                controller: _endDateController,
-                hintText: 'YYYY-MM-DD',
-                fontSize: inputFontSize,
-                readOnly: true,
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate:
-                        _selectedEndDate ??
-                        DateTime.now().add(const Duration(days: 7)),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                  );
-                  if (picked != null) {
-                    setState(() {
-                      _selectedEndDate = picked;
-                      _endDateController.text = _formatDate(picked);
-                      _selectedEndTime ??= TimeOfDay.now();
-                      _endTimeController.text = _selectedEndTime!.format(
-                        context,
-                      );
-                    });
-                  }
-                },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: AppColors.softShadow,
+                ),
+                child: TextFormField(
+                  controller: _endDateController,
+                  readOnly: true,
+                  onTap: () async {
+                    final DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now().add(Duration(days: 7)),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(Duration(days: 365)),
+                    );
+
+                    if (pickedDate != null) {
+                      setState(() {
+                        _selectedEndDate = pickedDate;
+                        _endDateController.text = _formatDate(pickedDate);
+
+                        // If time was not yet selected, populate a sensible default
+                        if (_selectedEndTime == null) {
+                          _selectedEndTime = TimeOfDay.now();
+                          _endTimeController.text = _selectedEndTime!.format(
+                            context,
+                          );
+                        }
+                      });
+                    }
+                  },
+                  decoration: const InputDecoration(
+                    hintText: "YYYY-MM-DD",
+                    hintStyle: TextStyle(color: AppColors.textTertiaryColor),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(16),
+                  ),
+                ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
+
             Expanded(
-              child: _StyledTextFormField(
-                controller: _endTimeController,
-                hintText: 'HH:MM AM/PM',
-                fontSize: inputFontSize,
-                readOnly: true,
-                onTap: () async {
-                  final picked = await showTimePicker(
-                    context: context,
-                    initialTime: _selectedEndTime ?? TimeOfDay.now(),
-                  );
-                  if (picked != null) {
-                    setState(() {
-                      _selectedEndTime = picked;
-                      _endTimeController.text = picked.format(context);
-                      if (_selectedEndDate == null) {
-                        _selectedEndDate = DateTime.now();
-                        _endDateController.text = _formatDate(DateTime.now());
-                      }
-                    });
-                  }
-                },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: AppColors.softShadow,
+                ),
+                child: TextFormField(
+                  controller: _endTimeController,
+                  readOnly: true,
+                  onTap: () async {
+                    final TimeOfDay? pickedTime = await showTimePicker(
+                      context: context,
+                      initialTime: _selectedEndTime ?? TimeOfDay.now(),
+                    );
+
+                    if (pickedTime != null) {
+                      setState(() {
+                        _selectedEndTime = pickedTime;
+                        _endTimeController.text = pickedTime.format(context);
+                        if (_selectedEndDate == null) {
+                          final now = DateTime.now();
+                          _selectedEndDate = now;
+                          _endDateController.text = _formatDate(now);
+                        }
+                      });
+                    }
+                  },
+                  decoration: const InputDecoration(
+                    hintText: "HH:MM: AM/PM",
+                    hintStyle: TextStyle(color: AppColors.textTertiaryColor),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(16),
+                  ),
+                ),
               ),
             ),
           ],

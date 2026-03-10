@@ -7,6 +7,7 @@ import 'package:gradient_elevated_button/gradient_elevated_button.dart';
 import 'package:leelame/app/routes/app_routes.dart';
 import 'package:leelame/app/theme/app_colors.dart';
 import 'package:leelame/core/custom_icons/notification_outlined_icon.dart';
+import 'package:leelame/core/services/storage/wishlist_service.dart';
 import 'package:leelame/core/utils/snackbar_util.dart';
 import 'package:leelame/features/bid/presentation/models/bid_ui_model.dart';
 import 'package:leelame/features/bid/presentation/states/bid_state.dart';
@@ -16,6 +17,10 @@ import 'package:leelame/features/buyer/presentation/states/buyer_state.dart';
 import 'package:leelame/features/buyer/presentation/view_models/buyer_view_model.dart';
 import 'package:leelame/features/category/presentation/states/category_state.dart';
 import 'package:leelame/features/category/presentation/view_models/category_view_model.dart';
+import 'package:leelame/features/order/domain/entities/order_entity.dart';
+import 'package:leelame/features/order/presentation/states/order_state.dart';
+import 'package:leelame/features/order/presentation/view_models/order_view_model.dart';
+import 'package:leelame/features/payment/domain/entities/payment_entity.dart';
 import 'package:leelame/features/product/presentation/models/product_ui_model.dart';
 import 'package:leelame/features/product/presentation/states/product_state.dart';
 import 'package:leelame/features/product/presentation/viewmodels/product_view_model.dart';
@@ -44,25 +49,6 @@ class ProductViewDetailsPage extends ConsumerStatefulWidget {
   final String sellerId;
   final String currentUserId;
 
-  // const ProductViewDetailsPage({
-  //   super.key,
-  //   required this.product,
-  //   required this.category,
-  //   required this.productCondition,
-  //   required this.seller,
-  //   this.bids = const [],
-  //   this.currentUser,
-  //   this.bidders = const [],
-  // });
-
-  // final ProductUiModel product;
-  // final CategoryUiModel category;
-  // final ProductConditionUiModel productCondition;
-  // final SellerUiModel seller;
-  // final List<BidUiModel> bids;
-  // final BuyerUiModel? currentUser;
-  // final List<BuyerUiModel> bidders;
-
   @override
   ConsumerState<ProductViewDetailsPage> createState() =>
       _ProductViewDetailsPageState();
@@ -73,6 +59,7 @@ class _ProductViewDetailsPageState
   final TextEditingController _bidController = TextEditingController();
   final PageController _pageController = PageController();
   int _currentImageIndex = 0;
+  bool _isFavorite = false;
 
   // Shake detection state
   StreamSubscription<AccelerometerEvent>? _accelSubscription;
@@ -106,6 +93,7 @@ class _ProductViewDetailsPageState
       ref
           .read(buyerViewModelProvider.notifier)
           .getCurrentUser(buyerId: widget.currentUserId);
+      _loadFavoriteStatus();
       _startShakeDetection();
     });
   }
@@ -201,8 +189,42 @@ class _ProductViewDetailsPageState
     }
   }
 
+  Future<void> _loadFavoriteStatus() async {
+    final isFav = ref
+        .read(wishlistServiceProvider)
+        .isWishlisted(
+          userId: widget.currentUserId,
+          productId: widget.productId,
+        );
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _isFavorite = isFav;
+    });
+  }
+
+  Future<void> _toggleFavorite(bool shouldBeFavorite) async {
+    await ref
+        .read(wishlistServiceProvider)
+        .toggleWishlist(
+          userId: widget.currentUserId,
+          productId: widget.productId,
+          shouldBeFavorite: shouldBeFavorite,
+        );
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isFavorite = shouldBeFavorite;
+    });
+  }
+
   @override
   void dispose() {
+    _accelSubscription?.cancel();
     _bidController.dispose();
     _pageController.dispose();
     super.dispose();
@@ -233,23 +255,12 @@ class _ProductViewDetailsPageState
     return "Rs. ${amount.toStringAsFixed(2)}";
   }
 
-  /// Returns the display name for a bid given the bidders list.
-  // String _bidderName(
-  //   List<BuyerUiModel> bidders,
-  //   BidUiModel bid,
-  //   int fallbackIndex,
-  // ) {
-  //   if (bidders.isNotEmpty) {
-  //     // final match = bidders.firstWhere((b) => b.buyerId == bid.buyerId);
-  //     final match = bidders
-  //         .map((b) => b.buyerId == bid.buyerId ? b : null)
-  //         .firstWhere((b) => b != null, orElse: () => null);
-  //     if (match != null) {
-  //       return match.fullName;
-  //     }
-  //   }
-  //   return "Bidder ${fallbackIndex + 1}";
-  // }
+  double _calculateCommissionAmount({
+    required double buyNowPrice,
+    required double commissionRate,
+  }) {
+    return (buyNowPrice * commissionRate) / 100;
+  }
 
   Future<void> _handlePlaceBid({
     required String productId,
@@ -292,10 +303,9 @@ class _ProductViewDetailsPageState
         ],
       ),
     );
-    // if (confirmed == true && mounted) {
-    //   await ref
-    //       .read(productViewModelProvider.notifier)
-    //       .buyNow(productId: product.productId, buyerId: widget.currentUserId);
+
+    // if (confirmed == true) {
+    //   // Proceed with the purchase
     // }
   }
 
@@ -324,6 +334,9 @@ class _ProductViewDetailsPageState
                 _bidController.text = v.toStringAsFixed(2);
               });
             }
+
+            double totalWithCommission =
+                currentAmount() + (currentAmount() * product.commission / 100);
 
             return Padding(
               padding: EdgeInsets.only(
@@ -359,9 +372,37 @@ class _ProductViewDetailsPageState
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Current bid: ${_formatAmount(currentBid)}',
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Current bid: ${_formatAmount(currentBid)}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+
+                      Text(
+                        'Service fee: ${product.commission}%',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+
+                      Text(
+                        'You will pay: ${_formatAmount(totalWithCommission)}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimaryColor,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
 
@@ -375,6 +416,7 @@ class _ProductViewDetailsPageState
                     ),
                   ),
                   const SizedBox(height: 10),
+
                   Row(
                     children: [
                       // Minus button
@@ -516,6 +558,242 @@ class _ProductViewDetailsPageState
     );
   }
 
+  void _showBuyNowCheckoutSheet(ProductUiModel product, OrderState orderState) {
+    final buyNowPrice = product.buyNowPrice;
+    if (buyNowPrice == null) {
+      SnackbarUtil.showError(context, 'Buy Now is not available for this item');
+      return;
+    }
+
+    final addressController = TextEditingController();
+    PaymentMethod selectedGateway = PaymentMethod.khalti;
+    final commissionAmount = _calculateCommissionAmount(
+      buyNowPrice: buyNowPrice,
+      commissionRate: product.commission,
+    );
+    final totalAmount = buyNowPrice + commissionAmount;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheet) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Buy Now Checkout',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: addressController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      labelText: 'Delivery Address',
+                      hintText: 'Enter complete shipping address',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<PaymentMethod>(
+                    initialValue: selectedGateway,
+                    decoration: InputDecoration(
+                      labelText: 'Payment Gateway (Test)',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    items: PaymentMethod.values
+                        .map(
+                          (gateway) => DropdownMenuItem(
+                            value: gateway,
+                            child: Text(gateway.label),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (value) {
+                      if (value == null) {
+                        return;
+                      }
+                      setSheet(() => selectedGateway = value);
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                  _checkoutRow('Buy Now Price', _formatAmount(buyNowPrice)),
+                  _checkoutRow(
+                    'Commission (${product.commission.toStringAsFixed(2)}%)',
+                    _formatAmount(commissionAmount),
+                  ),
+                  _checkoutRow(
+                    'Total',
+                    _formatAmount(totalAmount),
+                    isBold: true,
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: GradientElevatedButton(
+                      style: GradientElevatedButton.styleFrom(
+                        backgroundGradient: AppColors.auctionPrimaryGradient,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () async {
+                        final delivaryAddress = addressController.text.trim();
+                        if (delivaryAddress.isEmpty) {
+                          SnackbarUtil.showError(
+                            context,
+                            'Please enter delivery address',
+                          );
+                          return;
+                        }
+
+                        final order = await ref
+                            .read(orderViewModelProvider.notifier)
+                            .createOrder(
+                              productId: product.productId!,
+                              buyerId: widget.currentUserId,
+                              sellerId: product.sellerId!,
+                              delivaryDate: DateTime.now().add(
+                                const Duration(days: 2),
+                              ),
+                              delivaryAddress: delivaryAddress,
+                              totalPrice: totalAmount,
+                              status: OrderStatus.pending,
+                            );
+
+                        if (orderState.order == null) {
+                          if (!mounted) {
+                            return;
+                          }
+                          SnackbarUtil.showError(
+                            context,
+                            ref.read(orderViewModelProvider).errorMessage ??
+                                'Failed to create order',
+                          );
+                          return;
+                        }
+
+                        // final payment = await ref
+                        //     .read(paymentViewModelProvider.notifier)
+                        //     .processTestGatewayPayment(
+                        //       orderId: orderState.order?.orderId ?? '',
+                        //       gateway: selectedGateway,
+                        //       amount: totalAmount,
+                        //     );
+
+                        // if (payment == null) {
+                        //   await ref
+                        //       .read(orderViewModelProvider.notifier)
+                        //       .updateOrderStatus(
+                        //         orderId: orderState.order?.orderId ?? '',
+                        //         status: OrderStatus.pending,
+                        //       );
+                        //   if (!mounted) {
+                        //     return;
+                        //   }
+                        //   SnackbarUtil.showError(
+                        //     context,
+                        //     ref.read(paymentViewModelProvider).errorMessage ??
+                        //         'Payment failed',
+                        //   );
+                        //   return;
+                        // }
+
+                        final updatedOrder = await ref
+                            .read(orderViewModelProvider.notifier)
+                            .updateOrderStatus(
+                              orderId: orderState.order?.orderId ?? '',
+                              status: OrderStatus.pending,
+                            );
+
+                        // final invoice = await ref
+                        //     .read(invoiceViewModelProvider.notifier)
+                        //     .createInvoice(
+
+                        //       order: updatedOrder ?? order,
+                        //       payment: payment,
+                        //     );
+
+                        // if (!mounted) {
+                        //   return;
+                        // }
+
+                        // AppRoutes.pop(sheetCtx);
+
+                        // if (invoice == null) {
+                        //   SnackbarUtil.showSuccess(
+                        //     context,
+                        //     'Payment successful. Invoice generation failed.',
+                        //   );
+                        //   return;
+                        // }
+
+                        // SnackbarUtil.showSuccess(
+                        //   context,
+                        //   'Payment completed successfully!',
+                        // );
+                        // AppRoutes.push(
+                        //   context,
+                        //   InvoicePage(
+                        //     invoice: InvoiceUiModel.fromEntity(invoice),
+                        //   ),
+                        // );
+                      },
+                      child: const Text(
+                        'Place Order & Pay',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    ).whenComplete(addressController.dispose);
+  }
+
+  Widget _checkoutRow(String label, String value, {bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: Colors.grey.shade700)),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -585,13 +863,6 @@ class _ProductViewDetailsPageState
       } else if (next.bidStatus == BidStatus.updated) {
         SnackbarUtil.showSuccess(context, "Bid details updated successfully!");
       } else if (next.bidStatus == BidStatus.created) {
-        // ref
-        //     .read(productViewModelProvider.notifier)
-        //     .getProductById(widget.productId);
-        // ref
-        //     .read(bidViewModelProvider.notifier)
-        //     .getAllBidsByProductId(widget.productId);
-        // ref.read(buyerViewModelProvider.notifier).getAllBuyers();
         SnackbarUtil.showSuccess(context, "Bid placed successfully!");
       }
     });
@@ -652,10 +923,6 @@ class _ProductViewDetailsPageState
                           ),
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(NotificationOutlinedIcon.icon),
-                        onPressed: () {},
-                      ),
                     ],
                   ),
                   const SizedBox(height: 15),
@@ -686,8 +953,8 @@ class _ProductViewDetailsPageState
                             onPageChanged: (i) =>
                                 setState(() => _currentImageIndex = i),
                             favoriteWidget: FavoriteButtonWidget(
-                              onFavoriteToggle: (val) {},
-                              isFavorite: false,
+                              onFavoriteToggle: _toggleFavorite,
+                              isFavorite: _isFavorite,
                             ),
                           ),
 
@@ -797,6 +1064,7 @@ class _ProductViewDetailsPageState
                                       ),
                                     ),
                                     const SizedBox(height: 4),
+
                                     Text(
                                       "${bidState.bids.length} bid${bidState.bids.length != 1 ? 's' : ''}",
                                       style: TextStyle(
@@ -804,6 +1072,19 @@ class _ProductViewDetailsPageState
                                         fontSize: 13,
                                       ),
                                     ),
+                                    const SizedBox(height: 4),
+
+                                    if (productState
+                                            .selectedProduct!
+                                            .buyNowPrice !=
+                                        null)
+                                      Text(
+                                        "Buy Price: ${_formatAmount(productState.selectedProduct!.buyNowPrice!)}",
+                                        style: TextStyle(
+                                          color: Colors.grey.shade600,
+                                          fontSize: 13,
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ],
@@ -811,7 +1092,6 @@ class _ProductViewDetailsPageState
                           ),
 
                           if (sellerState.seller != null)
-                            // Seller
                             Padding(
                               padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                               child: Row(
@@ -940,26 +1220,6 @@ class _ProductViewDetailsPageState
                                               ),
                                               bid: BidUiModel.fromEntity(bid),
                                               isHighest: isHighest,
-                                              product:
-                                                  ProductUiModel.fromEntity(
-                                                    productState
-                                                        .selectedProduct!,
-                                                  ),
-
-                                              // name: buyer.fullName,
-                                              // amount: _formatAmount(
-                                              //   bid.bidAmount,
-                                              // ),
-                                              // time: bid.createdAt != null
-                                              //     ? DateTime.parse(
-                                              //         bid.createdAt!.toString(),
-                                              //       ).toLocal()
-                                              //     : DateTime.now(),
-                                              // timeAgo: bid.createdAt != null
-                                              //     ? DateTime.parse(
-                                              //         bid.createdAt!.toString(),
-                                              //       ).toLocal().toString()
-                                              //     : "",
                                             )
                                           : null,
                                     )
@@ -969,75 +1229,21 @@ class _ProductViewDetailsPageState
                                     );
                               },
                             ),
-
-                          //     _BidHistoryTile(
-                          //       name: _bidderName(
-                          //         buyerState.buyers,
-                          //         bid,
-                          //         index,
-                          //       ),
-                          //       timeAgo: "",
-                          //       amount: _formatAmount(bid.bidAmount),
-                          //       isHighest: isHighest,
-                          //     );
-                          //   },
-                          // ),
                           const SizedBox(height: 100),
                         ],
                       ),
                     ),
                   ),
 
-            // Fixed bottom Place Bid button
+            // Fixed bottom action buttons
             if (productState.productStatus != ProductStatus.loading &&
-                productState.selectedProduct != null) ...[
-              if (hasBuyNow)
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber.shade600,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: isTablet ? 20 : 16,
-                      ),
-                      elevation: 2,
-                    ),
-                    onPressed: () => _handleBuyNow(
-                      ProductUiModel.fromEntity(productState.selectedProduct!),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Buy Now',
-                          style: TextStyle(
-                            fontSize: isTablet ? 15 : 13,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          _formatAmount(
-                            productState.selectedProduct!.buyNowPrice!),
-                          style: TextStyle(
-                            fontSize: isTablet ? 13 : 11,
-                            color: Colors.white.withValues(alpha: 0.9),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              const SizedBox(width: 12),
-
+                productState.selectedProduct != null)
               Container(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  border: Border(
-                    top: BorderSide(color: const Color(0xFFDDDDDD), width: 1.0),
+                  border: const Border(
+                    top: BorderSide(color: Color(0xFFDDDDDD), width: 1.0),
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -1047,32 +1253,70 @@ class _ProductViewDetailsPageState
                     ),
                   ],
                 ),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: GradientElevatedButton(
-                    style: GradientElevatedButton.styleFrom(
-                      backgroundGradient: AppColors.auctionPrimaryGradient,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                child: Row(
+                  children: [
+                    if (hasBuyNow) ...[
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber.shade600,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: isTablet ? 20 : 16,
+                            ),
+                            elevation: 2,
+                          ),
+                          onPressed: () => _handleBuyNow(
+                            ProductUiModel.fromEntity(
+                              productState.selectedProduct!,
+                            ),
+                          ),
+                          child: const Text(
+                            'Buy Now',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      elevation: 2,
-                    ),
-                    onPressed: () => _showBidBottomSheet(
-                      ProductUiModel.fromEntity(productState.selectedProduct!),
-                    ),
-                    child: const Text(
-                      "Place Bid",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      const SizedBox(width: 12),
+                    ],
+
+                    Expanded(
+                      flex: hasBuyNow ? 2 : 1,
+                      child: GradientElevatedButton(
+                        style: GradientElevatedButton.styleFrom(
+                          backgroundGradient: AppColors.auctionPrimaryGradient,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          padding: EdgeInsets.symmetric(
+                            vertical: isTablet ? 20 : 16,
+                          ),
+                          elevation: 2,
+                        ),
+                        onPressed: () => _showBidBottomSheet(
+                          ProductUiModel.fromEntity(
+                            productState.selectedProduct!,
+                          ),
+                        ),
+                        child: const Text(
+                          'Place Bid',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
           ],
         ),
       ),
@@ -1186,60 +1430,6 @@ class _TagChip extends StatelessWidget {
           fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
-      ),
-    );
-  }
-}
-
-class _BuyNowBanner extends StatelessWidget {
-  const _BuyNowBanner({required this.price, required this.isTablet});
-
-  final String price;
-  final bool isTablet;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: isTablet ? 14 : 12,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.amber.shade50,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.amber.shade300),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.flash_on_rounded,
-            color: Colors.amber.shade700,
-            size: isTablet ? 24 : 20,
-          ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Buy Now Available',
-                style: TextStyle(
-                  fontSize: isTablet ? 14 : 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.amber.shade800,
-                ),
-              ),
-              Text(
-                'Skip the auction and buy at $price',
-                style: TextStyle(
-                  fontSize: isTablet ? 15 : 13,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.amber.shade900,
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

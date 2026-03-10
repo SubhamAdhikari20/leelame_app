@@ -95,15 +95,16 @@ class ProductViewModel extends Notifier<ProductState> {
     DateTime? endDate,
     double? buyNowPrice,
     List<File>? productImages,
+    List<String>? removedExistingProductImageUrls,
     String? imageSubFolder,
   }) async {
     state = state.copyWith(productStatus: ProductStatus.loading);
     final result = await _updateProductUsecase(
       UpdateProductUsecaseParams(
         productId: productId,
+        // sellerId: sellerId,
         productName: productName,
         description: description,
-        sellerId: sellerId,
         categoryId: categoryId,
         conditionId: conditionId,
         startPrice: startPrice,
@@ -112,6 +113,7 @@ class ProductViewModel extends Notifier<ProductState> {
         endDate: endDate,
         buyNowPrice: buyNowPrice,
         productImages: productImages,
+        removedExistingProductImageUrls: removedExistingProductImageUrls,
         imageSubFolder: imageSubFolder,
       ),
     );
@@ -139,10 +141,28 @@ class ProductViewModel extends Notifier<ProductState> {
         productStatus: ProductStatus.error,
         errorMessage: failure.message,
       ),
-      (result) => state = state.copyWith(
-        productStatus: ProductStatus.deleted,
-        selectedProduct: null,
-      ),
+      (isDeleted) {
+        if (!isDeleted) {
+          state = state.copyWith(
+            productStatus: ProductStatus.error,
+            errorMessage: 'Failed to delete product.',
+          );
+          return;
+        }
+
+        final updatedProducts = state.products
+            .where((p) => p.productId != productId)
+            .toList();
+
+        state = state.copyWith(
+          productStatus: ProductStatus.deleted,
+          products: updatedProducts,
+          selectedProduct: state.selectedProduct?.productId == productId
+              ? null
+              : state.selectedProduct,
+          errorMessage: null,
+        );
+      },
     );
   }
 

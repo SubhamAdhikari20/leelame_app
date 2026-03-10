@@ -11,9 +11,9 @@ import 'package:leelame/features/product/domain/repositories/product_repository.
 
 class UpdateProductUsecaseParams extends Equatable {
   final String productId;
+  final String? sellerId;
   final String? productName;
   final String? description;
-  final String? sellerId;
   final String? categoryId;
   final String? conditionId;
   final double? startPrice;
@@ -22,6 +22,7 @@ class UpdateProductUsecaseParams extends Equatable {
   final DateTime? endDate;
   final double? buyNowPrice;
   final List<File>? productImages;
+  final List<String>? removedExistingProductImageUrls;
   final String? imageSubFolder;
 
   const UpdateProductUsecaseParams({
@@ -37,6 +38,7 @@ class UpdateProductUsecaseParams extends Equatable {
     this.endDate,
     this.buyNowPrice,
     this.productImages,
+    this.removedExistingProductImageUrls,
     this.imageSubFolder,
   });
 
@@ -54,6 +56,7 @@ class UpdateProductUsecaseParams extends Equatable {
     endDate,
     buyNowPrice,
     productImages,
+    removedExistingProductImageUrls,
     imageSubFolder,
   ];
 }
@@ -94,6 +97,8 @@ class UpdateProductUsecase
           bidIntervalPrice: params.bidIntervalPrice,
           endDate: params.endDate,
           buyNowPrice: params.buyNowPrice,
+          removedExistingProductImageUrls:
+              params.removedExistingProductImageUrls,
         );
 
         return await _productRepository.updateProduct(

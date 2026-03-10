@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:leelame/app/theme/app_colors.dart';
 import 'package:leelame/features/bid/presentation/models/bid_ui_model.dart';
 import 'package:leelame/features/buyer/presentation/models/buyer_ui_model.dart';
-import 'package:leelame/features/product/presentation/models/product_ui_model.dart';
 import 'package:leelame/features/product/presentation/widgets/time_ago_widget.dart';
 
 class BidHistoryTile extends StatelessWidget {
@@ -12,13 +11,11 @@ class BidHistoryTile extends StatelessWidget {
     super.key,
     required this.buyer,
     required this.bid,
-    required this.product,
     this.isHighest = false,
   });
 
   final BuyerUiModel buyer;
   final BidUiModel bid;
-  final ProductUiModel product;
   final bool isHighest;
 
   @override

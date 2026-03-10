@@ -4,9 +4,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:leelame/app/theme/app_colors.dart';
-import 'package:leelame/core/custom_icons/notification_outlined_icon.dart';
-import 'package:leelame/core/custom_icons/search_icon.dart';
 import 'package:leelame/core/services/storage/user_session_service.dart';
+import 'package:leelame/core/services/storage/wishlist_service.dart';
 import 'package:leelame/core/widgets/category_toggle_item.dart';
 import 'package:leelame/core/widgets/custom_tab_item.dart';
 import 'package:leelame/features/bid/presentation/models/bid_ui_model.dart';
@@ -39,8 +38,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin {
   String? _selectedCategoryId;
   String _searchQuery = "";
+  int _selectedTabIndex = 0;
+  String? _currentBuyerId;
+  Set<String> _favoriteProductIds = <String>{};
 
   late TabController _tabController;
+  final TextEditingController _searchController = TextEditingController();
 
   StreamSubscription<AccelerometerEvent>? _accelSubscription;
   DateTime? _lastShakeTimestamp;
@@ -54,6 +57,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (!mounted) {
+        return;
+      }
+
+      if (_selectedTabIndex != _tabController.index) {
+        setState(() {
+          _selectedTabIndex = _tabController.index;
+        });
+      }
+    });
+    _searchController.addListener(
+      () => setState(() => _searchQuery = _searchController.text.toLowerCase()),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(categoryViewModelProvider.notifier).getAllCategories();
       ref
@@ -155,12 +172,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       await ref
           .read(buyerViewModelProvider.notifier)
           .getCurrentUser(buyerId: buyerId);
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _currentBuyerId = buyerId;
+        _favoriteProductIds = ref
+            .read(wishlistServiceProvider)
+            .getWishlistProductIds(buyerId);
+      });
     }
+  }
+
+  Future<void> _toggleFavorite({
+    required String productId,
+    required bool shouldBeFavorite,
+  }) async {
+    final buyerId = _currentBuyerId;
+    if (buyerId == null) {
+      return;
+    }
+
+    final updated = await ref
+        .read(wishlistServiceProvider)
+        .toggleWishlist(
+          userId: buyerId,
+          productId: productId,
+          shouldBeFavorite: shouldBeFavorite,
+        );
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _favoriteProductIds = updated;
+    });
   }
 
   @override
   void dispose() {
+    _accelSubscription?.cancel();
     _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -191,6 +247,45 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
 
     return products;
+  }
+
+  List<ProductUiModel> _filterProductsByTab(
+    List<ProductUiModel> products,
+    List<BidUiModel> allBids,
+    int tabIndex,
+  ) {
+    final now = DateTime.now();
+
+    final liveAuctions = products.where((product) {
+      return !product.isSoldOut && product.endDate.toLocal().isAfter(now);
+    }).toList()..sort((a, b) => a.endDate.compareTo(b.endDate));
+
+    final endingSoon = liveAuctions.where((product) {
+      final remaining = product.endDate.toLocal().difference(now);
+      return !remaining.isNegative && remaining <= const Duration(hours: 24);
+    }).toList()..sort((a, b) => a.endDate.compareTo(b.endDate));
+
+    final newAuctions = liveAuctions.where((product) {
+      final bidsForProduct = allBids
+          .where((bid) => bid.productId == product.productId)
+          .length;
+      final remaining = product.endDate.toLocal().difference(now);
+      final lowActivity =
+          bidsForProduct <= 1 ||
+          (product.currentBidPrice - product.startPrice).abs() < 0.0001;
+
+      // Keep "New" distinct from "Ending Soon" by focusing on low-activity listings
+      // with more than 24h remaining.
+      return remaining > const Duration(hours: 24) && lowActivity;
+    }).toList()..sort((a, b) => b.endDate.compareTo(a.endDate));
+
+    if (tabIndex == 1) {
+      return endingSoon;
+    }
+    if (tabIndex == 2) {
+      return newAuctions;
+    }
+    return liveAuctions;
   }
 
   CategoryUiModel _getCategoryById(
@@ -233,21 +328,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         .toList();
     return allBidsByProductId;
   }
-
-  // List<BuyerUiModel> _getAllBiddersByProductId(
-  //   String? productId,
-  //   List<BuyerUiModel> allBuyers,
-  //   List<BidUiModel> allBids,
-  // ) {
-  //   final allBidsByProductId = _getAllBidsByProductId(productId, allBids);
-  //   final allBiddersByProductId = allBuyers
-  //       .where(
-  //         (buyer) =>
-  //             allBidsByProductId.any((bid) => bid.buyerId == buyer.buyerId),
-  //       )
-  //       .toList();
-  //   return allBiddersByProductId;
-  // }
 
   IconData _getCategoryIcon(String categoryName) {
     final name = categoryName.toLowerCase();
@@ -319,68 +399,107 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     required String sellerId,
     required String currentUserId,
   }) async {
-    await Navigator.of(context)
-        .push(
-          MaterialPageRoute(
-            builder: (_) => ProductViewDetailsPage(
-              productId: productId,
-              categoryId: categoryId,
-              productConditionId: productConditionId,
-              sellerId: sellerId,
-              currentUserId: currentUserId,
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ProductViewDetailsPage(
+          productId: productId,
+          categoryId: categoryId,
+          productConditionId: productConditionId,
+          sellerId: sellerId,
+          currentUserId: currentUserId,
+        ),
+      ),
+    );
+
+    await Future.wait([
+      ref.read(categoryViewModelProvider.notifier).getAllCategories(),
+      ref
+          .read(productConditionViewModelProvider.notifier)
+          .getAllProductConditions(),
+      ref.read(productViewModelProvider.notifier).getAllProducts(),
+      ref.read(sellerViewModelProvider.notifier).getAllSellers(),
+      ref.read(bidViewModelProvider.notifier).getAllBids(),
+      ref.read(buyerViewModelProvider.notifier).getAllBuyers(),
+      _loadCurrentUser(),
+    ]);
+  }
+
+  Widget _buildSearchBar({required bool isTablet, required double hPad}) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(hPad, 14, hPad, 0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: AppColors.softShadow,
+        ),
+        child: TextField(
+          controller: _searchController,
+          style: TextStyle(fontSize: isTablet ? 16 : 14),
+          decoration: InputDecoration(
+            hintText: 'Search products...',
+            hintStyle: TextStyle(color: Colors.grey.shade400),
+            prefixIcon: Icon(Icons.search_rounded, color: Colors.grey.shade400),
+            suffixIcon: _searchQuery.isNotEmpty
+                ? IconButton(
+                    icon: Icon(
+                      Icons.close_rounded,
+                      color: Colors.grey.shade400,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      _searchController.clear();
+                      setState(() => _searchQuery = '');
+                    },
+                  )
+                : null,
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: isTablet ? 16 : 14,
             ),
           ),
-        )
-        .then((_) {
-          ref.read(categoryViewModelProvider.notifier).getAllCategories();
-          ref
-              .read(productConditionViewModelProvider.notifier)
-              .getAllProductConditions();
-          ref.read(productViewModelProvider.notifier).getAllProducts();
-          ref.read(sellerViewModelProvider.notifier).getAllSellers();
-          ref.read(bidViewModelProvider.notifier).getAllBids();
-          ref.read(buyerViewModelProvider.notifier).getAllBuyers();
-          _loadCurrentUser();
-        });
-
-    // AppRoutes.push(
-    //   context,
-    //   ProductViewDetailsPage(
-    //     productId: productId,
-    //     categoryId: categoryId,
-    //     productConditionId: productConditionId,
-    //     sellerId: sellerId,
-    //     currentUserId: currentUserId,
-    //   ),
-    // );
-
-    // try {
-    //   ref.read(productViewModelProvider.notifier).getAllProducts();
-    //   ref.read(bidViewModelProvider.notifier).getAllBids();
-    //   ref.read(sellerViewModelProvider.notifier).getAllSellers();
-    //   final buyerId = ref.read(userSessionServiceProvider).getUserId();
-    //   if (buyerId != null) {
-    //     ref
-    //         .read(buyerViewModelProvider.notifier)
-    //         .getCurrentUser(buyerId: buyerId);
-    //   }
-    // } catch (error) {
-    //   if (!context.mounted) {
-    //     return;
-    //   }
-    //   SnackbarUtil.showError(context, 'Refresh failed: ${error.toString()}');
-    // }
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
+    final hPad = isTablet ? screenWidth * 0.04 : 16.0;
+
     final categoryState = ref.watch(categoryViewModelProvider);
     final productConditionState = ref.watch(productConditionViewModelProvider);
     final productState = ref.watch(productViewModelProvider);
     final sellerState = ref.watch(sellerViewModelProvider);
     final buyerState = ref.watch(buyerViewModelProvider);
     final bidState = ref.watch(bidViewModelProvider);
-    final allProducts = _getAllProducts(productState);
+    final baseFilteredProducts = _getAllProducts(productState);
+    final allBids = BidUiModel.fromEntityList(bidState.bids);
+
+    final liveCount = _filterProductsByTab(
+      baseFilteredProducts,
+      allBids,
+      0,
+    ).length;
+    final endingSoonCount = _filterProductsByTab(
+      baseFilteredProducts,
+      allBids,
+      1,
+    ).length;
+    final newCount = _filterProductsByTab(
+      baseFilteredProducts,
+      allBids,
+      2,
+    ).length;
+
+    final allProducts = _filterProductsByTab(
+      baseFilteredProducts,
+      allBids,
+      _selectedTabIndex,
+    );
 
     final isLoading =
         productState.productStatus == ProductStatus.loading ||
@@ -407,30 +526,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       }),
     ];
 
+    final currentBuyerId = _currentBuyerId ?? buyerState.buyer?.buyerId;
+
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Theme.of(context).colorScheme.onPrimary,
-      //   elevation: 2,
-      //   shadowColor: Colors.grey.shade300,
-      //   leading: Padding(
-      //     padding: EdgeInsets.only(left: 10),
-      //     child: Image.asset(
-      //       "assets/images/leelame_logo_cropped_png.png",
-      //       width: MediaQuery.of(context).size.width * 0.25,
-      //       height: MediaQuery.of(context).size.width * 0.25,
-      //       fit: BoxFit.contain,
-      //     ),
-      //   ),
-      //   leadingWidth: 65,
-      //   actions: [
-      //     IconButton(icon: Icon(SearchIcon.icon), onPressed: () {}),
-      //     IconButton(
-      //       icon: Icon(NotificationOutlinedIcon.icon),
-      //       onPressed: () {},
-      //     ),
-      //   ],
-      //   actionsPadding: EdgeInsets.only(right: 10),
-      // ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -448,14 +546,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   fit: BoxFit.contain,
                 ),
               ),
-              leadingWidth: 65,
-              actions: [
-                IconButton(icon: Icon(SearchIcon.icon), onPressed: () {}),
-                IconButton(
-                  icon: Icon(NotificationOutlinedIcon.icon),
-                  onPressed: () {},
-                ),
-              ],
               flexibleSpace:
                   categoryState.categoryStatus == CategoryStatus.loading
                   ? null
@@ -526,6 +616,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
               )
             else ...[
+              SliverToBoxAdapter(
+                child: _buildSearchBar(isTablet: isTablet, hPad: hPad),
+              ),
+
               SliverPersistentHeader(
                 pinned: true,
                 delegate: SliverAppBarDelegate(
@@ -553,27 +647,77 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           vertical: 5,
                         ),
                         controller: _tabController,
+                        onTap: (index) {
+                          if (_selectedTabIndex == index) {
+                            return;
+                          }
+                          setState(() {
+                            _selectedTabIndex = index;
+                          });
+                        },
                         indicatorSize: TabBarIndicatorSize.tab,
                         dividerColor: Colors.transparent,
                         indicator: BoxDecoration(
-                          gradient: LinearGradient(
+                          gradient: const LinearGradient(
                             colors: [Color(0xFF9831E0), Color(0xFFCF2988)],
                           ),
-                          borderRadius: BorderRadius.all(Radius.circular(25)),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(25),
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x339831E0),
+                              blurRadius: 10,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
                         ),
                         labelColor: Colors.white,
                         unselectedLabelColor: Colors.grey,
                         indicatorColor: Colors.purple,
+                        labelStyle: const TextStyle(
+                          fontFamily: 'OpenSans SemiBold',
+                          fontSize: 13,
+                        ),
+                        unselectedLabelStyle: const TextStyle(
+                          fontFamily: 'OpenSans Medium',
+                          fontSize: 12.5,
+                        ),
                         tabs: [
-                          CustomTabItem(title: 'Live Auctions', count: 0),
-                          CustomTabItem(title: 'Ending Soon', count: 0),
-                          CustomTabItem(title: 'New', count: 0),
+                          CustomTabItem(
+                            title: 'Live Auctions',
+                            count: liveCount,
+                          ),
+                          CustomTabItem(
+                            title: 'Ending Soon',
+                            count: endingSoonCount,
+                          ),
+                          CustomTabItem(title: 'New', count: newCount),
                         ],
                       ),
                     ),
                   ),
                 ),
               ),
+
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(hPad, 10, hPad, 0),
+                  child: Text(
+                    _selectedTabIndex == 0
+                        ? 'Showing live auctions'
+                        : _selectedTabIndex == 1
+                        ? 'Showing auctions ending within 24h'
+                        : 'Showing newly active listings',
+                    style: TextStyle(
+                      fontSize: isTablet ? 14 : 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondaryColor,
+                    ),
+                  ),
+                ),
+              ),
+
               // Product List
               allProducts.isEmpty
                   ? SliverToBoxAdapter(
@@ -607,20 +751,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         horizontal: 15,
                         vertical: 20,
                       ),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          // final product = productState.products[index];
-                          final product = allProducts[index];
-
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 20),
-                            child:
-                                productState.productStatus ==
-                                    ProductStatus.loading
-                                ? const Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                : ProductCard(
+                      sliver: isTablet
+                          ? SliverGrid(
+                              delegate: SliverChildBuilderDelegate((
+                                context,
+                                index,
+                              ) {
+                                final product = allProducts[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: ProductCard(
                                     category: _getCategoryById(
                                       product.categoryId,
                                       CategoryUiModel.fromEntityList(
@@ -633,7 +773,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         productConditionState.productConditions,
                                       ),
                                     ),
-                                    // product: ProductUiModel.fromEntity(product),
                                     product: product,
                                     seller: _getSellerById(
                                       product.sellerId,
@@ -645,13 +784,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                       product.productId,
                                       BidUiModel.fromEntityList(bidState.bids),
                                     ),
-                                    isFavorite: false,
-                                    onFavoriteToggle: (val) {
-                                      setState(() {
-                                        true;
-                                      });
+                                    isFavorite:
+                                        product.productId != null &&
+                                        _favoriteProductIds.contains(
+                                          product.productId,
+                                        ),
+                                    onFavoriteToggle: (shouldBeFavorite) {
+                                      final productId = product.productId;
+                                      if (productId == null) {
+                                        return;
+                                      }
+                                      _toggleFavorite(
+                                        productId: productId,
+                                        shouldBeFavorite: shouldBeFavorite,
+                                      );
                                     },
                                     onTap: () {
+                                      if (product.productId == null ||
+                                          product.categoryId == null ||
+                                          product.conditionId == null ||
+                                          product.sellerId == null ||
+                                          currentBuyerId == null) {
+                                        return;
+                                      }
                                       _openProductDetailsAndRefresh(
                                         context: context,
                                         productId: product.productId!,
@@ -659,23 +814,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         productConditionId:
                                             product.conditionId!,
                                         sellerId: product.sellerId!,
-                                        currentUserId:
-                                            buyerState.buyer!.buyerId!,
+                                        currentUserId: currentBuyerId,
                                       );
-                                      // AppRoutes.push(
-                                      //   context,
-                                      //   ProductViewDetailsPage(
-                                      //     productId: product.productId!,
-                                      //     categoryId: product.categoryId!,
-                                      //     productConditionId:
-                                      //         product.conditionId!,
-                                      //     sellerId: product.sellerId!,
-                                      //     currentUserId:
-                                      //         buyerState.buyer!.buyerId!,
-                                      //   ),
-                                      // );
                                     },
                                     onPlaceBid: () {
+                                      if (product.productId == null ||
+                                          product.categoryId == null ||
+                                          product.conditionId == null ||
+                                          product.sellerId == null ||
+                                          currentBuyerId == null) {
+                                        return;
+                                      }
                                       _openProductDetailsAndRefresh(
                                         context: context,
                                         productId: product.productId!,
@@ -683,26 +832,108 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         productConditionId:
                                             product.conditionId!,
                                         sellerId: product.sellerId!,
-                                        currentUserId:
-                                            buyerState.buyer!.buyerId!,
+                                        currentUserId: currentBuyerId,
                                       );
-                                      // AppRoutes.push(
-                                      //   context,
-                                      //   ProductViewDetailsPage(
-                                      //     productId: product.productId!,
-                                      //     categoryId: product.categoryId!,
-                                      //     productConditionId:
-                                      //         product.conditionId!,
-                                      //     sellerId: product.sellerId!,
-                                      //     currentUserId:
-                                      //         buyerState.buyer!.buyerId!,
-                                      //   ),
-                                      // );
                                     },
                                   ),
-                          );
-                        }, childCount: allProducts.length),
-                      ),
+                                );
+                              }, childCount: allProducts.length),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: 0.98,
+                                  ),
+                            )
+                          : SliverList(
+                              delegate: SliverChildBuilderDelegate((
+                                context,
+                                index,
+                              ) {
+                                final product = allProducts[index];
+
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: 20),
+                                  child: ProductCard(
+                                    category: _getCategoryById(
+                                      product.categoryId,
+                                      CategoryUiModel.fromEntityList(
+                                        categoryState.categories,
+                                      ),
+                                    ),
+                                    productCondition: _getProductConditionById(
+                                      product.conditionId,
+                                      ProductConditionUiModel.fromEntityList(
+                                        productConditionState.productConditions,
+                                      ),
+                                    ),
+                                    product: product,
+                                    seller: _getSellerById(
+                                      product.sellerId,
+                                      SellerUiModel.fromEntityList(
+                                        sellerState.sellers,
+                                      ),
+                                    ),
+                                    bid: _getAllBidsByProductId(
+                                      product.productId,
+                                      BidUiModel.fromEntityList(bidState.bids),
+                                    ),
+                                    isFavorite:
+                                        product.productId != null &&
+                                        _favoriteProductIds.contains(
+                                          product.productId,
+                                        ),
+                                    onFavoriteToggle: (shouldBeFavorite) {
+                                      final productId = product.productId;
+                                      if (productId == null) {
+                                        return;
+                                      }
+                                      _toggleFavorite(
+                                        productId: productId,
+                                        shouldBeFavorite: shouldBeFavorite,
+                                      );
+                                    },
+                                    onTap: () {
+                                      if (product.productId == null ||
+                                          product.categoryId == null ||
+                                          product.conditionId == null ||
+                                          product.sellerId == null ||
+                                          currentBuyerId == null) {
+                                        return;
+                                      }
+                                      _openProductDetailsAndRefresh(
+                                        context: context,
+                                        productId: product.productId!,
+                                        categoryId: product.categoryId!,
+                                        productConditionId:
+                                            product.conditionId!,
+                                        sellerId: product.sellerId!,
+                                        currentUserId: currentBuyerId,
+                                      );
+                                    },
+                                    onPlaceBid: () {
+                                      if (product.productId == null ||
+                                          product.categoryId == null ||
+                                          product.conditionId == null ||
+                                          product.sellerId == null ||
+                                          currentBuyerId == null) {
+                                        return;
+                                      }
+                                      _openProductDetailsAndRefresh(
+                                        context: context,
+                                        productId: product.productId!,
+                                        categoryId: product.categoryId!,
+                                        productConditionId:
+                                            product.conditionId!,
+                                        sellerId: product.sellerId!,
+                                        currentUserId: currentBuyerId,
+                                      );
+                                    },
+                                  ),
+                                );
+                              }, childCount: allProducts.length),
+                            ),
                     ),
             ],
 

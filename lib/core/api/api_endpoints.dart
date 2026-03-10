@@ -127,4 +127,19 @@ class ApiEndpoints {
       "/bid/get-all-bids/$buyerId";
   static String getAllBidsBySellerId(String sellerId) =>
       "/bid/get-all-bids/$sellerId";
+
+  // ======================= Order Endpoints =======================
+  static const String createOrder = "/order/create-order";
+  static String orderById(String orderId) => "/order/$orderId";
+  static String updateOrderDetails(String orderId) =>
+      "/order/update-order-details/$orderId";
+  static String updateOrderStatus(String orderId) =>
+      "/order/update-order-status/$orderId";
+
+  // ======================= Payment Endpoints =======================
+  static const String paymentCheckout = "/payment/checkout";
+  static const String verifyPayment = "/payment/verify";
+
+  // ======================= Invoice Endpoints =======================
+  static const String createInvoice = "/initiate-payment";
 }

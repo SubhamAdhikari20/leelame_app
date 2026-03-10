@@ -16,7 +16,7 @@ class FavoriteButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => onFavoriteToggle(isFavorite),
+      onTap: () => onFavoriteToggle(!isFavorite),
       borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: EdgeInsets.all(8),

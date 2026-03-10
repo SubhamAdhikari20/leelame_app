@@ -536,9 +536,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         if (_profileImage != null) {
           _profileImage = null;
         }
-        // ref
-        //     .read(buyerViewModelProvider.notifier)
-        //     .getCurrentUser(buyerId: widget.buyerId);
+        ref
+            .read(buyerViewModelProvider.notifier)
+            .getCurrentUser(buyerId: widget.buyerId);
+
         SnackbarUtil.showSuccess(
           context,
           "User profile picture uploaded successfully!",
